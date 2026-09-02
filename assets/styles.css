@@ -1,0 +1,289 @@
+.management-dashboard {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 24px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    color: #1a1a2e;
+    background: #f4f6fb;
+}
+
+.management-dashboard *,
+.management-dashboard *::before,
+.management-dashboard *::after {
+    box-sizing: border-box;
+}
+
+.management-dashboard__header {
+    margin-bottom: 20px;
+}
+
+.management-dashboard__title {
+    margin: 0 0 6px;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.management-dashboard__subtitle {
+    margin: 0;
+    color: #5c6370;
+}
+
+.management-dashboard__filters {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+    padding: 16px;
+    background: #ffffff;
+    border: 1px solid #e3e8f0;
+    border-radius: 12px;
+}
+
+.management-dashboard__field label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #5c6370;
+}
+
+.management-dashboard__field select,
+.management-dashboard__field input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #cfd6e4;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.management-dashboard__custom-compare {
+    display: none;
+    grid-column: 1 / -1;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.management-dashboard__custom-compare.is-visible {
+    display: grid;
+}
+
+.management-dashboard__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.management-dashboard__btn {
+    padding: 10px 16px;
+    border: 0;
+    border-radius: 8px;
+    background: #2563eb;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.management-dashboard__btn--secondary {
+    background: #e8edf7;
+    color: #1a1a2e;
+}
+
+.management-dashboard__status {
+    color: #5c6370;
+    font-size: 13px;
+}
+
+.management-dashboard__status.is-error {
+    color: #b42318;
+}
+
+.management-dashboard__section {
+    margin-bottom: 24px;
+}
+
+.management-dashboard__section-title {
+    margin: 0 0 8px;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.management-dashboard__section-hint {
+    margin: 0 0 12px;
+    color: #5c6370;
+    font-size: 13px;
+}
+
+.management-dashboard__kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+}
+
+.management-dashboard__kpi-grid--overview {
+    grid-template-columns: repeat(3, minmax(200px, 1fr));
+}
+
+.management-dashboard__kpi {
+    padding: 14px;
+    background: #ffffff;
+    border: 1px solid #e3e8f0;
+    border-radius: 12px;
+}
+
+.management-dashboard__kpi--overview:nth-child(1) {
+    border-left: 4px solid #4338ca;
+}
+
+.management-dashboard__kpi--overview:nth-child(2) {
+    border-left: 4px solid #16a34a;
+}
+
+.management-dashboard__kpi--overview:nth-child(3) {
+    border-left: 4px solid #f97316;
+}
+
+.management-dashboard__kpi--earned {
+    border-top: 3px solid #16a34a;
+}
+
+.management-dashboard__kpi--manual {
+    border-top: 3px solid #f97316;
+}
+
+.management-dashboard__kpi-hint {
+    margin-top: 8px;
+    font-size: 11px;
+    line-height: 1.35;
+    color: #8b93a1;
+}
+
+.management-dashboard__kpi-label {
+    margin-bottom: 8px;
+    font-size: 12px;
+    color: #5c6370;
+}
+
+.management-dashboard__kpi-value {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.management-dashboard__kpi-delta {
+    margin-top: 6px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.management-dashboard__kpi-delta.is-up {
+    color: #067647;
+}
+
+.management-dashboard__kpi-delta.is-down {
+    color: #b42318;
+}
+
+.management-dashboard__kpi-delta.is-neutral {
+    color: #5c6370;
+}
+
+.management-dashboard__chart-wrap {
+    padding: 16px;
+    background: #ffffff;
+    border: 1px solid #e3e8f0;
+    border-radius: 12px;
+}
+
+.management-dashboard__chart-wrap--tall {
+    height: 360px;
+}
+
+.management-dashboard__toggle {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    font-size: 13px;
+    color: #5c6370;
+}
+
+.management-dashboard__table-wrap {
+    overflow-x: auto;
+    background: #ffffff;
+    border: 1px solid #e3e8f0;
+    border-radius: 12px;
+}
+
+.management-dashboard__table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.management-dashboard__table th,
+.management-dashboard__table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #eef2f7;
+    text-align: left;
+    vertical-align: top;
+}
+
+.management-dashboard__table th.is-num,
+.management-dashboard__table td.is-num {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.management-dashboard__table th {
+    background: #f8fafc;
+    font-size: 12px;
+    font-weight: 700;
+    color: #5c6370;
+}
+
+.management-dashboard__table tr.is-earned td:first-child {
+    border-left: 3px solid #16a34a;
+}
+
+.management-dashboard__table tr.is-manual td:first-child {
+    border-left: 3px solid #f97316;
+}
+
+.management-dashboard__table-hint {
+    margin-top: 4px;
+    font-size: 11px;
+    line-height: 1.35;
+    color: #8b93a1;
+    font-weight: 400;
+}
+
+.management-dashboard__table .is-up {
+    color: #067647;
+}
+
+.management-dashboard__table .is-down {
+    color: #b42318;
+}
+
+.management-dashboard__table .is-neutral {
+    color: #5c6370;
+}
+
+.management-dashboard__btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.management-dashboard__periods {
+    margin-bottom: 16px;
+    padding: 12px 16px;
+    background: #eef2ff;
+    border-radius: 10px;
+    color: #3730a3;
+    font-size: 13px;
+}
+
+.management-dashboard__hidden {
+    display: none !important;
+}

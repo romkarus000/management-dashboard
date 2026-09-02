@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управленческий отчёт — активности</title>
+    <link rel="stylesheet" href="./assets/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body class="management-dashboard">
+    <header class="management-dashboard__header">
+        <h1 class="management-dashboard__title">Управленческий отчёт</h1>
+        <p class="management-dashboard__subtitle">Активности партнёров: заработано vs ручная, полная структура способов</p>
+    </header>
+
+    <section class="management-dashboard__filters">
+        <div class="management-dashboard__field">
+            <label for="filter-period-type">Период</label>
+            <select id="filter-period-type">
+                <option value="day">День</option>
+                <option value="month" selected>Месяц</option>
+                <option value="quarter">Квартал</option>
+                <option value="year">Год</option>
+            </select>
+        </div>
+        <div class="management-dashboard__field">
+            <label for="filter-period">Дата / значение</label>
+            <input id="filter-period" type="month" value="2026-08">
+        </div>
+        <div class="management-dashboard__field">
+            <label for="filter-compare-mode">Сравнение</label>
+            <select id="filter-compare-mode">
+                <option value="previous" selected>С предыдущим периодом</option>
+                <option value="custom">Сравнение периодов</option>
+            </select>
+        </div>
+        <div class="management-dashboard__field">
+            <label for="filter-company">Компания</label>
+            <select id="filter-company">
+                <option value="0">Все</option>
+            </select>
+        </div>
+        <div id="custom-compare-fields" class="management-dashboard__custom-compare">
+            <div class="management-dashboard__field">
+                <label for="filter-compare-from">Сравнить с — от</label>
+                <input id="filter-compare-from" type="date">
+            </div>
+            <div class="management-dashboard__field">
+                <label for="filter-compare-to">Сравнить с — до</label>
+                <input id="filter-compare-to" type="date">
+            </div>
+        </div>
+    </section>
+
+    <div class="management-dashboard__actions">
+        <button id="btn-refresh-live" type="button" class="management-dashboard__btn">Обновить с API</button>
+        <button id="btn-load-snapshot" type="button" class="management-dashboard__btn management-dashboard__btn--secondary">Загрузить snapshot.json</button>
+        <label class="management-dashboard__toggle">
+            <input id="toggle-rare" type="checkbox">
+            Показать гибрид и overlap
+        </label>
+        <span id="dashboard-status" class="management-dashboard__status">Инициализация…</span>
+    </div>
+
+    <div id="periods-info" class="management-dashboard__periods"></div>
+
+    <section class="management-dashboard__section">
+        <h2 class="management-dashboard__section-title">Сводка</h2>
+        <div id="activity-overview-kpi" class="management-dashboard__kpi-grid management-dashboard__kpi-grid--overview"></div>
+    </section>
+
+    <section class="management-dashboard__section">
+        <h2 class="management-dashboard__section-title">Total vs заработано vs ручная</h2>
+        <p class="management-dashboard__section-hint">Текущий период и период сравнения — чтобы понять, за счёт чего растёт total.</p>
+        <div class="management-dashboard__chart-wrap management-dashboard__chart-wrap--tall">
+            <canvas id="activity-total-chart"></canvas>
+        </div>
+    </section>
+
+    <section class="management-dashboard__section">
+        <h2 class="management-dashboard__section-title">Структура способов</h2>
+        <p class="management-dashboard__section-hint">Обычная гистограмма: число людей по каждому способу. Оранжевый — ручная, зелёный — заработанная.</p>
+        <div class="management-dashboard__chart-wrap management-dashboard__chart-wrap--tall">
+            <canvas id="activity-structure-chart"></canvas>
+        </div>
+    </section>
+
+    <section class="management-dashboard__section">
+        <h2 class="management-dashboard__section-title">Заработанные способы</h2>
+        <div id="activity-earned-kpi" class="management-dashboard__kpi-grid"></div>
+    </section>
+
+    <section class="management-dashboard__section">
+        <h2 class="management-dashboard__section-title">Ручная активность</h2>
+        <p class="management-dashboard__section-hint">Партнёры с act=1 без заработанного способа — разбивка по основанию.</p>
+        <div id="activity-manual-kpi" class="management-dashboard__kpi-grid"></div>
+    </section>
+
+    <section class="management-dashboard__section">
+        <h2 class="management-dashboard__section-title">Таблица по способам</h2>
+        <div class="management-dashboard__table-wrap">
+            <table class="management-dashboard__table" id="activity-table">
+                <thead>
+                    <tr>
+                        <th>Способ</th>
+                        <th class="is-num">Текущий</th>
+                        <th class="is-num">Сравнение</th>
+                        <th class="is-num">Δ</th>
+                        <th class="is-num">Δ %</th>
+                    </tr>
+                </thead>
+                <tbody id="activity-table-body"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <section id="marketing-section" class="management-dashboard__section management-dashboard__hidden">
+        <h2 class="management-dashboard__section-title">Маркетинг (выбранная компания)</h2>
+        <div id="marketing-kpi" class="management-dashboard__kpi-grid"></div>
+    </section>
+
+    <script>
+        window.MGMT_REPORT_API_BASE = '/api/management-report';
+    </script>
+    <script src="./assets/app.js"></script>
+</body>
+</html>
