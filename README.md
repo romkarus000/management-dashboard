@@ -45,21 +45,37 @@ Live-режим: Bearer-токен API в query `?token=...` или в `localSto
 - `MGMT_DASHBOARD_SERVER` — SSH target (по умолчанию `root@46.149.70.15`)
 - `MGMT_DASHBOARD_PATH` — remote root (по умолчанию `/var/www/management-report`)
 
-## Когда обновлять
+## Как действуем дальше
 
-Обновляй этот репозиторий и деплой на сервер, если меняются:
+```
+total-lk-yii (API)  →  сверка контракта ключей  →  этот репо (если нужно)  →  ./scripts/deploy.sh
+```
 
-- ключи метрик в ответе `partnerActivity.summary`;
-- подписи / группы способов (`earned` vs `manual`);
-- вёрстка (`index.html`, `styles.css`).
+1. В монолите доработали backend и задеплоили `management-report` API.
+2. Смотрим ответ `partnerActivity.summary.current`: изменились ли **имена ключей** или смысл групп earned/manual.
+3. **Если да** — обновляем `assets/app.js` здесь, коммитим, деплоим на сервер.
+4. **Если нет** (поменяли только SQL/пороги, ключи те же) — фронт не трогаем, цифры подтянутся сами.
 
-Backend-only правки в `total-lk-yii` без смены ключей — дашборд не трогать.
+Push в GitHub **не** обновляет http://46.149.70.15:8080/ — только `./scripts/deploy.sh`.
 
-Порядок при смене контракта метрик:
+### Когда обновлять фронт
 
-1. Задеплоить backend (`total-lk-yii`).
-2. Обновить и задеплоить этот фронт: `./scripts/deploy.sh app.js`.
+| Ситуация | Фронт |
+|---|---|
+| Новый / переименованный / удалённый ключ в JSON | **да** |
+| Способ переехал из «ручная» в «заработано» (или наоборот) | **да** — `EARNED_KEYS` / `MANUAL_KEYS` |
+| Новая подпись или hint на карточке | **да** |
+| Правка вёрстки / фильтров / графиков | **да** |
+| Только SQL, пороги, кэш, auth — ключи те же | **нет** |
+| Правки админки owner-отчёта в Yii | **нет** (другой UI) |
+
+Порядок при смене контракта:
+
+1. Backend (`total-lk-yii`) на prod.
+2. Этот фронт + `./scripts/deploy.sh app.js`.
 3. При необходимости на app-сервере: `./yii management-report/warm-cache`.
+
+Правило для агентов: `.cursor/rules/when-to-update-frontend.mdc`.
 
 ## Ключи метрик partnerActivity (schema 2.0)
 
