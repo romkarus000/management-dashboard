@@ -771,31 +771,28 @@
 
         var token = getToken();
 
+        // Live API предпочтительнее snapshot: иначе после смены ключей метрик
+        // старый snapshot.json показывает нули по новым корзинам.
+        if (token) {
+            loadCatalog(token)
+                .then(function () {
+                    return refreshLive();
+                })
+                .catch(function (error) {
+                    setStatus('API недоступен, пробуем snapshot: ' + error.message, true);
+                    return loadSnapshotFile().catch(function (snapError) {
+                        setStatus('Нет данных: ' + snapError.message, true);
+                    });
+                });
+            return;
+        }
+
         loadSnapshotFile()
             .then(function () {
-                setStatus('Snapshot загружен. Нажми «Обновить с API» для live-данных.');
-                if (!token) {
-                    return;
-                }
-                return loadCatalog(token).then(function () {
-                    if (state.snapshot && state.snapshot.filters) {
-                        applyDefaults(state.snapshot.filters);
-                    }
-                    if (state.snapshot) {
-                        renderDashboard(state.snapshot);
-                    }
-                });
+                setStatus('Snapshot загружен. Добавь ?token=... и нажми «Обновить с API».');
             })
             .catch(function (error) {
-                if (!token) {
-                    setStatus('Нет snapshot.json: ' + error.message, true);
-                    return;
-                }
-                return loadCatalog(token).then(function () {
-                    setStatus('Выбери период и нажми «Обновить с API».');
-                }).catch(function (catalogError) {
-                    setStatus('API недоступен: ' + catalogError.message, true);
-                });
+                setStatus('Нет snapshot.json и нет token: ' + error.message, true);
             });
     }
 
