@@ -85,7 +85,9 @@ Push в GitHub **не** обновляет http://46.149.70.15:8080/ — тол�
 
 **Ручные** (`MANUAL_KEYS`):
 
-`manual_role`, `manual_human`
+`manual_ambassador`, `manual_barter_influence`, `manual_barter_solo`, `manual_coach`, `manual_human`
+
+Приоритет ручных: амбассадоры (parent 4264877 / comment «амбассадор*») → бартер инфлюенс (группа 3823) → бартер самостоятельный («блогер*») → коучи/наставники/кураторы/сотрудники → human.
 
 **Overview:** `total`, `manual` (из API), `earned` (сумма `EARNED_KEYS` на фронте)
 

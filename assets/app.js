@@ -11,7 +11,13 @@
         'purchase', 'registration', 'hybrid', 'adv', 'club',
         'partner_registration', 'product_education', 'overlap'
     ];
-    var MANUAL_KEYS = ['manual_role', 'manual_human'];
+    var MANUAL_KEYS = [
+        'manual_ambassador',
+        'manual_barter_influence',
+        'manual_barter_solo',
+        'manual_coach',
+        'manual_human'
+    ];
     var RARE_KEYS = ['hybrid', 'overlap'];
 
     var METRICS = {
@@ -73,14 +79,29 @@
             group: 'earned',
             rare: true
         },
-        manual_role: {
-            label: 'Блогеры, коучи',
-            hint: 'Ручная + WAH с ролевым комментарием',
+        manual_ambassador: {
+            label: 'Амбассадоры Fitstars',
+            hint: 'Ручная: parent 4264877 или комментарий «амбассадор*»',
+            group: 'manual'
+        },
+        manual_barter_influence: {
+            label: 'Бартер Инфлюенс',
+            hint: 'Ручная: группа user_group 3823, не амбассадор',
+            group: 'manual'
+        },
+        manual_barter_solo: {
+            label: 'Бартер самостоятельный',
+            hint: 'Ручная: комментарий «блогер*», без Fitstars и без группы 3823',
+            group: 'manual'
+        },
+        manual_coach: {
+            label: 'Коучи / наставники',
+            hint: 'Ручная: коуч, наставник, куратор, сотрудник — по комментарию',
             group: 'manual'
         },
         manual_human: {
             label: 'Ручное действие',
-            hint: 'Ручная без ролевого комментария WAH',
+            hint: 'Ручная без амбассадора, бартера и коуча',
             group: 'manual'
         }
     };
@@ -89,7 +110,8 @@
         'total', 'earned', 'manual',
         'purchase', 'registration', 'hybrid', 'adv', 'club',
         'partner_registration', 'product_education', 'overlap',
-        'manual_role', 'manual_human'
+        'manual_ambassador', 'manual_barter_influence', 'manual_barter_solo',
+        'manual_coach', 'manual_human'
     ];
 
     var state = {
