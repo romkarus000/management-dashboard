@@ -10,7 +10,7 @@ LOCAL_ROOT="${REPO_ROOT}"
 
 usage() {
     cat <<EOF
-Usage: $(basename "$0") [app.js|styles.css|index.html|snapshot.json|all]
+Usage: $(basename "$0") [app.js|styles.css|index.html|drill.html|drill.js|snapshot.json|all]
 
 Deploy management dashboard static files to ${SERVER}:${REMOTE_ROOT}
 
@@ -53,12 +53,20 @@ case "${TARGET}" in
     index.html)
         deploy_file "index.html"
         ;;
+    drill.html)
+        deploy_file "drill.html"
+        ;;
+    drill.js)
+        deploy_file "assets/drill.js"
+        ;;
     snapshot.json)
         deploy_file "snapshot.json"
         ;;
     all)
         deploy_file "index.html"
+        deploy_file "drill.html"
         deploy_file "assets/app.js"
+        deploy_file "assets/drill.js"
         deploy_file "assets/styles.css"
         ;;
     *)

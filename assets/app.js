@@ -401,6 +401,14 @@
             var card = document.createElement('div');
             card.className = 'management-dashboard__kpi management-dashboard__kpi--' + (meta.group || 'overview');
 
+            if (!meta.computed) {
+                card.classList.add('management-dashboard__kpi--link');
+                card.title = (meta.hint || meta.label) + ' — открыть drill';
+                card.addEventListener('click', function () {
+                    window.location.href = buildDrillUrl(key);
+                });
+            }
+
             var label = document.createElement('div');
             label.className = 'management-dashboard__kpi-label';
             label.textContent = meta.label;
@@ -430,6 +438,26 @@
 
             container.appendChild(card);
         });
+    }
+
+    /**
+     * URL drill-страницы с текущими фильтрами шапки.
+     *
+     * @param {string} type
+     * @returns {string}
+     */
+    function buildDrillUrl(type) {
+        var filters = readFiltersFromForm();
+        var params = new URLSearchParams();
+        params.set('type', type);
+        params.set('periodType', filters.periodType);
+        params.set('period', filters.period);
+        params.set('companyId', String(filters.companyId || 0));
+        var token = getToken();
+        if (token) {
+            params.set('token', token);
+        }
+        return 'drill.html?' + params.toString();
     }
 
     /**

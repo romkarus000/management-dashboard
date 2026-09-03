@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drill — активность партнёров</title>
+    <link rel="stylesheet" href="./assets/styles.css">
+</head>
+<body class="management-dashboard">
+    <header class="management-dashboard__header">
+        <p class="management-dashboard__subtitle">
+            <a id="back-link" href="./index.html">← К сводке</a>
+        </p>
+        <h1 id="drill-title" class="management-dashboard__title">Drill</h1>
+        <p id="drill-subtitle" class="management-dashboard__subtitle"></p>
+    </header>
+
+    <div class="management-dashboard__actions">
+        <span id="dashboard-status" class="management-dashboard__status">Загрузка…</span>
+    </div>
+
+    <div id="periods-info" class="management-dashboard__periods"></div>
+
+    <section class="management-dashboard__section">
+        <h2 class="management-dashboard__section-title">Партнёры корзины</h2>
+        <p class="management-dashboard__section-hint">
+            Регистрации 1 линии за интервал и чистая выручка от 1 линии за тот же интервал
+            (регистрация и оплата — разные метрики).
+        </p>
+        <div class="management-dashboard__table-wrap">
+            <table class="management-dashboard__table" id="partners-table">
+                <thead>
+                <tr>
+                    <th>Партнёр</th>
+                    <th>Email</th>
+                    <th class="is-num">Регистрации 1 линии</th>
+                    <th class="is-num">Выручка (чистый итог)</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="management-dashboard__section">
+        <h2 class="management-dashboard__section-title">Клиенты 1 линии с оплатами</h2>
+        <p class="management-dashboard__section-hint">
+            Оплаты в выбранном интервале от людей под партнёром. Канал — utm_medium заказа
+            с parent_user_id = партнёр (может быть пустым).
+        </p>
+        <div class="management-dashboard__table-wrap">
+            <table class="management-dashboard__table" id="leads-table">
+                <thead>
+                <tr>
+                    <th>Партнёр</th>
+                    <th>Клиент</th>
+                    <th>Канал (utm_medium)</th>
+                    <th class="is-num">Платежей</th>
+                    <th class="is-num">Выручка (чистый итог)</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </section>
+
+    <script>
+        window.MGMT_REPORT_API_BASE = '/api/management-report';
+    </script>
+    <script src="./assets/drill.js"></script>
+</body>
+</html>

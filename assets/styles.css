@@ -250,6 +250,16 @@
     border-left: 3px solid #f97316;
 }
 
+.management-dashboard__kpi--link {
+    cursor: pointer;
+    transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.management-dashboard__kpi--link:hover {
+    box-shadow: 0 4px 14px rgba(26, 26, 46, 0.12);
+    transform: translateY(-1px);
+}
+
 .management-dashboard__table-hint {
     margin-top: 4px;
     font-size: 11px;
