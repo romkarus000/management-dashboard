@@ -1,0 +1,119 @@
+{
+  "schemaVersion": "2.0",
+  "referenceDate": "2026-09-02",
+  "timezone": "Europe/Moscow",
+  "periodTypes": [
+    {
+      "id": "day",
+      "label": "День",
+      "format": "Y-m-d",
+      "example": "2026-09-02"
+    },
+    {
+      "id": "month",
+      "label": "Месяц",
+      "format": "Y-m",
+      "example": "2026-09"
+    },
+    {
+      "id": "quarter",
+      "label": "Квартал",
+      "format": "Y-Q1..Q4",
+      "example": "2026-Q3"
+    },
+    {
+      "id": "year",
+      "label": "Год",
+      "format": "Y",
+      "example": "2026"
+    }
+  ],
+  "compareModes": [
+    {
+      "id": "previous",
+      "label": "С предыдущим периодом"
+    },
+    {
+      "id": "custom",
+      "label": "Сравнение периодов"
+    }
+  ],
+  "companies": [
+    {
+      "id": 0,
+      "name": "Все"
+    },
+    {
+      "id": 1,
+      "name": "Тренинговый центр"
+    },
+    {
+      "id": 2,
+      "name": "Total Life"
+    },
+    {
+      "id": 3,
+      "name": "Академия EDPRO"
+    },
+    {
+      "id": 5,
+      "name": "INSIDIUM Тренинговый центр"
+    },
+    {
+      "id": 7,
+      "name": "EdproBiz"
+    },
+    {
+      "id": 9,
+      "name": "Edprocross"
+    },
+    {
+      "id": 11,
+      "name": "EdproStudy"
+    },
+    {
+      "id": 13,
+      "name": "Полина Девочкина"
+    },
+    {
+      "id": 15,
+      "name": "МАПП"
+    },
+    {
+      "id": 19,
+      "name": "ИП Сорока "
+    }
+  ],
+  "sections": {
+    "main": [
+      "profit"
+    ],
+    "owner": [
+      "companyMarketing",
+      "partnerActivity"
+    ]
+  },
+  "sectionMeta": {
+    "partnerActivity": {
+      "ignoresCompanyFilter": true,
+      "label": "Активности партнёров"
+    },
+    "companyMarketing": {
+      "ignoresCompanyFilter": false,
+      "label": "Маркетинг по компаниям"
+    },
+    "profit": {
+      "ignoresCompanyFilter": false,
+      "label": "Выручка"
+    }
+  },
+  "defaults": {
+    "periodType": "month",
+    "period": "2026-09",
+    "compareMode": "previous",
+    "compareFrom": null,
+    "compareTo": null,
+    "companyId": 0,
+    "companyName": "Все"
+  }
+}

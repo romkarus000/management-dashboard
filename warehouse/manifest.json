@@ -1,0 +1,28 @@
+{
+  "version": "1.0",
+  "schemaVersion": "2.0",
+  "generatedAt": "2026-09-03T14:42:04+03:00",
+  "coverage": {
+    "from": "2026-08",
+    "to": "2026-08",
+    "count": 1
+  },
+  "lastRun": {
+    "mode": "seed-from-snapshot",
+    "at": "2026-09-03T14:42:04+03:00",
+    "ok": 1,
+    "failed": [],
+    "changed": 1,
+    "monthsRequested": 1
+  },
+  "periods": {
+    "2026-08": {
+      "fetchedAt": "2026-09-03T14:42:04+03:00",
+      "checksum": "786a219a63446f41",
+      "file": "periods/2026-08.json",
+      "changed": true,
+      "durationMs": null,
+      "sectionsFailed": 0
+    }
+  }
+}

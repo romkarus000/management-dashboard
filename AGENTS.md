@@ -1,44 +1,38 @@
 # AGENTS.md — management-dashboard
 
-Статический SPA управленческого отчёта (активности партнёров) для EdPro Biz.
+Статический SPA управленческого отчёта для EdPro Biz.
 
 ## Где что
 
 - Код фронта — этот репозиторий.
 - Backend API — монолит `total-lk-yii` (`management-report` API).
+- Warehouse — `warehouse/` (месячные JSON + `manifest.json`).
 - Prod: `root@46.149.70.15:/var/www/management-report/`, URL `http://46.149.70.15:8080/`.
 
-## Как действуем (процесс)
+## Вкладки / страницы
 
-1. Доработали бэкенд в `total-lk-yii` → задеплоили API.
-2. Сверили **контракт** ответа `partnerActivity.summary` (ключи и смысл).
-3. Если контракт/подписи/UI изменились — правим этот репо и деплоим:
-   ```bash
-   ./scripts/deploy.sh app.js   # или all
-   ```
-4. Если поменялась только внутренняя логика SQL без смены ключей — **фронт не трогаем**.
+1. **`index.html`** — каталог дашбордов по отделам.
+2. **`management.html`** — блок «Управление»: owner / main / активности + drill.
 
-Подробное правило: `.cursor/rules/when-to-update-frontend.mdc`.
-
-## Когда обновлять фронт (кратко)
-
-**Да:** новые/переименованные/удалённые ключи; перенос earned↔manual; новые подписи; вёрстка.
-
-**Нет:** только SQL/пороги/кэш/auth при тех же ключах JSON.
-
-Push в GitHub ≠ деплой. Prod обновляется только `./scripts/deploy.sh`.
-
-## Как деплоить
+## Warehouse sync
 
 ```bash
-./scripts/deploy.sh app.js
-# или
-./scripts/deploy.sh all
+export MGMT_REPORT_API_TOKEN='...'
+node scripts/sync-warehouse.mjs --mode=mass --from=2021-01 --to=2026-08
+node scripts/sync-warehouse.mjs --mode=refresh --include-previous
 ```
+
+1 месяц = 1 `query-batch`. Файлы: `warehouse/periods/YYYY-MM.json`. Реестр: `warehouse/manifest.json`.
+
+## Как действуем
+
+1. Доработали бэкенд в `total-lk-yii` → задеплоили API.
+2. Сверили контракт секций.
+3. При смене UI/ключей — правь этот репо + `./scripts/deploy.sh all`.
+4. После mass/refresh — `./scripts/deploy.sh warehouse`.
 
 ## Правила
 
 - Не коммить секреты и токены.
-- При смене ключей метрик: сначала backend на prod, потом этот фронт.
-- Источник подписей и групп на UI — `assets/app.js` (`METRICS`, `EARNED_KEYS`, `MANUAL_KEYS`).
-- Подробности — `README.md`.
+- `warehouse/periods/` в `.gitignore` — на prod через sync + deploy warehouse.
+- Push ≠ деплой. Prod только через `./scripts/deploy.sh`.

@@ -1,0 +1,374 @@
+#!/usr/bin/env node
+/**
+ * Sync warehouse: тянет management-report API по месяцам и пишет файлы + manifest.
+ *
+ * Usage:
+ *   node scripts/sync-warehouse.mjs --mode=mass --from=2021-01 --to=2026-08
+ *   node scripts/sync-warehouse.mjs --mode=refresh
+ *   node scripts/sync-warehouse.mjs --mode=refresh --months=2026-07,2026-08,2026-09
+ *
+ * Env:
+ *   MGMT_REPORT_API_TOKEN   Bearer token (обязателен)
+ *   MGMT_REPORT_API_BASE    default https://biz.edpro.ru/api/v1/management-report
+ *   MGMT_SYNC_DELAY_MS      пауза между месяцами (default 8000)
+ */
+import fs from 'node:fs';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const REPO_ROOT = path.resolve(__dirname, '..');
+const WAREHOUSE_DIR = path.join(REPO_ROOT, 'warehouse');
+const PERIODS_DIR = path.join(WAREHOUSE_DIR, 'periods');
+const MANIFEST_PATH = path.join(WAREHOUSE_DIR, 'manifest.json');
+
+const DEFAULT_API_BASE = 'https://biz.edpro.ru/api/v1/management-report';
+const DEFAULT_FROM = '2021-01';
+const DEFAULT_DELAY_MS = 8000;
+
+/**
+ * @param {string[]} argv
+ * @returns {Record<string, string|boolean>}
+ */
+function parseArgs(argv) {
+    const out = {};
+    for (const arg of argv) {
+        if (!arg.startsWith('--')) {
+            continue;
+        }
+        const eq = arg.indexOf('=');
+        if (eq === -1) {
+            out[arg.slice(2)] = true;
+            continue;
+        }
+        out[arg.slice(2, eq)] = arg.slice(eq + 1);
+    }
+    return out;
+}
+
+/**
+ * @param {string} ym YYYY-MM
+ * @returns {{year: number, month: number}}
+ */
+function parseYm(ym) {
+    const m = /^(\d{4})-(\d{2})$/.exec(ym);
+    if (!m) {
+        throw new Error(`Неверный месяц: ${ym} (ожидается YYYY-MM)`);
+    }
+    const year = Number(m[1]);
+    const month = Number(m[2]);
+    if (month < 1 || month > 12) {
+        throw new Error(`Неверный месяц: ${ym}`);
+    }
+    return { year, month };
+}
+
+/**
+ * @param {number} year
+ * @param {number} month
+ * @returns {string}
+ */
+function formatYm(year, month) {
+    return `${year}-${String(month).padStart(2, '0')}`;
+}
+
+/**
+ * @param {string} fromYm
+ * @param {string} toYm
+ * @returns {string[]}
+ */
+function listMonths(fromYm, toYm) {
+    const from = parseYm(fromYm);
+    const to = parseYm(toYm);
+    const out = [];
+    let y = from.year;
+    let m = from.month;
+    while (y < to.year || (y === to.year && m <= to.month)) {
+        out.push(formatYm(y, m));
+        m += 1;
+        if (m > 12) {
+            m = 1;
+            y += 1;
+        }
+    }
+    return out;
+}
+
+/**
+ * Текущий календарный месяц (MTD) в Europe/Moscow приблизительно через локаль сервера.
+ *
+ * @returns {string}
+ */
+function currentMonthYm() {
+    const now = new Date();
+    return formatYm(now.getFullYear(), now.getMonth() + 1);
+}
+
+/**
+ * @param {object} payload
+ * @returns {string}
+ */
+function checksumPayload(payload) {
+    const blocks = payload?.blocks || {};
+    const slice = {
+        main: blocks.main?.profit?.summary?.current || null,
+        owner: blocks.owner?.companyMarketing?.summary?.current || null,
+        activity: blocks.owner?.partnerActivity?.summary?.current || null,
+    };
+    return crypto.createHash('sha256').update(JSON.stringify(slice)).digest('hex').slice(0, 16);
+}
+
+/**
+ * @returns {object}
+ */
+function loadManifest() {
+    if (!fs.existsSync(MANIFEST_PATH)) {
+        return {
+            version: '1.0',
+            schemaVersion: '2.0',
+            generatedAt: null,
+            coverage: { from: null, to: null },
+            lastRun: null,
+            periods: {},
+        };
+    }
+    return JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf8'));
+}
+
+/**
+ * @param {object} manifest
+ * @returns {void}
+ */
+function saveManifest(manifest) {
+    fs.mkdirSync(WAREHOUSE_DIR, { recursive: true });
+    fs.writeFileSync(MANIFEST_PATH, JSON.stringify(manifest, null, 2) + '\n', 'utf8');
+}
+
+/**
+ * @param {string} apiBase
+ * @param {string} token
+ * @returns {Promise<object>}
+ */
+async function fetchFilters(apiBase, token) {
+    const url = `${apiBase.replace(/\/$/, '')}/filters`;
+    const response = await fetch(url, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: 'application/json',
+        },
+    });
+    const body = await response.json();
+    if (!body.success) {
+        throw new Error(body.data?.error || `filters HTTP ${response.status}`);
+    }
+    return body.data;
+}
+
+/**
+ * @param {string} apiBase
+ * @param {string} token
+ * @param {string} periodYm
+ * @param {number} companyId
+ * @returns {Promise<object>}
+ */
+async function fetchMonth(apiBase, token, periodYm, companyId) {
+    const params = new URLSearchParams({
+        mainSections: 'profit',
+        ownerSections: 'companyMarketing,partnerActivity',
+        periodType: 'month',
+        period: periodYm,
+        compareMode: 'previous',
+        companyId: String(companyId),
+    });
+    const url = `${apiBase.replace(/\/$/, '')}/query-batch?${params.toString()}`;
+    const response = await fetch(url, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: 'application/json',
+        },
+    });
+    const body = await response.json();
+    if (!body.success) {
+        const err = body.data?.error || body.data?.code || `HTTP ${response.status}`;
+        throw new Error(String(err));
+    }
+    if (body.data?.code) {
+        throw new Error(`${body.data.code}: ${body.data.error || 'report failed'}`);
+    }
+    return body.data;
+}
+
+/**
+ * @param {number} ms
+ * @returns {Promise<void>}
+ */
+function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * @param {object} args
+ * @returns {string[]}
+ */
+function resolveMonths(args) {
+    const mode = String(args.mode || 'refresh');
+    if (args.months) {
+        return String(args.months).split(',').map((s) => s.trim()).filter(Boolean);
+    }
+    if (mode === 'mass') {
+        const from = String(args.from || DEFAULT_FROM);
+        const to = String(args.to || currentMonthYm());
+        return listMonths(from, to);
+    }
+    // refresh: текущий месяц (+ опционально --include-previous)
+    const months = [currentMonthYm()];
+    if (args['include-previous']) {
+        const cur = parseYm(months[0]);
+        const prevMonth = cur.month === 1 ? 12 : cur.month - 1;
+        const prevYear = cur.month === 1 ? cur.year - 1 : cur.year;
+        months.unshift(formatYm(prevYear, prevMonth));
+    }
+    return months;
+}
+
+async function main() {
+    const args = parseArgs(process.argv.slice(2));
+    if (args.help || args.h) {
+        console.log(`Usage:
+  node scripts/sync-warehouse.mjs --mode=mass --from=2021-01 --to=2026-08
+  node scripts/sync-warehouse.mjs --mode=refresh
+  node scripts/sync-warehouse.mjs --mode=refresh --include-previous
+  node scripts/sync-warehouse.mjs --months=2026-08,2026-09
+
+Env: MGMT_REPORT_API_TOKEN, MGMT_REPORT_API_BASE, MGMT_SYNC_DELAY_MS`);
+        process.exit(0);
+    }
+
+    const token = process.env.MGMT_REPORT_API_TOKEN || String(args.token || '');
+    if (!token) {
+        console.error('Нужен MGMT_REPORT_API_TOKEN или --token=...');
+        process.exit(1);
+    }
+
+    const apiBase = process.env.MGMT_REPORT_API_BASE || String(args['api-base'] || DEFAULT_API_BASE);
+    const delayMs = Number(process.env.MGMT_SYNC_DELAY_MS || args.delay || DEFAULT_DELAY_MS);
+    const companyId = Number(args.companyId || 0);
+    const mode = String(args.mode || 'refresh');
+    const months = resolveMonths(args);
+
+    if (months.length === 0) {
+        console.error('Список месяцев пуст');
+        process.exit(1);
+    }
+
+    fs.mkdirSync(PERIODS_DIR, { recursive: true });
+    const manifest = loadManifest();
+    const failed = [];
+    let ok = 0;
+    let changed = 0;
+
+    console.log(`mode=${mode} months=${months.length} delayMs=${delayMs} api=${apiBase}`);
+
+    try {
+        process.stdout.write('filters … ');
+        const catalog = await fetchFilters(apiBase, token);
+        fs.writeFileSync(
+            path.join(WAREHOUSE_DIR, 'filters.json'),
+            JSON.stringify(catalog, null, 2) + '\n',
+            'utf8'
+        );
+        console.log('ok');
+    } catch (error) {
+        console.log(`skip (${error.message || error})`);
+    }
+
+    for (let i = 0; i < months.length; i += 1) {
+        const ym = months[i];
+        const started = Date.now();
+        process.stdout.write(`[${i + 1}/${months.length}] ${ym} … `);
+        try {
+            const payload = await fetchMonth(apiBase, token, ym, companyId);
+            const checksum = checksumPayload(payload);
+            const prev = manifest.periods[ym];
+            const fileRel = `periods/${ym}.json`;
+            const fileAbs = path.join(WAREHOUSE_DIR, fileRel);
+
+            const artifact = {
+                warehouseVersion: '1.0',
+                period: ym,
+                fetchedAt: new Date().toISOString(),
+                checksum,
+                filters: {
+                    periodType: 'month',
+                    period: ym,
+                    compareMode: 'previous',
+                    companyId,
+                },
+                meta: payload.meta || null,
+                blocks: payload.blocks || {},
+            };
+
+            fs.writeFileSync(fileAbs, JSON.stringify(artifact, null, 2) + '\n', 'utf8');
+
+            const wasChanged = !prev || prev.checksum !== checksum;
+            if (wasChanged) {
+                changed += 1;
+            }
+
+            manifest.periods[ym] = {
+                fetchedAt: artifact.fetchedAt,
+                checksum,
+                file: fileRel,
+                changed: wasChanged,
+                durationMs: Date.now() - started,
+                sectionsFailed: payload.meta?.sectionsFailed ?? null,
+            };
+            ok += 1;
+            console.log(`ok checksum=${checksum}${wasChanged ? ' (changed)' : ''} ${Date.now() - started}ms`);
+        } catch (error) {
+            failed.push({ period: ym, error: String(error.message || error) });
+            console.log(`FAIL ${error.message || error}`);
+        }
+
+        if (i < months.length - 1 && delayMs > 0) {
+            await sleep(delayMs);
+        }
+    }
+
+    const keys = Object.keys(manifest.periods).sort();
+    manifest.generatedAt = new Date().toISOString();
+    manifest.coverage = {
+        from: keys[0] || null,
+        to: keys[keys.length - 1] || null,
+        count: keys.length,
+    };
+    manifest.lastRun = {
+        mode,
+        at: manifest.generatedAt,
+        ok,
+        failed,
+        changed,
+        monthsRequested: months.length,
+    };
+    saveManifest(manifest);
+
+    // Удобный указатель для UI: последний успешно выгруженный месяц
+    const latestOk = [...months].reverse().find((ym) => manifest.periods[ym] && !failed.find((f) => f.period === ym));
+    if (latestOk) {
+        const latestSrc = path.join(WAREHOUSE_DIR, `periods/${latestOk}.json`);
+        const latestDst = path.join(WAREHOUSE_DIR, 'latest.json');
+        fs.copyFileSync(latestSrc, latestDst);
+    }
+
+    console.log(`\nDone. ok=${ok} failed=${failed.length} changed=${changed}`);
+    console.log(`manifest: ${MANIFEST_PATH}`);
+    if (failed.length) {
+        process.exit(2);
+    }
+}
+
+main().catch((error) => {
+    console.error(error);
+    process.exit(1);
+});

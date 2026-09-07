@@ -1,8 +1,14 @@
 # Management Dashboard
 
-Статический SPA «Управленческий отчёт» (активности партнёров) для EdPro Biz.
+Статический SPA дашбордов для EdPro Biz.
 
-Данные берёт из API `management-report` монолита `total-lk-yii`. Сам фронт живёт отдельно от монолита.
+## Структура UI
+
+1. **`index.html`** — каталог дашбордов по отделам.
+2. **`management.html`** — блок «Управление»: вкладки owner / main / активности.
+3. **`drill.html`** — drill активностей.
+
+Данные: live API монолита или **warehouse** (месячные JSON + manifest).
 
 ## Prod
 
@@ -11,90 +17,55 @@
 | URL | http://46.149.70.15:8080/ |
 | SSH | `root@46.149.70.15` |
 | Document root | `/var/www/management-report/` |
-| Nginx | `/etc/nginx/sites-available/management-report` |
-| API (через nginx proxy) | `/api/management-report/` → `https://biz.edpro.ru/api/v1/management-report/` |
+| API proxy | `/api/management-report/` → `https://biz.edpro.ru/api/v1/management-report/` |
 
 ## Структура
 
 ```
 .
-├── index.html          # UI, window.MGMT_REPORT_API_BASE
-├── snapshot.json       # офлайн-демо
+├── index.html                 # каталог по отделам
+├── management.html            # блок «Управление»
+├── drill.html
+├── snapshot.json
+├── warehouse/
+│   ├── manifest.json
+│   ├── latest.json
+│   └── periods/YYYY-MM.json
 ├── assets/
-│   ├── app.js          # METRICS, EARNED_KEYS / MANUAL_KEYS
+│   ├── app.js
+│   ├── drill.js
 │   └── styles.css
 └── scripts/
+    ├── sync-warehouse.mjs
     └── deploy.sh
 ```
 
-## Локально
+## Warehouse sync
 
-Открой `index.html` через любой static server, либо правь и сразу деплой.
-
-Live-режим: Bearer-токен API в query `?token=...` или в `localStorage` (`mgmtReportApiToken`).
-
-## Деплой
+Один API-запрос = один месяц (`query-batch`: profit + companyMarketing + partnerActivity).
 
 ```bash
-./scripts/deploy.sh app.js   # только JS
-./scripts/deploy.sh all      # index + css + js
+export MGMT_REPORT_API_TOKEN='…'
+
+node scripts/sync-warehouse.mjs --mode=mass --from=2021-01 --to=2026-08
+node scripts/sync-warehouse.mjs --mode=refresh --include-previous
 ```
 
-Переменные:
+После sync:
 
-- `MGMT_DASHBOARD_SERVER` — SSH target (по умолчанию `root@46.149.70.15`)
-- `MGMT_DASHBOARD_PATH` — remote root (по умолчанию `/var/www/management-report`)
-
-## Как действуем дальше
-
-```
-total-lk-yii (API)  →  сверка контракта ключей  →  этот репо (если нужно)  →  ./scripts/deploy.sh
+```bash
+./scripts/deploy.sh warehouse
+# или
+./scripts/deploy.sh all
 ```
 
-1. В монолите доработали backend и задеплоили `management-report` API.
-2. Смотрим ответ `partnerActivity.summary.current`: изменились ли **имена ключей** или смысл групп earned/manual.
-3. **Если да** — обновляем `assets/app.js` здесь, коммитим, деплоим на сервер.
-4. **Если нет** (поменяли только SQL/пороги, ключи те же) — фронт не трогаем, цифры подтянутся сами.
+## UI
 
-Push в GitHub **не** обновляет http://46.149.70.15:8080/ — только `./scripts/deploy.sh`.
-
-### Когда обновлять фронт
-
-| Ситуация | Фронт |
-|---|---|
-| Новый / переименованный / удалённый ключ в JSON | **да** |
-| Способ переехал из «ручная» в «заработано» (или наоборот) | **да** — `EARNED_KEYS` / `MANUAL_KEYS` |
-| Новая подпись или hint на карточке | **да** |
-| Правка вёрстки / фильтров / графиков | **да** |
-| Только SQL, пороги, кэш, auth — ключи те же | **нет** |
-| Правки админки owner-отчёта в Yii | **нет** (другой UI) |
-
-Порядок при смене контракта:
-
-1. Backend (`total-lk-yii`) на prod.
-2. Этот фронт + `./scripts/deploy.sh app.js`.
-3. При необходимости на app-сервере: `./yii management-report/warm-cache`.
-
-Правило для агентов: `.cursor/rules/when-to-update-frontend.mdc`.
-
-## Ключи метрик partnerActivity (schema 2.0)
-
-**Заработанные** (`EARNED_KEYS`):
-
-`purchase`, `registration`, `hybrid`, `adv`, `club`, `partner_registration`, `product_education`, `overlap`
-
-**Ручные** (`MANUAL_KEYS`):
-
-`manual_ambassador`, `manual_barter_influence`, `manual_barter_solo`, `manual_coach`, `manual_human`
-
-Приоритет ручных: амбассадоры (parent 4264877 / comment «амбассадор*») → бартер инфлюенс (группа 3823) → бартер самостоятельный («блогер*») → коучи/наставники/кураторы/сотрудники → human.
-
-**Overview:** `total`, `manual` (из API), `earned` (сумма `EARNED_KEYS` на фронте)
-
-SQL-логика: `OwnerPartnerActivityStatsRepository` в монолите `total-lk-yii`.
+- Старт: список отделов → клик «Управление» → `management.html`.
+- Вкладки: owner / main / activity.
+- «Из warehouse» / «Обновить с API».
+- Token: `?token=…` пробрасывается между страницами.
 
 ## Связь с монолитом
 
-Backend: `api/modules/v1/controllers/ManagementReportController.php`,  
-`common/models/services/managementReport/*`,  
-`common/models/reports/OwnerPartnerActivity*`.
+Backend: `ManagementReportController`, `common/models/services/managementReport/*`.

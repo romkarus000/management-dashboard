@@ -4,3 +4,7 @@
 *.log
 .env
 .env.*
+
+# Warehouse: большие period-файлы не коммитим (manifest можно).
+warehouse/periods/
+warehouse/latest.json

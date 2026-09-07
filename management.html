@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление — отчёты</title>
+    <link rel="stylesheet" href="./assets/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body class="management-dashboard">
+    <header class="management-dashboard__header">
+        <p class="management-dashboard__breadcrumb">
+            <a href="./index.html" id="link-home">Дашборды</a>
+            <span aria-hidden="true"> / </span>
+            <span>Управление</span>
+        </p>
+        <h1 class="management-dashboard__title">Управление</h1>
+        <p class="management-dashboard__subtitle">Отчёт владельца · главный отчёт · активности партнёров</p>
+    </header>
+
+    <nav class="management-dashboard__tabs" role="tablist" aria-label="Вкладки отчёта">
+        <button type="button" class="management-dashboard__tab is-active" data-tab="owner" role="tab" aria-selected="true">Отчёт владельца</button>
+        <button type="button" class="management-dashboard__tab" data-tab="main" role="tab" aria-selected="false">Главный отчёт</button>
+        <button type="button" class="management-dashboard__tab" data-tab="activity" role="tab" aria-selected="false">Активности</button>
+    </nav>
+
+    <section class="management-dashboard__filters">
+        <div class="management-dashboard__field management-dashboard__field--period">
+            <span class="management-dashboard__field-label">Год</span>
+            <div id="filter-year-buttons" class="management-dashboard__chips" role="group" aria-label="Год"></div>
+        </div>
+        <div class="management-dashboard__field management-dashboard__field--period">
+            <span class="management-dashboard__field-label">Месяц</span>
+            <div id="filter-month-buttons" class="management-dashboard__chips" role="group" aria-label="Месяц"></div>
+        </div>
+        <div class="management-dashboard__field">
+            <label for="filter-compare-mode">Сравнение</label>
+            <select id="filter-compare-mode">
+                <option value="previous" selected>С предыдущим периодом</option>
+                <option value="custom">Сравнение периодов</option>
+            </select>
+        </div>
+        <div class="management-dashboard__field">
+            <label for="filter-company">Компания</label>
+            <select id="filter-company">
+                <option value="0">Все</option>
+            </select>
+        </div>
+        <div id="custom-compare-fields" class="management-dashboard__custom-compare">
+            <div class="management-dashboard__field">
+                <label for="filter-compare-from">Сравнить с — от</label>
+                <input id="filter-compare-from" type="date">
+            </div>
+            <div class="management-dashboard__field">
+                <label for="filter-compare-to">Сравнить с — до</label>
+                <input id="filter-compare-to" type="date">
+            </div>
+        </div>
+    </section>
+
+    <div class="management-dashboard__actions">
+        <button id="btn-refresh-live" type="button" class="management-dashboard__btn">Обновить с API</button>
+        <button id="btn-load-warehouse" type="button" class="management-dashboard__btn management-dashboard__btn--secondary">Из warehouse</button>
+        <button id="btn-load-snapshot" type="button" class="management-dashboard__btn management-dashboard__btn--secondary">snapshot.json</button>
+        <label id="toggle-rare-wrap" class="management-dashboard__toggle management-dashboard__hidden">
+            <input id="toggle-rare" type="checkbox">
+            Показать гибрид и overlap
+        </label>
+        <span id="dashboard-status" class="management-dashboard__status">Инициализация…</span>
+    </div>
+
+    <div id="periods-info" class="management-dashboard__periods"></div>
+    <div id="warehouse-info" class="management-dashboard__periods"></div>
+
+    <!-- Owner -->
+    <div id="panel-owner" class="management-dashboard__panel is-active" role="tabpanel">
+        <section class="management-dashboard__section">
+            <h2 class="management-dashboard__section-title">Маркетинг по компаниям</h2>
+            <p class="management-dashboard__section-hint">Секция owner.companyMarketing</p>
+            <div id="owner-kpi" class="management-dashboard__kpi-grid"></div>
+        </section>
+        <section class="management-dashboard__section">
+            <h2 class="management-dashboard__section-title">Таблица метрик</h2>
+            <div class="management-dashboard__table-wrap">
+                <table class="management-dashboard__table">
+                    <thead>
+                        <tr>
+                            <th>Метрика</th>
+                            <th class="is-num">Текущий</th>
+                            <th class="is-num">Сравнение</th>
+                            <th class="is-num">Δ</th>
+                            <th class="is-num">Δ %</th>
+                        </tr>
+                    </thead>
+                    <tbody id="owner-table-body"></tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <!-- Main -->
+    <div id="panel-main" class="management-dashboard__panel" role="tabpanel" hidden>
+        <section class="management-dashboard__section">
+            <h2 class="management-dashboard__section-title">Выручка (profit)</h2>
+            <p class="management-dashboard__section-hint">Секция main.profit</p>
+            <div id="main-kpi" class="management-dashboard__kpi-grid"></div>
+        </section>
+        <section class="management-dashboard__section">
+            <h2 class="management-dashboard__section-title">Таблица метрик</h2>
+            <div class="management-dashboard__table-wrap">
+                <table class="management-dashboard__table">
+                    <thead>
+                        <tr>
+                            <th>Метрика</th>
+                            <th class="is-num">Текущий</th>
+                            <th class="is-num">Сравнение</th>
+                            <th class="is-num">Δ</th>
+                            <th class="is-num">Δ %</th>
+                        </tr>
+                    </thead>
+                    <tbody id="main-table-body"></tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <!-- Activity -->
+    <div id="panel-activity" class="management-dashboard__panel" role="tabpanel" hidden>
+        <section class="management-dashboard__section">
+            <h2 class="management-dashboard__section-title">Сводка</h2>
+            <div id="activity-overview-kpi" class="management-dashboard__kpi-grid management-dashboard__kpi-grid--overview"></div>
+        </section>
+
+        <section class="management-dashboard__section">
+            <h2 class="management-dashboard__section-title">Total vs заработано vs ручная</h2>
+            <p class="management-dashboard__section-hint">Текущий период и период сравнения.</p>
+            <div class="management-dashboard__chart-wrap management-dashboard__chart-wrap--tall">
+                <canvas id="activity-total-chart"></canvas>
+            </div>
+        </section>
+
+        <section class="management-dashboard__section">
+            <h2 class="management-dashboard__section-title">Структура способов</h2>
+            <p class="management-dashboard__section-hint">Оранжевый — ручная, зелёный — заработанная. Клик по KPI открывает drill.</p>
+            <div class="management-dashboard__chart-wrap management-dashboard__chart-wrap--tall">
+                <canvas id="activity-structure-chart"></canvas>
+            </div>
+        </section>
+
+        <section class="management-dashboard__section">
+            <h2 class="management-dashboard__section-title">Заработанные способы</h2>
+            <div id="activity-earned-kpi" class="management-dashboard__kpi-grid"></div>
+        </section>
+
+        <section class="management-dashboard__section">
+            <h2 class="management-dashboard__section-title">Ручная активность</h2>
+            <div id="activity-manual-kpi" class="management-dashboard__kpi-grid"></div>
+        </section>
+
+        <section class="management-dashboard__section">
+            <h2 class="management-dashboard__section-title">Таблица по способам</h2>
+            <div class="management-dashboard__table-wrap">
+                <table class="management-dashboard__table" id="activity-table">
+                    <thead>
+                        <tr>
+                            <th>Способ</th>
+                            <th class="is-num">Текущий</th>
+                            <th class="is-num">Сравнение</th>
+                            <th class="is-num">Δ</th>
+                            <th class="is-num">Δ %</th>
+                        </tr>
+                    </thead>
+                    <tbody id="activity-table-body"></tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        window.MGMT_REPORT_API_BASE = '/api/management-report';
+        window.MGMT_WAREHOUSE_BASE = './warehouse';
+        (function () {
+            var token = new URLSearchParams(window.location.search).get('token');
+            if (!token) {
+                return;
+            }
+            var home = document.getElementById('link-home');
+            if (home) {
+                home.href = './index.html?token=' + encodeURIComponent(token);
+            }
+        })();
+    </script>
+    <script src="./assets/app.js"></script>
+</body>
+</html>

@@ -19,6 +19,22 @@
     margin-bottom: 20px;
 }
 
+.management-dashboard__breadcrumb {
+    margin: 0 0 10px;
+    font-size: 13px;
+    color: #5c6370;
+}
+
+.management-dashboard__breadcrumb a {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.management-dashboard__breadcrumb a:hover {
+    text-decoration: underline;
+}
+
 .management-dashboard__title {
     margin: 0 0 6px;
     font-size: 24px;
@@ -28,6 +44,39 @@
 .management-dashboard__subtitle {
     margin: 0;
     color: #5c6370;
+}
+
+.management-dashboard__tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.management-dashboard__tab {
+    padding: 10px 16px;
+    border: 1px solid #cfd6e4;
+    border-radius: 8px;
+    background: #fff;
+    color: #1a1a2e;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.management-dashboard__tab:hover {
+    border-color: #2563eb;
+    color: #2563eb;
+}
+
+.management-dashboard__tab.is-active {
+    border-color: #2563eb;
+    background: #2563eb;
+    color: #fff;
+}
+
+.management-dashboard__panel[hidden] {
+    display: none !important;
 }
 
 .management-dashboard__filters {
@@ -41,7 +90,8 @@
     border-radius: 12px;
 }
 
-.management-dashboard__field label {
+.management-dashboard__field label,
+.management-dashboard__field-label {
     display: block;
     margin-bottom: 6px;
     font-size: 12px;
@@ -56,6 +106,38 @@
     border: 1px solid #cfd6e4;
     border-radius: 8px;
     background: #fff;
+}
+
+.management-dashboard__field--period {
+    grid-column: 1 / -1;
+}
+
+.management-dashboard__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.management-dashboard__chip {
+    padding: 7px 12px;
+    border: 1px solid #cfd6e4;
+    border-radius: 8px;
+    background: #fff;
+    color: #1a1a2e;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.management-dashboard__chip:hover {
+    border-color: #2563eb;
+    color: #2563eb;
+}
+
+.management-dashboard__chip.is-active {
+    border-color: #2563eb;
+    background: #2563eb;
+    color: #fff;
 }
 
 .management-dashboard__custom-compare {
@@ -297,3 +379,105 @@
 .management-dashboard__hidden {
     display: none !important;
 }
+
+/* —— Каталог дашбордов (index) —— */
+
+.dashboard-home {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 32px 24px 48px;
+    max-width: 960px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    color: #1a1a2e;
+    background: #f4f6fb;
+}
+
+.dashboard-home *,
+.dashboard-home *::before,
+.dashboard-home *::after {
+    box-sizing: border-box;
+}
+
+.dashboard-home__header {
+    margin-bottom: 28px;
+}
+
+.dashboard-home__title {
+    margin: 0 0 8px;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.dashboard-home__subtitle {
+    margin: 0;
+    color: #5c6370;
+}
+
+.dashboard-home__department {
+    margin-bottom: 32px;
+}
+
+.dashboard-home__dept-title {
+    margin: 0 0 4px;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.dashboard-home__dept-hint {
+    margin: 0 0 14px;
+    color: #5c6370;
+    font-size: 13px;
+}
+
+.dashboard-home__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+}
+
+.dashboard-home__card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 18px 16px;
+    border: 1px solid #e3e8f0;
+    border-radius: 12px;
+    background: #fff;
+    color: inherit;
+    text-decoration: none;
+    transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+a.dashboard-home__card:hover {
+    border-color: #2563eb;
+    background: #f8fafc;
+}
+
+.dashboard-home__card.is-disabled {
+    opacity: 0.55;
+    cursor: default;
+}
+
+.dashboard-home__card-title {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.dashboard-home__card-desc {
+    color: #5c6370;
+    font-size: 13px;
+}
+
+.dashboard-home__card-meta {
+    margin-top: 4px;
+    color: #2563eb;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.dashboard-home__department--soon .dashboard-home__card-title {
+    color: #5c6370;
+}
+

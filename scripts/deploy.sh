@@ -10,7 +10,7 @@ LOCAL_ROOT="${REPO_ROOT}"
 
 usage() {
     cat <<EOF
-Usage: $(basename "$0") [app.js|styles.css|index.html|drill.html|drill.js|snapshot.json|all]
+Usage: $(basename "$0") [app.js|styles.css|index.html|management.html|drill.html|drill.js|snapshot.json|warehouse|sync-script|all]
 
 Deploy management dashboard static files to ${SERVER}:${REMOTE_ROOT}
 
@@ -40,7 +40,24 @@ deploy_file() {
         return 1
     fi
     echo "→ ${rel}"
+    # shellcheck disable=SC2029
+    ssh "${SERVER}" "mkdir -p ${REMOTE_ROOT}/$(dirname "${rel}")"
     scp "${local_path}" "${SERVER}:${REMOTE_ROOT}/${rel}"
+}
+
+deploy_warehouse() {
+    ssh "${SERVER}" "mkdir -p ${REMOTE_ROOT}/warehouse/periods ${REMOTE_ROOT}/scripts"
+    deploy_file "warehouse/manifest.json" || true
+    if [[ -f "${LOCAL_ROOT}/warehouse/filters.json" ]]; then
+        deploy_file "warehouse/filters.json" || true
+    fi
+    if [[ -f "${LOCAL_ROOT}/warehouse/latest.json" ]]; then
+        deploy_file "warehouse/latest.json" || true
+    fi
+    if [[ -d "${LOCAL_ROOT}/warehouse/periods" ]]; then
+        echo "→ warehouse/periods/ (rsync)"
+        rsync -az --delete "${LOCAL_ROOT}/warehouse/periods/" "${SERVER}:${REMOTE_ROOT}/warehouse/periods/"
+    fi
 }
 
 case "${TARGET}" in
@@ -53,6 +70,9 @@ case "${TARGET}" in
     index.html)
         deploy_file "index.html"
         ;;
+    management.html)
+        deploy_file "management.html"
+        ;;
     drill.html)
         deploy_file "drill.html"
         ;;
@@ -62,12 +82,21 @@ case "${TARGET}" in
     snapshot.json)
         deploy_file "snapshot.json"
         ;;
+    warehouse)
+        deploy_warehouse
+        ;;
+    sync-script)
+        deploy_file "scripts/sync-warehouse.mjs"
+        ;;
     all)
         deploy_file "index.html"
+        deploy_file "management.html"
         deploy_file "drill.html"
         deploy_file "assets/app.js"
         deploy_file "assets/drill.js"
         deploy_file "assets/styles.css"
+        deploy_file "scripts/sync-warehouse.mjs"
+        deploy_warehouse
         ;;
     *)
         echo "Unknown target: ${TARGET}" >&2
