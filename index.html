@@ -16,7 +16,7 @@
         <h2 id="dept-management" class="dashboard-home__dept-title">Управление</h2>
         <p class="dashboard-home__dept-hint">Управленческая отчётность: владелец, главный отчёт, активности</p>
         <div class="dashboard-home__grid">
-            <a class="dashboard-home__card" href="./management.html" data-preserve-token>
+            <a class="dashboard-home__card" href="./management.html">
                 <span class="dashboard-home__card-title">Управленческий отчёт</span>
                 <span class="dashboard-home__card-desc">Owner · Main · Активности · drill</span>
                 <span class="dashboard-home__card-meta">warehouse + live API</span>
@@ -45,15 +45,16 @@
 
     <script>
         (function () {
-            var token = new URLSearchParams(window.location.search).get('token');
-            if (!token) {
-                return;
+            var KEY = 'mgmtReportApiToken';
+            var url = new URL(window.location.href);
+            var token = url.searchParams.get('token');
+            if (token) {
+                localStorage.setItem(KEY, token);
+                url.searchParams.delete('token');
+                var qs = url.searchParams.toString();
+                history.replaceState({}, '', url.pathname + (qs ? '?' + qs : '') + url.hash);
             }
-            document.querySelectorAll('[data-preserve-token]').forEach(function (link) {
-                var href = link.getAttribute('href') || '';
-                var joiner = href.indexOf('?') === -1 ? '?' : '&';
-                link.setAttribute('href', href + joiner + 'token=' + encodeURIComponent(token));
-            });
+            // В ссылки токен не кладём — нужен только drill / live API
         })();
     </script>
 </body>

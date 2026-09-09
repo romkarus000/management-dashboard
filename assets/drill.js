@@ -22,7 +22,7 @@
         manual_barter_influence: 'Бартер Инфлюенс',
         manual_barter_solo: 'Бартер самостоятельный',
         manual_coach: 'Коучи / наставники',
-        manual_human: 'Ручное действие'
+        manual_human: 'Аккаунты компании'
     };
 
     /**
@@ -34,12 +34,29 @@
     }
 
     /**
+     * Убирает token из адресной строки после сохранения в localStorage.
+     * @returns {void}
+     */
+    function stripTokenFromUrl() {
+        var url = new URL(window.location.href);
+        if (!url.searchParams.has('token')) {
+            return;
+        }
+        url.searchParams.delete('token');
+        var qs = url.searchParams.toString();
+        var next = url.pathname + (qs ? '?' + qs : '') + url.hash;
+        window.history.replaceState({}, '', next);
+    }
+
+    /**
+     * Токен только из localStorage (или один раз из ?token= для записи).
      * @returns {string}
      */
     function getToken() {
         var fromQuery = new URLSearchParams(window.location.search).get('token');
         if (fromQuery) {
             localStorage.setItem(TOKEN_STORAGE_KEY, fromQuery);
+            stripTokenFromUrl();
             return fromQuery;
         }
         return localStorage.getItem(TOKEN_STORAGE_KEY) || '';
@@ -117,19 +134,8 @@
             ' · ' + params.periodType + ' ' + params.period;
 
         var back = el('back-link');
-        var backParams = new URLSearchParams();
-        if (params.periodType) {
-            backParams.set('periodType', params.periodType);
-        }
-        if (params.period) {
-            backParams.set('period', params.period);
-        }
-        var token = getToken();
-        if (token) {
-            backParams.set('token', token);
-        }
-        var qs = backParams.toString();
-        back.href = './index.html' + (qs ? '?' + qs : '');
+        // token не прокидываем — warehouse-страницы читают без API
+        back.href = './management.html';
     }
 
     /**
@@ -214,7 +220,7 @@
 
         var token = getToken();
         if (!token) {
-            setStatus('Нужен API token (?token=... в URL)', true);
+            setStatus('Нужен API token: один раз открой с ?token=... (сохранится локально)', true);
             return;
         }
 

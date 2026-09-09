@@ -41,7 +41,7 @@
         manual_barter_influence: { label: 'Бартер Инфлюенс', hint: 'Группа 3823', group: 'manual' },
         manual_barter_solo: { label: 'Бартер самостоятельный', hint: 'блогер*', group: 'manual' },
         manual_coach: { label: 'Коучи / наставники', hint: 'коуч/наставник/куратор', group: 'manual' },
-        manual_human: { label: 'Ручное действие', hint: 'Без других оснований', group: 'manual' }
+        manual_human: { label: 'Аккаунты компании', hint: 'Без других оснований', group: 'manual' }
     };
 
     var ACTIVITY_TABLE_ORDER = [
@@ -71,6 +71,11 @@
         { key: 'creditCharge', label: 'Кредитные комиссии' }
     ];
 
+    /** Ключи, которые нельзя суммировать из byCompany (служебные / не метрики). */
+    var PROFIT_SKIP_SUM_KEYS = {
+        companyId: true
+    };
+
     var state = {
         catalog: null,
         payload: null,
@@ -80,11 +85,18 @@
         selectedYear: null,
         selectedMonth: null,
         activeTab: 'owner',
-        source: null
+        source: null,
+        /** @type {Object.<string, Array>|null} кэш серий profit по году */
+        profitYearCache: null,
+        profitYearCacheKey: null
     };
 
     var totalChart = null;
     var structureChart = null;
+    var mainMoneyChart = null;
+    var mainStructureChart = null;
+    var mainRefundChart = null;
+    var mainRateChart = null;
 
     function el(id) {
         return document.getElementById(id);
@@ -96,10 +108,31 @@
         node.classList.toggle('is-error', !!isError);
     }
 
+    /**
+     * Убирает token из адресной строки после сохранения в localStorage.
+     * @returns {void}
+     */
+    function stripTokenFromUrl() {
+        var url = new URL(window.location.href);
+        if (!url.searchParams.has('token')) {
+            return;
+        }
+        url.searchParams.delete('token');
+        var qs = url.searchParams.toString();
+        var next = url.pathname + (qs ? '?' + qs : '') + url.hash;
+        window.history.replaceState({}, '', next);
+    }
+
+    /**
+     * Токен только из localStorage (или один раз из ?token= для записи).
+     * В ссылки и адресную строку не кладём — нужен для drill / live API.
+     * @returns {string}
+     */
     function getToken() {
         var fromQuery = new URLSearchParams(window.location.search).get('token');
         if (fromQuery) {
             localStorage.setItem(TOKEN_STORAGE_KEY, fromQuery);
+            stripTokenFromUrl();
             return fromQuery;
         }
         return localStorage.getItem(TOKEN_STORAGE_KEY) || '';
@@ -160,6 +193,10 @@
         var maxYear = getMaxPeriodYear();
         for (var year = PERIOD_START_YEAR; year <= maxYear; year += 1) {
             yearWrap.appendChild(createPeriodChip(String(year), year === state.selectedYear, function (value) {
+                if (state.selectedYear !== value) {
+                    state.profitYearCache = null;
+                    state.profitYearCacheKey = null;
+                }
                 state.selectedYear = value;
                 renderPeriodButtons();
                 loadSelectedPeriodPreferWarehouse();
@@ -246,6 +283,8 @@
         el('toggle-rare-wrap').classList.toggle('management-dashboard__hidden', tabId !== 'activity');
         if (state.payload) {
             renderDashboard(state.payload, state.source);
+        } else if (tabId === 'main') {
+            refreshMainProfitCharts();
         }
     }
 
@@ -308,6 +347,503 @@
         return (Math.round(n * 100) / 100).toLocaleString('ru-RU');
     }
 
+    function formatPercent(value) {
+        if (value === null || value === undefined || Number.isNaN(Number(value))) {
+            return '—';
+        }
+        return (Math.round(Number(value) * 100) / 100).toLocaleString('ru-RU') + '%';
+    }
+
+    /**
+     * Некредитный денежный оборот (без бонусов и кредита).
+     *
+     * @param {Object|null} row
+     * @returns {number}
+     */
+    function acquiringTurnover(row) {
+        if (!row) {
+            return 0;
+        }
+        return (Number(row.grossTurnover) || 0)
+            - (Number(row.bonusTurnover) || 0)
+            - (Number(row.creditTurnover) || 0);
+    }
+
+    /**
+     * Средняя ставка кредитной комиссии, %.
+     *
+     * @param {Object|null} row
+     * @returns {number|null}
+     */
+    function creditRatePct(row) {
+        if (!row) {
+            return null;
+        }
+        var base = Number(row.creditTurnover) || 0;
+        if (base <= 0) {
+            return null;
+        }
+        return (Number(row.creditCharge) || 0) / base * 100;
+    }
+
+    /**
+     * Средняя ставка эквайринга, %.
+     *
+     * @param {Object|null} row
+     * @returns {number|null}
+     */
+    function acquiringRatePct(row) {
+        if (!row) {
+            return null;
+        }
+        var base = acquiringTurnover(row);
+        if (base <= 0) {
+            return null;
+        }
+        return (Number(row.acquiringCharge) || 0) / base * 100;
+    }
+
+    /**
+     * Суммирует метрики компаний за сторону current|previous.
+     * summary в API иногда битый — byCompany надёжнее.
+     *
+     * @param {Array<Object>} byCompany
+     * @param {string} side
+     * @returns {Object<string, number>}
+     */
+    function sumProfitByCompanySide(byCompany, side) {
+        var out = {};
+        var hasAny = false;
+        (byCompany || []).forEach(function (row) {
+            var src = row && row[side];
+            if (!src || typeof src !== 'object') {
+                return;
+            }
+            Object.keys(src).forEach(function (key) {
+                if (PROFIT_SKIP_SUM_KEYS[key]) {
+                    return;
+                }
+                var value = Number(src[key]);
+                if (Number.isNaN(value)) {
+                    return;
+                }
+                hasAny = true;
+                out[key] = (out[key] || 0) + value;
+            });
+        });
+        return hasAny ? out : null;
+    }
+
+    /**
+     * Δ для KPI/таблицы из двух сторон.
+     *
+     * @param {Object<string, number>} current
+     * @param {Object<string, number>|null} previous
+     * @returns {Object<string, Object>}
+     */
+    function buildProfitDelta(current, previous) {
+        var delta = {};
+        var keys = {};
+        Object.keys(current || {}).forEach(function (k) { keys[k] = true; });
+        Object.keys(previous || {}).forEach(function (k) { keys[k] = true; });
+        Object.keys(keys).forEach(function (key) {
+            var cur = Number((current || {})[key]) || 0;
+            var prev = previous && previous[key] != null ? Number(previous[key]) : null;
+            if (prev === null || Number.isNaN(prev)) {
+                delta[key] = {
+                    absolute: cur,
+                    percent: null,
+                    meaningful: false,
+                    isNew: true
+                };
+                return;
+            }
+            var abs = cur - prev;
+            var meaningful = prev > 0 && ((cur >= 0) === (prev >= 0));
+            delta[key] = {
+                absolute: Math.round(abs * 10000) / 10000,
+                percent: meaningful ? Math.round(abs / Math.abs(prev) * 10000) / 100 : null,
+                meaningful: meaningful,
+                isNew: false
+            };
+        });
+        return delta;
+    }
+
+    /**
+     * Пересобирает summary из byCompany, если он есть.
+     *
+     * @param {Object|null} profit
+     * @returns {Object|null}
+     */
+    function rebuildProfitFromByCompany(profit) {
+        if (!profit || !profit.summary) {
+            return profit;
+        }
+        var byCompany = profit.byCompany || [];
+        if (!byCompany.length) {
+            return profit;
+        }
+        var current = sumProfitByCompanySide(byCompany, 'current');
+        var previous = sumProfitByCompanySide(byCompany, 'previous');
+        if (!current && !previous) {
+            return profit;
+        }
+        current = current || {};
+        previous = previous || (profit.summary.previous || null);
+        return Object.assign({}, profit, {
+            summary: {
+                current: current,
+                previous: previous || {},
+                delta: buildProfitDelta(current, previous)
+            }
+        });
+    }
+
+    /**
+     * Достаёт summary.current из warehouse-артефакта месяца.
+     *
+     * @param {Object} artifact
+     * @returns {Object|null}
+     */
+    function extractProfitCurrent(artifact) {
+        var profit = artifact
+            && artifact.blocks
+            && artifact.blocks.main
+            && artifact.blocks.main.profit;
+        if (!profit) {
+            return null;
+        }
+        var fixed = rebuildProfitFromByCompany(profit);
+        if (!fixed || !fixed.summary || !fixed.summary.current) {
+            return null;
+        }
+        var current = fixed.summary.current;
+        // Пустой/нулевой месяц без компаний — считаем «нет данных».
+        if (!Object.keys(current).length) {
+            return null;
+        }
+        return current;
+    }
+
+    /**
+     * Загружает 12 месяцев выбранного года из warehouse.
+     *
+     * @param {number} year
+     * @returns {Promise<{labels: string[], months: string[], rows: Array<Object|null>}>}
+     */
+    function loadProfitYearSeries(year) {
+        var cacheKey = String(year);
+        if (state.profitYearCache && state.profitYearCacheKey === cacheKey) {
+            return Promise.resolve(state.profitYearCache);
+        }
+
+        var fetches = [];
+        var months = [];
+        for (var month = 1; month <= 12; month += 1) {
+            var ym = year + '-' + String(month).padStart(2, '0');
+            months.push(ym);
+            fetches.push(
+                fetch(WAREHOUSE_BASE + '/periods/' + ym + '.json?_=' + Date.now())
+                    .then(function (response) {
+                        if (!response.ok) {
+                            return null;
+                        }
+                        return response.json();
+                    })
+                    .then(function (artifact) {
+                        return artifact ? extractProfitCurrent(artifact) : null;
+                    })
+                    .catch(function () {
+                        return null;
+                    })
+            );
+        }
+
+        return Promise.all(fetches).then(function (rows) {
+            var series = {
+                labels: MONTH_LABELS.slice(),
+                months: months,
+                rows: rows
+            };
+            state.profitYearCacheKey = cacheKey;
+            state.profitYearCache = series;
+            return series;
+        });
+    }
+
+    function destroyChart(chart) {
+        if (chart) {
+            chart.destroy();
+        }
+        return null;
+    }
+
+    function moneyTooltipCallback(context) {
+        var label = context.dataset.label || '';
+        var value = context.parsed.y;
+        if (value === null || value === undefined) {
+            return label + ': —';
+        }
+        return label + ': ' + formatNumber(value);
+    }
+
+    function percentTooltipCallback(context) {
+        var label = context.dataset.label || '';
+        var value = context.parsed.y;
+        if (value === null || value === undefined) {
+            return label + ': —';
+        }
+        return label + ': ' + formatPercent(value);
+    }
+
+    /**
+     * Рисует 4 графика profit по серии года.
+     *
+     * @param {{labels: string[], rows: Array<Object|null>}} series
+     * @returns {void}
+     */
+    function renderMainProfitCharts(series) {
+        if (state.activeTab !== 'main') {
+            return;
+        }
+
+        var labels = series.labels;
+        var rows = series.rows || [];
+        var hint = el('main-charts-hint');
+        var filled = rows.filter(Boolean).length;
+        if (hint) {
+            hint.textContent = 'Год ' + state.selectedYear +
+                ': месяцев с profit в warehouse — ' + filled + ' из 12.';
+        }
+
+        var net = [];
+        var credit = [];
+        var acquiring = [];
+        var refund = [];
+        var creditRate = [];
+        var acquiringRate = [];
+
+        rows.forEach(function (row) {
+            if (!row) {
+                net.push(null);
+                credit.push(null);
+                acquiring.push(null);
+                refund.push(null);
+                creditRate.push(null);
+                acquiringRate.push(null);
+                return;
+            }
+            net.push(Number(row.netTotal) || 0);
+            credit.push(Number(row.creditTurnover) || 0);
+            acquiring.push(acquiringTurnover(row));
+            refund.push(Math.abs(Number(row.realRefund) || 0));
+            creditRate.push(creditRatePct(row));
+            acquiringRate.push(acquiringRatePct(row));
+        });
+
+        var commonOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { position: 'top' },
+                tooltip: { callbacks: { label: moneyTooltipCallback } }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function (value) {
+                            return formatNumber(value);
+                        }
+                    }
+                }
+            }
+        };
+
+        mainMoneyChart = destroyChart(mainMoneyChart);
+        var moneyCanvas = el('main-money-chart');
+        if (moneyCanvas) {
+            mainMoneyChart = new Chart(moneyCanvas, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Чистый итог',
+                            data: net,
+                            borderColor: '#16a34a',
+                            backgroundColor: 'rgba(22, 163, 74, 0.15)',
+                            fill: true,
+                            tension: 0.25,
+                            spanGaps: false
+                        }
+                    ]
+                },
+                options: commonOptions
+            });
+        }
+
+        mainStructureChart = destroyChart(mainStructureChart);
+        var structureCanvas = el('main-structure-chart');
+        if (structureCanvas) {
+            mainStructureChart = new Chart(structureCanvas, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Кредит',
+                            data: credit,
+                            backgroundColor: '#f59e0b'
+                        },
+                        {
+                            label: 'Эквайринг (без бонусов)',
+                            data: acquiring,
+                            backgroundColor: '#38bdf8'
+                        }
+                    ]
+                },
+                options: Object.assign({}, commonOptions, {
+                    scales: {
+                        x: { stacked: false },
+                        y: {
+                            stacked: false,
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function (value) {
+                                    return formatNumber(value);
+                                }
+                            }
+                        }
+                    }
+                })
+            });
+        }
+
+        mainRefundChart = destroyChart(mainRefundChart);
+        var refundCanvas = el('main-refund-chart');
+        if (refundCanvas) {
+            mainRefundChart = new Chart(refundCanvas, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Возврат реальный',
+                            data: refund,
+                            borderColor: '#ef4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                            fill: true,
+                            tension: 0.25,
+                            spanGaps: false
+                        }
+                    ]
+                },
+                options: commonOptions
+            });
+        }
+
+        mainRateChart = destroyChart(mainRateChart);
+        var rateCanvas = el('main-rate-chart');
+        if (rateCanvas) {
+            mainRateChart = new Chart(rateCanvas, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Ставка кредита, %',
+                            data: creditRate,
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.12)',
+                            tension: 0.25,
+                            spanGaps: false
+                        },
+                        {
+                            label: 'Ставка эквайринга, %',
+                            data: acquiringRate,
+                            borderColor: '#0ea5e9',
+                            backgroundColor: 'rgba(14, 165, 233, 0.12)',
+                            tension: 0.25,
+                            spanGaps: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: { callbacks: { label: percentTooltipCallback } }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function (value) {
+                                    return formatPercent(value);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    /**
+     * Подмешивает profit текущего payload в серию года (live / snapshot).
+     *
+     * @param {{labels: string[], months: string[], rows: Array<Object|null>}} series
+     * @returns {{labels: string[], months: string[], rows: Array<Object|null>}}
+     */
+    function mergeCurrentProfitIntoSeries(series) {
+        var profit = state.payload
+            && state.payload.blocks
+            && state.payload.blocks.main
+            && state.payload.blocks.main.profit;
+        var fixed = rebuildProfitFromByCompany(profit);
+        var current = fixed && fixed.summary && fixed.summary.current;
+        if (!current || !state.selectedYear || !state.selectedMonth) {
+            return series;
+        }
+        var idx = state.selectedMonth - 1;
+        if (idx < 0 || idx > 11) {
+            return series;
+        }
+        var rows = series.rows.slice();
+        rows[idx] = current;
+        return {
+            labels: series.labels,
+            months: series.months,
+            rows: rows
+        };
+    }
+
+    /**
+     * Подгружает серию года и рисует графики Main.
+     *
+     * @returns {void}
+     */
+    function refreshMainProfitCharts() {
+        if (state.activeTab !== 'main' || !state.selectedYear) {
+            return;
+        }
+        loadProfitYearSeries(state.selectedYear)
+            .then(function (series) {
+                renderMainProfitCharts(mergeCurrentProfitIntoSeries(series));
+            })
+            .catch(function () {
+                var hint = el('main-charts-hint');
+                if (hint) {
+                    hint.textContent = 'Не удалось загрузить серии profit из warehouse.';
+                }
+            });
+    }
+
     function getDelta(summaryBlock, key) {
         if (key === 'earned') {
             var current = computeEarned(summaryBlock.current);
@@ -331,10 +867,7 @@
         params.set('periodType', filters.periodType);
         params.set('period', filters.period);
         params.set('companyId', String(filters.companyId || 0));
-        var token = getToken();
-        if (token) {
-            params.set('token', token);
-        }
+        // token не в URL — drill читает из localStorage
         return 'drill.html?' + params.toString();
     }
 
@@ -634,12 +1167,14 @@
         }
 
         if (profit && profit.summary) {
-            renderGenericKpi(el('main-kpi'), profit.summary, MAIN_METRICS);
-            renderGenericTable(el('main-table-body'), profit.summary, MAIN_METRICS);
+            var profitFixed = rebuildProfitFromByCompany(profit);
+            renderGenericKpi(el('main-kpi'), profitFixed.summary, MAIN_METRICS);
+            renderGenericTable(el('main-table-body'), profitFixed.summary, MAIN_METRICS);
         } else {
             el('main-kpi').innerHTML = '';
             el('main-table-body').innerHTML = '<tr><td colspan="5">Нет данных profit за период</td></tr>';
         }
+        refreshMainProfitCharts();
 
         if (activity && activity.summary) {
             renderActivityKpiCards(el('activity-overview-kpi'), activity.summary, ['total', 'earned', 'manual']);
@@ -692,11 +1227,19 @@
                 if (artifact.filters && artifact.filters.period) {
                     var parts = String(artifact.filters.period).split('-');
                     if (parts.length === 2) {
-                        state.selectedYear = Number(parts[0]);
+                        var nextYear = Number(parts[0]);
+                        if (state.selectedYear !== nextYear) {
+                            state.profitYearCache = null;
+                            state.profitYearCacheKey = null;
+                        }
+                        state.selectedYear = nextYear;
                         state.selectedMonth = Number(parts[1]);
                         renderPeriodButtons();
                     }
                 }
+                // Месячный файл мог обновиться — сбрасываем кэш серии года.
+                state.profitYearCache = null;
+                state.profitYearCacheKey = null;
                 renderDashboard(artifact, 'warehouse');
             });
     }
@@ -801,7 +1344,7 @@
     function refreshLive() {
         var token = getToken();
         if (!token) {
-            setStatus('Нужен API token (?token=... в URL)', true);
+            setStatus('Нужен API token: один раз открой страницу с ?token=... (сохранится локально)', true);
             return Promise.resolve();
         }
         if (state.loading) {

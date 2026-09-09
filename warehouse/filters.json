@@ -1,13 +1,13 @@
 {
   "schemaVersion": "2.0",
-  "referenceDate": "2026-09-02",
+  "referenceDate": "2026-09-07",
   "timezone": "Europe/Moscow",
   "periodTypes": [
     {
       "id": "day",
       "label": "День",
       "format": "Y-m-d",
-      "example": "2026-09-02"
+      "example": "2026-09-07"
     },
     {
       "id": "month",

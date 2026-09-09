@@ -1,15 +1,18 @@
 {
   "version": "1.0",
   "schemaVersion": "2.0",
-  "generatedAt": "2026-09-03T14:42:04+03:00",
+  "generatedAt": "2026-09-08T08:22:34.998Z",
   "coverage": {
-    "from": "2026-08",
-    "to": "2026-08",
-    "count": 1
+    "from": "2021-01",
+    "to": "2026-09",
+    "count": 69
   },
   "lastRun": {
-    "mode": "seed-from-snapshot",
-    "at": "2026-09-03T14:42:04+03:00",
+    "mode": "refresh",
+    "tabs": [
+      "owner"
+    ],
+    "at": "2026-09-08T08:22:34.998Z",
     "ok": 1,
     "failed": [],
     "changed": 1,
@@ -17,12 +20,901 @@
   },
   "periods": {
     "2026-08": {
-      "fetchedAt": "2026-09-03T14:42:04+03:00",
-      "checksum": "786a219a63446f41",
+      "fetchedAt": "2026-09-08T08:21:57.495Z",
+      "checksum": "acfe53e2a0118a15",
       "file": "periods/2026-08.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": false,
+      "durationMs": 116,
+      "sectionsFailed": null
+    },
+    "2021-01": {
+      "fetchedAt": "2026-09-08T07:35:22.303Z",
+      "checksum": "05b106f100f7759f",
+      "file": "periods/2021-01.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
       "changed": true,
-      "durationMs": null,
-      "sectionsFailed": 0
+      "durationMs": 21661,
+      "sectionsFailed": null
+    },
+    "2021-02": {
+      "fetchedAt": "2026-09-08T07:35:52.191Z",
+      "checksum": "06ac047612a8a9f1",
+      "file": "periods/2021-02.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 24884,
+      "sectionsFailed": null
+    },
+    "2021-03": {
+      "fetchedAt": "2026-09-08T07:36:22.606Z",
+      "checksum": "bbe59d511409665f",
+      "file": "periods/2021-03.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 25414,
+      "sectionsFailed": null
+    },
+    "2021-04": {
+      "fetchedAt": "2026-09-08T07:36:52.057Z",
+      "checksum": "6f871554f2df96cb",
+      "file": "periods/2021-04.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 24448,
+      "sectionsFailed": null
+    },
+    "2021-05": {
+      "fetchedAt": "2026-09-08T07:37:22.439Z",
+      "checksum": "7853fdcc109bba09",
+      "file": "periods/2021-05.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 25382,
+      "sectionsFailed": null
+    },
+    "2021-06": {
+      "fetchedAt": "2026-09-08T07:37:51.648Z",
+      "checksum": "3c6263602958646e",
+      "file": "periods/2021-06.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 24204,
+      "sectionsFailed": null
+    },
+    "2021-07": {
+      "fetchedAt": "2026-09-08T07:38:23.835Z",
+      "checksum": "62aaa81741d0cb3a",
+      "file": "periods/2021-07.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 27186,
+      "sectionsFailed": null
+    },
+    "2021-08": {
+      "fetchedAt": "2026-09-08T07:38:43.265Z",
+      "checksum": "736d4b3bd4a50d37",
+      "file": "periods/2021-08.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 14429,
+      "sectionsFailed": null
+    },
+    "2021-09": {
+      "fetchedAt": "2026-09-08T07:39:18.831Z",
+      "checksum": "eb72be2685d2d72a",
+      "file": "periods/2021-09.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 30566,
+      "sectionsFailed": null
+    },
+    "2021-10": {
+      "fetchedAt": "2026-09-08T07:39:56.601Z",
+      "checksum": "68b445b384298619",
+      "file": "periods/2021-10.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 32769,
+      "sectionsFailed": null
+    },
+    "2021-11": {
+      "fetchedAt": "2026-09-08T07:40:34.792Z",
+      "checksum": "2b20feb163a13c5b",
+      "file": "periods/2021-11.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 33190,
+      "sectionsFailed": null
+    },
+    "2021-12": {
+      "fetchedAt": "2026-09-08T07:41:13.234Z",
+      "checksum": "4a7e9a623251835d",
+      "file": "periods/2021-12.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 33440,
+      "sectionsFailed": null
+    },
+    "2022-01": {
+      "fetchedAt": "2026-09-08T07:41:37.011Z",
+      "checksum": "e5822c0f1a3df134",
+      "file": "periods/2022-01.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 18777,
+      "sectionsFailed": null
+    },
+    "2022-02": {
+      "fetchedAt": "2026-09-08T07:42:08.807Z",
+      "checksum": "787e689e87c1323b",
+      "file": "periods/2022-02.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 26796,
+      "sectionsFailed": null
+    },
+    "2022-03": {
+      "fetchedAt": "2026-09-08T07:42:40.341Z",
+      "checksum": "11c8932c7477f2de",
+      "file": "periods/2022-03.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 26534,
+      "sectionsFailed": null
+    },
+    "2022-04": {
+      "fetchedAt": "2026-09-08T07:43:10.647Z",
+      "checksum": "822213e9c775d21e",
+      "file": "periods/2022-04.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 25304,
+      "sectionsFailed": null
+    },
+    "2022-05": {
+      "fetchedAt": "2026-09-08T07:43:42.627Z",
+      "checksum": "1da1f4faaf939a97",
+      "file": "periods/2022-05.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 26981,
+      "sectionsFailed": null
+    },
+    "2022-06": {
+      "fetchedAt": "2026-09-08T07:44:15.435Z",
+      "checksum": "4ae57376767f7fd4",
+      "file": "periods/2022-06.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 27805,
+      "sectionsFailed": null
+    },
+    "2022-07": {
+      "fetchedAt": "2026-09-08T07:44:51.043Z",
+      "checksum": "58cd0e8d8f8b5e24",
+      "file": "periods/2022-07.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 30609,
+      "sectionsFailed": null
+    },
+    "2022-08": {
+      "fetchedAt": "2026-09-08T07:45:15.964Z",
+      "checksum": "58e906f5e5ad857e",
+      "file": "periods/2022-08.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 19919,
+      "sectionsFailed": null
+    },
+    "2022-09": {
+      "fetchedAt": "2026-09-08T07:45:58.965Z",
+      "checksum": "86f209461f01b44f",
+      "file": "periods/2022-09.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 38003,
+      "sectionsFailed": null
+    },
+    "2022-10": {
+      "fetchedAt": "2026-09-08T07:46:46.276Z",
+      "checksum": "edd38b5271d1d417",
+      "file": "periods/2022-10.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 42306,
+      "sectionsFailed": null
+    },
+    "2022-11": {
+      "fetchedAt": "2026-09-08T07:47:33.555Z",
+      "checksum": "2bc39147c31ee486",
+      "file": "periods/2022-11.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 42281,
+      "sectionsFailed": null
+    },
+    "2022-12": {
+      "fetchedAt": "2026-09-08T07:48:23.353Z",
+      "checksum": "4dfdde7b6233d9e5",
+      "file": "periods/2022-12.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 44794,
+      "sectionsFailed": null
+    },
+    "2023-01": {
+      "fetchedAt": "2026-09-08T07:48:48.060Z",
+      "checksum": "ca2b8717fc98ff62",
+      "file": "periods/2023-01.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 19707,
+      "sectionsFailed": null
+    },
+    "2023-02": {
+      "fetchedAt": "2026-09-08T07:49:33.119Z",
+      "checksum": "10d671bf9acb08c7",
+      "file": "periods/2023-02.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 40055,
+      "sectionsFailed": null
+    },
+    "2023-03": {
+      "fetchedAt": "2026-09-08T07:50:31.994Z",
+      "checksum": "9342083ae5fef987",
+      "file": "periods/2023-03.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 53876,
+      "sectionsFailed": null
+    },
+    "2023-04": {
+      "fetchedAt": "2026-09-08T07:51:29.203Z",
+      "checksum": "b1a4c3db78153475",
+      "file": "periods/2023-04.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 52207,
+      "sectionsFailed": null
+    },
+    "2023-05": {
+      "fetchedAt": "2026-09-08T07:52:24.022Z",
+      "checksum": "ad1a8ad9379045ef",
+      "file": "periods/2023-05.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 49820,
+      "sectionsFailed": null
+    },
+    "2023-06": {
+      "fetchedAt": "2026-09-08T07:53:19.657Z",
+      "checksum": "b16f5e2fadb89cef",
+      "file": "periods/2023-06.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 50633,
+      "sectionsFailed": null
+    },
+    "2023-07": {
+      "fetchedAt": "2026-09-08T07:54:13.286Z",
+      "checksum": "63b0dccb45bf5b7e",
+      "file": "periods/2023-07.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 48629,
+      "sectionsFailed": null
+    },
+    "2023-08": {
+      "fetchedAt": "2026-09-08T07:54:41.661Z",
+      "checksum": "ee48e03d9a36a012",
+      "file": "periods/2023-08.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 23372,
+      "sectionsFailed": null
+    },
+    "2023-09": {
+      "fetchedAt": "2026-09-08T07:55:28.084Z",
+      "checksum": "7100052611f54a79",
+      "file": "periods/2023-09.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 41425,
+      "sectionsFailed": null
+    },
+    "2023-10": {
+      "fetchedAt": "2026-09-08T07:56:04.941Z",
+      "checksum": "8305bfa6f2a7106f",
+      "file": "periods/2023-10.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 31854,
+      "sectionsFailed": null
+    },
+    "2023-11": {
+      "fetchedAt": "2026-09-08T07:56:44.372Z",
+      "checksum": "fc62a7ce759b3c42",
+      "file": "periods/2023-11.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 34431,
+      "sectionsFailed": null
+    },
+    "2024-01": {
+      "fetchedAt": "2026-09-08T07:57:41.472Z",
+      "checksum": "b38d30bfc456ccfa",
+      "file": "periods/2024-01.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 12939,
+      "sectionsFailed": null
+    },
+    "2024-02": {
+      "fetchedAt": "2026-09-08T07:58:18.482Z",
+      "checksum": "160dcb7244af2883",
+      "file": "periods/2024-02.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 32010,
+      "sectionsFailed": null
+    },
+    "2024-03": {
+      "fetchedAt": "2026-09-08T07:58:59.712Z",
+      "checksum": "f7fac40967f85cf3",
+      "file": "periods/2024-03.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 36231,
+      "sectionsFailed": null
+    },
+    "2024-04": {
+      "fetchedAt": "2026-09-08T07:59:38.091Z",
+      "checksum": "b7dbc565fef35d91",
+      "file": "periods/2024-04.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 33376,
+      "sectionsFailed": null
+    },
+    "2024-05": {
+      "fetchedAt": "2026-09-08T08:00:28.334Z",
+      "checksum": "baa10eb1c6c06c29",
+      "file": "periods/2024-05.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 45243,
+      "sectionsFailed": null
+    },
+    "2024-06": {
+      "fetchedAt": "2026-09-08T08:22:34.992Z",
+      "checksum": "3890c63fb97cf9ec",
+      "file": "periods/2024-06.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 116,
+      "sectionsFailed": null
+    },
+    "2024-07": {
+      "fetchedAt": "2026-09-08T08:09:24.056Z",
+      "checksum": "49fc1bed71486f06",
+      "file": "periods/2024-07.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 224723,
+      "sectionsFailed": null
+    },
+    "2024-08": {
+      "fetchedAt": "2026-09-08T08:09:45.830Z",
+      "checksum": "bcb7402c8aef1093",
+      "file": "periods/2024-08.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 16771,
+      "sectionsFailed": null
+    },
+    "2024-09": {
+      "fetchedAt": "2026-09-08T08:10:25.635Z",
+      "checksum": "883298fd2718ad89",
+      "file": "periods/2024-09.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 34805,
+      "sectionsFailed": null
+    },
+    "2024-10": {
+      "fetchedAt": "2026-09-08T08:11:06.893Z",
+      "checksum": "8ff0af2b103ebf8c",
+      "file": "periods/2024-10.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 36257,
+      "sectionsFailed": null
+    },
+    "2024-11": {
+      "fetchedAt": "2026-09-08T08:11:47.517Z",
+      "checksum": "020a868b6096fbe2",
+      "file": "periods/2024-11.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 35623,
+      "sectionsFailed": null
+    },
+    "2024-12": {
+      "fetchedAt": "2026-09-08T08:12:22.757Z",
+      "checksum": "65e20265378d58ad",
+      "file": "periods/2024-12.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 30239,
+      "sectionsFailed": null
+    },
+    "2025-01": {
+      "fetchedAt": "2026-09-08T08:12:41.727Z",
+      "checksum": "9c9ace30fdb0eb54",
+      "file": "periods/2025-01.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 13971,
+      "sectionsFailed": null
+    },
+    "2025-02": {
+      "fetchedAt": "2026-09-08T08:13:13.797Z",
+      "checksum": "9c91f8f8287a071f",
+      "file": "periods/2025-02.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 27069,
+      "sectionsFailed": null
+    },
+    "2025-03": {
+      "fetchedAt": "2026-09-08T08:13:41.930Z",
+      "checksum": "323e071470b09846",
+      "file": "periods/2025-03.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 23133,
+      "sectionsFailed": null
+    },
+    "2025-04": {
+      "fetchedAt": "2026-09-08T08:14:11.550Z",
+      "checksum": "ccbb59141aa823b0",
+      "file": "periods/2025-04.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 24618,
+      "sectionsFailed": null
+    },
+    "2025-05": {
+      "fetchedAt": "2026-09-08T08:14:40.543Z",
+      "checksum": "559c9aa1b5010bf3",
+      "file": "periods/2025-05.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 23991,
+      "sectionsFailed": null
+    },
+    "2025-06": {
+      "fetchedAt": "2026-09-08T08:15:09.587Z",
+      "checksum": "505d99477fe8a531",
+      "file": "periods/2025-06.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 24043,
+      "sectionsFailed": null
+    },
+    "2025-07": {
+      "fetchedAt": "2026-09-08T08:15:40.687Z",
+      "checksum": "82aee6c8c049ba2e",
+      "file": "periods/2025-07.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 26100,
+      "sectionsFailed": null
+    },
+    "2025-08": {
+      "fetchedAt": "2026-09-08T08:15:58.515Z",
+      "checksum": "5e8d19db80227ad3",
+      "file": "periods/2025-08.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 12825,
+      "sectionsFailed": null
+    },
+    "2025-09": {
+      "fetchedAt": "2026-09-08T08:16:30.136Z",
+      "checksum": "0b6e740c5e0f222c",
+      "file": "periods/2025-09.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 26622,
+      "sectionsFailed": null
+    },
+    "2025-10": {
+      "fetchedAt": "2026-09-08T08:17:09.527Z",
+      "checksum": "919210603425873c",
+      "file": "periods/2025-10.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 34388,
+      "sectionsFailed": null
+    },
+    "2025-11": {
+      "fetchedAt": "2026-09-08T08:17:47.676Z",
+      "checksum": "890512b62fa5c6d6",
+      "file": "periods/2025-11.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 33152,
+      "sectionsFailed": null
+    },
+    "2025-12": {
+      "fetchedAt": "2026-09-08T08:18:24.867Z",
+      "checksum": "3edaf401497597af",
+      "file": "periods/2025-12.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 32188,
+      "sectionsFailed": null
+    },
+    "2026-01": {
+      "fetchedAt": "2026-09-08T08:18:45.910Z",
+      "checksum": "b3c715be057bb7a9",
+      "file": "periods/2026-01.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 16042,
+      "sectionsFailed": null
+    },
+    "2026-02": {
+      "fetchedAt": "2026-09-08T08:19:28.795Z",
+      "checksum": "52e13321b1aefd48",
+      "file": "periods/2026-02.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 37883,
+      "sectionsFailed": null
+    },
+    "2026-03": {
+      "fetchedAt": "2026-09-08T08:20:11.789Z",
+      "checksum": "cd81dc4e3b14adf9",
+      "file": "periods/2026-03.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 37993,
+      "sectionsFailed": null
+    },
+    "2026-04": {
+      "fetchedAt": "2026-09-08T08:20:16.916Z",
+      "checksum": "f8bb87525aeab1d5",
+      "file": "periods/2026-04.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 126,
+      "sectionsFailed": null
+    },
+    "2026-05": {
+      "fetchedAt": "2026-09-08T08:20:54.242Z",
+      "checksum": "bad5083e9a127907",
+      "file": "periods/2026-05.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 32326,
+      "sectionsFailed": null
+    },
+    "2026-06": {
+      "fetchedAt": "2026-09-08T08:21:32.658Z",
+      "checksum": "345e8afddf103b1b",
+      "file": "periods/2026-06.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 33413,
+      "sectionsFailed": null
+    },
+    "2026-07": {
+      "fetchedAt": "2026-09-08T08:21:52.377Z",
+      "checksum": "dbcf74dfedeb3ac3",
+      "file": "periods/2026-07.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 14718,
+      "sectionsFailed": null
+    },
+    "2026-09": {
+      "fetchedAt": "2026-09-08T08:22:21.963Z",
+      "checksum": "ff8d0ac0455457d9",
+      "file": "periods/2026-09.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 19468,
+      "sectionsFailed": null
+    },
+    "2023-12": {
+      "fetchedAt": "2026-09-08T07:57:23.533Z",
+      "checksum": "d457e6ceb4c4c991",
+      "file": "periods/2023-12.json",
+      "tabs": [
+        "activity",
+        "main",
+        "owner"
+      ],
+      "changed": true,
+      "durationMs": 34160,
+      "sectionsFailed": null
     }
   }
 }
