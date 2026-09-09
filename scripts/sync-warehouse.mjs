@@ -1,16 +1,16 @@
 #!/usr/bin/env node
 /**
- * Sync warehouse: тянет management-report API по месяцам и пишет файлы + manifest.
+ * Sync warehouse v2: датасеты по папкам (см. docs/warehouse-v2-contract.md).
  *
  * Usage:
- *   node scripts/sync-warehouse.mjs --mode=mass --from=2021-01 --to=2026-08
- *   node scripts/sync-warehouse.mjs --mode=refresh
- *   node scripts/sync-warehouse.mjs --mode=refresh --months=2026-07,2026-08,2026-09
+ *   node scripts/sync-warehouse.mjs --mode=mass --tabs=main,owner,activity --from=2021-01 --to=2026-08
+ *   node scripts/sync-warehouse.mjs --mode=refresh --tabs=all --include-previous
+ *   node scripts/sync-warehouse.mjs --tabs=activity-drill --drill-types=manual_human --months=2026-08
  *
  * Env:
  *   MGMT_REPORT_API_TOKEN   Bearer token (обязателен)
  *   MGMT_REPORT_API_BASE    default https://biz.edpro.ru/api/v1/management-report
- *   MGMT_SYNC_DELAY_MS      пауза между месяцами (default 8000)
+ *   MGMT_SYNC_DELAY_MS      пауза между запросами (default 8000)
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -20,23 +20,54 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 const WAREHOUSE_DIR = path.join(REPO_ROOT, 'warehouse');
-const PERIODS_DIR = path.join(WAREHOUSE_DIR, 'periods');
 const MANIFEST_PATH = path.join(WAREHOUSE_DIR, 'manifest.json');
 
 const DEFAULT_API_BASE = 'https://biz.edpro.ru/api/v1/management-report';
 const DEFAULT_FROM = '2021-01';
 const DEFAULT_DELAY_MS = 8000;
+const WAREHOUSE_VERSION = '2.0';
 
-/** @type {Record<string, {mainSections: string, ownerSections: string}>} */
-const TAB_QUERY = {
-    activity: { mainSections: '', ownerSections: 'partnerActivity' },
-    owner: { mainSections: '', ownerSections: 'companyMarketing' },
-    main: { mainSections: 'profit', ownerSections: '' },
-    all: {
-        mainSections: 'profit',
-        ownerSections: 'companyMarketing,partnerActivity',
+/** Summary-датасеты (вкладки дашборда). */
+const SUMMARY_DATASETS = {
+    'main.profit': {
+        path: 'main/profit',
+        reportType: 'main',
+        section: 'profit',
+        tab: 'main',
+    },
+    'owner.marketing': {
+        path: 'owner/marketing',
+        reportType: 'owner',
+        section: 'companyMarketing',
+        tab: 'owner',
+    },
+    'activity.summary': {
+        path: 'activity/summary',
+        reportType: 'owner',
+        section: 'partnerActivity',
+        tab: 'activity',
     },
 };
+
+/** Корзины drill (activity.drill.{type}). */
+const DEFAULT_DRILL_TYPES = [
+    'total',
+    'manual',
+    'purchase',
+    'registration',
+    'hybrid',
+    'adv',
+    'club',
+    'partner_registration',
+    'product_education',
+    'overlap',
+    'manual_ambassador',
+    'manual_barter_influence',
+    'manual_cross_marketing',
+    'manual_barter_solo',
+    'manual_coach',
+    'manual_human',
+];
 
 /**
  * @param {string[]} argv
@@ -107,8 +138,6 @@ function listMonths(fromYm, toYm) {
 }
 
 /**
- * Текущий календарный месяц (MTD) в Europe/Moscow приблизительно через локаль сервера.
- *
  * @returns {string}
  */
 function currentMonthYm() {
@@ -117,129 +146,62 @@ function currentMonthYm() {
 }
 
 /**
- * @param {object} payload
+ * @param {unknown} data
  * @returns {string}
  */
-function checksumPayload(payload) {
-    const blocks = payload?.blocks || {};
-    const slice = {
-        main: blocks.main?.profit?.summary?.current || null,
-        owner: blocks.owner?.companyMarketing?.summary?.current || null,
-        activity: blocks.owner?.partnerActivity?.summary?.current || null,
-    };
-    return crypto.createHash('sha256').update(JSON.stringify(slice)).digest('hex').slice(0, 16);
+function checksumData(data) {
+    return crypto.createHash('sha256').update(JSON.stringify(data ?? null)).digest('hex').slice(0, 16);
 }
 
 /**
  * @param {string} tabsArg
- * @returns {string[]}
+ * @returns {{summaryIds: string[], drill: boolean}}
  */
 function resolveTabs(tabsArg) {
     const raw = String(tabsArg || 'all')
         .split(',')
         .map((s) => s.trim())
         .filter(Boolean);
-    if (raw.includes('all')) {
-        return ['all'];
-    }
+
+    let drill = false;
+    const summaryIds = [];
+
     for (const tab of raw) {
-        if (!TAB_QUERY[tab]) {
-            throw new Error(`Неизвестный tab: ${tab}. Допустимо: activity,owner,main,all`);
+        if (tab === 'all') {
+            summaryIds.push(...Object.keys(SUMMARY_DATASETS));
+            continue;
         }
+        if (tab === 'activity-drill') {
+            drill = true;
+            continue;
+        }
+        const match = Object.entries(SUMMARY_DATASETS).find(([, meta]) => meta.tab === tab);
+        if (!match) {
+            throw new Error(
+                `Неизвестный tab: ${tab}. Допустимо: main,owner,activity,activity-drill,all`
+            );
+        }
+        summaryIds.push(match[0]);
     }
-    return raw;
-}
 
-/**
- * Собирает query params для набора вкладок.
- *
- * @param {string[]} tabs
- * @returns {{mainSections: string, ownerSections: string}}
- */
-function buildSectionsForTabs(tabs) {
-    if (tabs.length === 1 && tabs[0] === 'all') {
-        return TAB_QUERY.all;
-    }
-    const main = [];
-    const owner = [];
-    for (const tab of tabs) {
-        const q = TAB_QUERY[tab];
-        if (q.mainSections) {
-            main.push(...q.mainSections.split(',').filter(Boolean));
-        }
-        if (q.ownerSections) {
-            owner.push(...q.ownerSections.split(',').filter(Boolean));
-        }
-    }
     return {
-        mainSections: [...new Set(main)].join(','),
-        ownerSections: [...new Set(owner)].join(','),
+        summaryIds: [...new Set(summaryIds)],
+        drill,
     };
 }
 
 /**
- * Мержит новый ответ API в уже сохранённый артефакт месяца.
- *
- * @param {object|null} existing
- * @param {object} payload
- * @param {string} periodYm
- * @param {number} companyId
- * @param {string[]} tabs
- * @returns {object}
+ * @param {string|boolean|undefined} arg
+ * @returns {string[]}
  */
-function mergeArtifact(existing, payload, periodYm, companyId, tabs) {
-    const base = existing && existing.blocks
-        ? existing
-        : {
-            warehouseVersion: '1.0',
-            period: periodYm,
-            filters: {
-                periodType: 'month',
-                period: periodYm,
-                compareMode: 'previous',
-                companyId,
-            },
-            blocks: { main: {}, owner: {} },
-        };
-
-    const nextBlocks = {
-        main: { ...(base.blocks.main || {}) },
-        owner: { ...(base.blocks.owner || {}) },
-    };
-    const incoming = payload.blocks || {};
-
-    if (incoming.main?.profit) {
-        nextBlocks.main.profit = incoming.main.profit;
+function resolveDrillTypes(arg) {
+    if (!arg || arg === true) {
+        return DEFAULT_DRILL_TYPES.slice();
     }
-    if (incoming.owner?.companyMarketing) {
-        nextBlocks.owner.companyMarketing = incoming.owner.companyMarketing;
-    }
-    if (incoming.owner?.partnerActivity) {
-        nextBlocks.owner.partnerActivity = incoming.owner.partnerActivity;
-    }
-
-    const tabsDone = new Set([...(base.tabs || []), ...tabs.filter((t) => t !== 'all')]);
-    if (tabs.includes('all')) {
-        tabsDone.add('activity');
-        tabsDone.add('owner');
-        tabsDone.add('main');
-    }
-
-    return {
-        warehouseVersion: '1.0',
-        period: periodYm,
-        fetchedAt: new Date().toISOString(),
-        tabs: [...tabsDone].sort(),
-        checksum: null,
-        filters: {
-            periodType: 'month',
-            period: periodYm,
-            compareMode: 'previous',
-            companyId,
-        },
-        meta: payload.meta || base.meta || null,
-        blocks: nextBlocks,
-    };
+    return String(arg)
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean);
 }
 
 /**
@@ -247,16 +209,95 @@ function mergeArtifact(existing, payload, periodYm, companyId, tabs) {
  */
 function loadManifest() {
     if (!fs.existsSync(MANIFEST_PATH)) {
-        return {
-            version: '1.0',
-            schemaVersion: '2.0',
-            generatedAt: null,
-            coverage: { from: null, to: null },
-            lastRun: null,
+        return emptyManifest();
+    }
+    const raw = JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf8'));
+    return normalizeManifest(raw);
+}
+
+/**
+ * @returns {object}
+ */
+function emptyManifest() {
+    return {
+        version: '2.0',
+        schemaVersion: '2.0',
+        warehouseVersion: WAREHOUSE_VERSION,
+        generatedAt: null,
+        coverage: { from: null, to: null, count: 0 },
+        datasets: {},
+        lastRun: null,
+    };
+}
+
+/**
+ * Поднимает legacy manifest (periods{}) до datasets.
+ *
+ * @param {object} raw
+ * @returns {object}
+ */
+function normalizeManifest(raw) {
+    if (raw && raw.datasets && raw.warehouseVersion === '2.0') {
+        return raw;
+    }
+    const next = emptyManifest();
+    next.generatedAt = raw?.generatedAt || null;
+    next.lastRun = raw?.lastRun || null;
+    // coverage пересчитаем позже
+    return next;
+}
+
+/**
+ * @param {object} manifest
+ * @param {string} datasetId
+ * @param {string} relPath
+ * @returns {object}
+ */
+function ensureDataset(manifest, datasetId, relPath) {
+    if (!manifest.datasets[datasetId]) {
+        manifest.datasets[datasetId] = {
+            path: relPath,
+            coverage: { from: null, to: null, count: 0 },
             periods: {},
         };
     }
-    return JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf8'));
+    return manifest.datasets[datasetId];
+}
+
+/**
+ * @param {object} dataset
+ * @returns {void}
+ */
+function recomputeDatasetCoverage(dataset) {
+    const keys = Object.keys(dataset.periods || {}).sort();
+    dataset.coverage = {
+        from: keys[0] || null,
+        to: keys[keys.length - 1] || null,
+        count: keys.length,
+    };
+}
+
+/**
+ * Корневой coverage = объединение summary-датасетов.
+ *
+ * @param {object} manifest
+ * @returns {void}
+ */
+function recomputeRootCoverage(manifest) {
+    const set = new Set();
+    for (const id of Object.keys(SUMMARY_DATASETS)) {
+        const ds = manifest.datasets[id];
+        if (!ds?.periods) {
+            continue;
+        }
+        Object.keys(ds.periods).forEach((ym) => set.add(ym));
+    }
+    const keys = [...set].sort();
+    manifest.coverage = {
+        from: keys[0] || null,
+        to: keys[keys.length - 1] || null,
+        count: keys.length,
+    };
 }
 
 /**
@@ -266,6 +307,64 @@ function loadManifest() {
 function saveManifest(manifest) {
     fs.mkdirSync(WAREHOUSE_DIR, { recursive: true });
     fs.writeFileSync(MANIFEST_PATH, JSON.stringify(manifest, null, 2) + '\n', 'utf8');
+}
+
+/**
+ * @param {string} relDir
+ * @param {string} ym
+ * @returns {string}
+ */
+function datasetFileAbs(relDir, ym) {
+    return path.join(WAREHOUSE_DIR, relDir, `${ym}.json`);
+}
+
+/**
+ * @param {object} envelope
+ * @param {string} absPath
+ * @returns {void}
+ */
+function writeDatasetFile(envelope, absPath) {
+    fs.mkdirSync(path.dirname(absPath), { recursive: true });
+    fs.writeFileSync(absPath, JSON.stringify(envelope, null, 2) + '\n', 'utf8');
+}
+
+/**
+ * @param {string} absPath
+ * @returns {object|null}
+ */
+function readJsonIfExists(absPath) {
+    if (!fs.existsSync(absPath)) {
+        return null;
+    }
+    return JSON.parse(fs.readFileSync(absPath, 'utf8'));
+}
+
+/**
+ * @param {string} datasetId
+ * @param {string} periodYm
+ * @param {number} companyId
+ * @param {object} data
+ * @param {object|null} meta
+ * @param {object} [extra]
+ * @returns {object}
+ */
+function buildEnvelope(datasetId, periodYm, companyId, data, meta, extra = {}) {
+    return {
+        warehouseVersion: WAREHOUSE_VERSION,
+        dataset: datasetId,
+        period: periodYm,
+        fetchedAt: new Date().toISOString(),
+        checksum: checksumData(data),
+        filters: {
+            periodType: 'month',
+            period: periodYm,
+            compareMode: 'previous',
+            companyId,
+        },
+        meta: meta || null,
+        data,
+        ...extra,
+    };
 }
 
 /**
@@ -293,79 +392,20 @@ async function fetchFilters(apiBase, token) {
  * @param {string} token
  * @param {string} periodYm
  * @param {number} companyId
- * @param {string[]} tabs
- * @returns {Promise<object>}
+ * @param {{reportType: string, section: string}} spec
+ * @returns {Promise<{block: object, meta: object|null}>}
  */
-async function fetchMonth(apiBase, token, periodYm, companyId, tabs) {
+async function fetchSummarySection(apiBase, token, periodYm, companyId, spec) {
     const base = apiBase.replace(/\/$/, '');
-    const common = {
+    const params = new URLSearchParams({
         periodType: 'month',
         period: periodYm,
         compareMode: 'previous',
         companyId: String(companyId),
-    };
-
-    // Один tab → лёгкий /query (query-batch без mainSections всё равно подставит profit).
-    if (tabs.length === 1 && tabs[0] !== 'all') {
-        const tab = tabs[0];
-        let reportType;
-        let section;
-        if (tab === 'activity') {
-            reportType = 'owner';
-            section = 'partnerActivity';
-        } else if (tab === 'owner') {
-            reportType = 'owner';
-            section = 'companyMarketing';
-        } else if (tab === 'main') {
-            reportType = 'main';
-            section = 'profit';
-        } else {
-            throw new Error(`Неизвестный tab: ${tab}`);
-        }
-
-        const params = new URLSearchParams({ ...common, reportType, section });
-        const url = `${base}/query?${params.toString()}`;
-        const response = await fetch(url, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-                Accept: 'application/json, */*;q=0.8',
-            },
-        });
-        const body = await response.json();
-        if (!body.success) {
-            throw new Error(String(body.data?.error || body.data?.code || `HTTP ${response.status}`));
-        }
-        if (body.data?.code) {
-            throw new Error(`${body.data.code}: ${body.data.error || 'report failed'}`);
-        }
-
-        const data = body.data;
-        const block = data.block || data.data || null;
-        const blocks = { main: {}, owner: {} };
-        if (reportType === 'main') {
-            blocks.main[section] = block;
-        } else {
-            blocks.owner[section] = block;
-        }
-        return {
-            meta: data.meta || null,
-            blocks,
-        };
-    }
-
-    const sections = buildSectionsForTabs(tabs);
-    const params = new URLSearchParams(common);
-    if (sections.mainSections) {
-        params.set('mainSections', sections.mainSections);
-    }
-    if (sections.ownerSections) {
-        params.set('ownerSections', sections.ownerSections);
-    }
-    if (!sections.mainSections && !sections.ownerSections) {
-        throw new Error('Не выбраны секции для запроса');
-    }
-
-    const url = `${base}/query-batch?${params.toString()}`;
+        reportType: spec.reportType,
+        section: spec.section,
+    });
+    const url = `${base}/query?${params.toString()}`;
     const response = await fetch(url, {
         headers: {
             Authorization: `Bearer ${token}`,
@@ -374,13 +414,117 @@ async function fetchMonth(apiBase, token, periodYm, companyId, tabs) {
     });
     const body = await response.json();
     if (!body.success) {
-        const err = body.data?.error || body.data?.code || `HTTP ${response.status}`;
-        throw new Error(String(err));
+        throw new Error(String(body.data?.error || body.data?.code || `HTTP ${response.status}`));
     }
     if (body.data?.code) {
         throw new Error(`${body.data.code}: ${body.data.error || 'report failed'}`);
     }
-    return body.data;
+    const data = body.data;
+    const block = data.block || data.data || null;
+    if (!block) {
+        throw new Error(`Пустой block для ${spec.reportType}/${spec.section}`);
+    }
+    return { block, meta: data.meta || null };
+}
+
+/**
+ * Delta одной метрики — та же семантика, что ManagementReportMapper::buildMetricDelta.
+ *
+ * @param {number} current
+ * @param {number|null|undefined} previous
+ * @returns {{absolute: number, percent: number|null, meaningful: boolean, isNew: boolean}}
+ */
+function buildMetricDelta(current, previous) {
+    if (previous === null || previous === undefined) {
+        return {
+            absolute: current,
+            percent: null,
+            meaningful: false,
+            isNew: true,
+        };
+    }
+    const absolute = current - previous;
+    const sameSign = current >= 0 === previous >= 0;
+    const meaningful = previous > 0 && sameSign;
+    const percent = meaningful ? Math.round((absolute / Math.abs(previous)) * 10000) / 100 : null;
+    return {
+        absolute: Math.round(absolute * 10000) / 10000,
+        percent,
+        meaningful,
+        isNew: false,
+    };
+}
+
+/**
+ * KPI drill: totals / previous / delta.
+ * До миграции бэка totals суммируем из partners; previous без бэка — null.
+ *
+ * @param {object} payload
+ * @returns {object}
+ */
+function ensureDrillTotals(payload) {
+    const next = { ...payload };
+    if (!next.type && next.filter?.type) {
+        next.type = next.filter.type;
+    }
+    if (!next.totals) {
+        let reg = 0;
+        let revenue = 0;
+        for (const row of next.partners || []) {
+            reg += Number(row.reg_count) || 0;
+            revenue += Number(row.revenue) || 0;
+        }
+        next.totals = {
+            reg_count: reg,
+            revenue: Math.round(revenue * 100) / 100,
+        };
+    }
+    if (!next.previous) {
+        next.previous = { reg_count: null, revenue: null };
+    }
+    if (!next.delta) {
+        const prevReg = next.previous.reg_count;
+        const prevRev = next.previous.revenue;
+        next.delta = {
+            reg_count: buildMetricDelta(Number(next.totals.reg_count) || 0, prevReg),
+            revenue: buildMetricDelta(Number(next.totals.revenue) || 0, prevRev),
+        };
+    }
+    return next;
+}
+
+/**
+ * @param {string} apiBase
+ * @param {string} token
+ * @param {string} periodYm
+ * @param {number} companyId
+ * @param {string} type
+ * @returns {Promise<object>}
+ */
+async function fetchDrill(apiBase, token, periodYm, companyId, type) {
+    const base = apiBase.replace(/\/$/, '');
+    const params = new URLSearchParams({
+        type,
+        periodType: 'month',
+        period: periodYm,
+        companyId: String(companyId),
+        compareMode: 'previous',
+    });
+    const url = `${base}/partner-activity/drill?${params.toString()}`;
+    const response = await fetch(url, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: 'application/json, */*;q=0.8',
+        },
+    });
+    const body = await response.json();
+    if (!body.success) {
+        throw new Error(String(body.data?.error || body.data?.code || `HTTP ${response.status}`));
+    }
+    if (body.data?.code) {
+        throw new Error(`${body.data.code}: ${body.data.error || 'drill failed'}`);
+    }
+    return ensureDrillTotals(body.data);
 }
 
 /**
@@ -405,7 +549,6 @@ function resolveMonths(args) {
         const to = String(args.to || currentMonthYm());
         return listMonths(from, to);
     }
-    // refresh: текущий месяц (+ опционально --include-previous)
     const months = [currentMonthYm()];
     if (args['include-previous']) {
         const cur = parseYm(months[0]);
@@ -416,16 +559,46 @@ function resolveMonths(args) {
     return months;
 }
 
+/**
+ * @param {object} manifest
+ * @param {string} datasetId
+ * @param {string} relDir
+ * @param {string} ym
+ * @param {object} envelope
+ * @param {number} durationMs
+ * @returns {boolean} changed
+ */
+function commitDatasetPeriod(manifest, datasetId, relDir, ym, envelope, durationMs) {
+    const ds = ensureDataset(manifest, datasetId, relDir);
+    const abs = datasetFileAbs(relDir, ym);
+    const existing = readJsonIfExists(abs);
+    const prevChecksum = existing?.checksum || ds.periods[ym]?.checksum;
+    const wasChanged = prevChecksum !== envelope.checksum;
+
+    writeDatasetFile(envelope, abs);
+
+    ds.periods[ym] = {
+        fetchedAt: envelope.fetchedAt,
+        checksum: envelope.checksum,
+        file: `${relDir}/${ym}.json`,
+        changed: wasChanged,
+        durationMs,
+    };
+    recomputeDatasetCoverage(ds);
+    return wasChanged;
+}
+
 async function main() {
     const args = parseArgs(process.argv.slice(2));
     if (args.help || args.h) {
         console.log(`Usage:
-  node scripts/sync-warehouse.mjs --mode=mass --tabs=activity --from=2021-01 --to=2026-08
-  node scripts/sync-warehouse.mjs --mode=refresh --tabs=activity --include-previous
-  node scripts/sync-warehouse.mjs --tabs=all --months=2026-08,2026-09
+  node scripts/sync-warehouse.mjs --mode=mass --tabs=main,owner,activity --from=2021-01 --to=2026-08
+  node scripts/sync-warehouse.mjs --mode=refresh --tabs=all --include-previous
+  node scripts/sync-warehouse.mjs --tabs=activity-drill --drill-types=manual_human --months=2026-08
 
-Tabs: activity | owner | main | all (можно через запятую)
-Env: MGMT_REPORT_API_TOKEN, MGMT_REPORT_API_BASE, MGMT_SYNC_DELAY_MS`);
+Tabs: main | owner | activity | activity-drill | all
+Env: MGMT_REPORT_API_TOKEN, MGMT_REPORT_API_BASE, MGMT_SYNC_DELAY_MS
+Contract: docs/warehouse-v2-contract.md`);
         process.exit(0);
     }
 
@@ -439,21 +612,40 @@ Env: MGMT_REPORT_API_TOKEN, MGMT_REPORT_API_BASE, MGMT_SYNC_DELAY_MS`);
     const delayMs = Number(process.env.MGMT_SYNC_DELAY_MS || args.delay || DEFAULT_DELAY_MS);
     const companyId = Number(args.companyId || 0);
     const mode = String(args.mode || 'refresh');
-    const tabs = resolveTabs(args.tabs);
+    const { summaryIds, drill } = resolveTabs(args.tabs);
+    const drillTypes = drill ? resolveDrillTypes(args['drill-types']) : [];
     const months = resolveMonths(args);
 
     if (months.length === 0) {
         console.error('Список месяцев пуст');
         process.exit(1);
     }
+    if (summaryIds.length === 0 && !drill) {
+        console.error('Не выбраны tabs');
+        process.exit(1);
+    }
 
-    fs.mkdirSync(PERIODS_DIR, { recursive: true });
     const manifest = loadManifest();
     const failed = [];
     let ok = 0;
     let changed = 0;
+    let requestIndex = 0;
 
-    console.log(`mode=${mode} tabs=${tabs.join(',')} months=${months.length} delayMs=${delayMs} api=${apiBase}`);
+    const jobs = [];
+    for (const ym of months) {
+        for (const datasetId of summaryIds) {
+            jobs.push({ kind: 'summary', ym, datasetId });
+        }
+        for (const type of drillTypes) {
+            jobs.push({ kind: 'drill', ym, type });
+        }
+    }
+
+    console.log(
+        `mode=${mode} summary=${summaryIds.join(',') || '—'} ` +
+        `drill=${drill ? drillTypes.join(',') : '—'} ` +
+        `jobs=${jobs.length} delayMs=${delayMs} api=${apiBase}`
+    );
 
     try {
         process.stdout.write('filters … ');
@@ -468,77 +660,96 @@ Env: MGMT_REPORT_API_TOKEN, MGMT_REPORT_API_BASE, MGMT_SYNC_DELAY_MS`);
         console.log(`skip (${error.message || error})`);
     }
 
-    for (let i = 0; i < months.length; i += 1) {
-        const ym = months[i];
+    for (let i = 0; i < jobs.length; i += 1) {
+        const job = jobs[i];
         const started = Date.now();
-        process.stdout.write(`[${i + 1}/${months.length}] ${ym} … `);
+        const label = job.kind === 'summary'
+            ? `${job.ym} ${job.datasetId}`
+            : `${job.ym} activity.drill.${job.type}`;
+        process.stdout.write(`[${i + 1}/${jobs.length}] ${label} … `);
+
         try {
-            const payload = await fetchMonth(apiBase, token, ym, companyId, tabs);
-            const fileRel = `periods/${ym}.json`;
-            const fileAbs = path.join(WAREHOUSE_DIR, fileRel);
-            const existing = fs.existsSync(fileAbs)
-                ? JSON.parse(fs.readFileSync(fileAbs, 'utf8'))
-                : null;
-
-            const artifact = mergeArtifact(existing, payload, ym, companyId, tabs);
-            artifact.checksum = checksumPayload(artifact);
-
-            const prevChecksum = existing?.checksum || manifest.periods[ym]?.checksum;
-            const wasChanged = prevChecksum !== artifact.checksum;
-            if (wasChanged) {
-                changed += 1;
+            if (job.kind === 'summary') {
+                const spec = SUMMARY_DATASETS[job.datasetId];
+                const { block, meta } = await fetchSummarySection(
+                    apiBase,
+                    token,
+                    job.ym,
+                    companyId,
+                    spec
+                );
+                const envelope = buildEnvelope(job.datasetId, job.ym, companyId, block, meta);
+                const wasChanged = commitDatasetPeriod(
+                    manifest,
+                    job.datasetId,
+                    spec.path,
+                    job.ym,
+                    envelope,
+                    Date.now() - started
+                );
+                if (wasChanged) {
+                    changed += 1;
+                }
+                ok += 1;
+                console.log(
+                    `ok checksum=${envelope.checksum}` +
+                    `${wasChanged ? ' (changed)' : ''} ${Date.now() - started}ms`
+                );
+            } else {
+                const datasetId = `activity.drill.${job.type}`;
+                const relDir = `activity/drill/${job.type}`;
+                const data = await fetchDrill(apiBase, token, job.ym, companyId, job.type);
+                const envelope = buildEnvelope(datasetId, job.ym, companyId, data, data.meta || null, {
+                    type: job.type,
+                });
+                const wasChanged = commitDatasetPeriod(
+                    manifest,
+                    datasetId,
+                    relDir,
+                    job.ym,
+                    envelope,
+                    Date.now() - started
+                );
+                if (wasChanged) {
+                    changed += 1;
+                }
+                ok += 1;
+                console.log(
+                    `ok checksum=${envelope.checksum}` +
+                    `${wasChanged ? ' (changed)' : ''} ${Date.now() - started}ms`
+                );
             }
-
-            fs.writeFileSync(fileAbs, JSON.stringify(artifact, null, 2) + '\n', 'utf8');
-
-            manifest.periods[ym] = {
-                fetchedAt: artifact.fetchedAt,
-                checksum: artifact.checksum,
-                file: fileRel,
-                tabs: artifact.tabs,
-                changed: wasChanged,
-                durationMs: Date.now() - started,
-                sectionsFailed: payload.meta?.sectionsFailed ?? null,
-            };
-            ok += 1;
-            console.log(
-                `ok tabs=${artifact.tabs.join('+')} checksum=${artifact.checksum}` +
-                `${wasChanged ? ' (changed)' : ''} ${Date.now() - started}ms`
-            );
         } catch (error) {
-            failed.push({ period: ym, error: String(error.message || error) });
+            failed.push({ job: label, error: String(error.message || error) });
             console.log(`FAIL ${error.message || error}`);
         }
 
-        if (i < months.length - 1 && delayMs > 0) {
+        requestIndex += 1;
+        if (i < jobs.length - 1 && delayMs > 0) {
             await sleep(delayMs);
         }
     }
 
-    const keys = Object.keys(manifest.periods).sort();
+    recomputeRootCoverage(manifest);
+    manifest.warehouseVersion = WAREHOUSE_VERSION;
+    manifest.version = '2.0';
+    manifest.schemaVersion = '2.0';
     manifest.generatedAt = new Date().toISOString();
-    manifest.coverage = {
-        from: keys[0] || null,
-        to: keys[keys.length - 1] || null,
-        count: keys.length,
-    };
     manifest.lastRun = {
         mode,
-        tabs,
+        tabs: String(args.tabs || 'all').split(',').map((s) => s.trim()).filter(Boolean),
         at: manifest.generatedAt,
         ok,
         failed,
         changed,
-        monthsRequested: months.length,
+        jobsRequested: jobs.length,
+        requests: requestIndex,
     };
-    saveManifest(manifest);
-
-    const latestOk = [...months].reverse().find((ym) => manifest.periods[ym] && !failed.find((f) => f.period === ym));
-    if (latestOk) {
-        const latestSrc = path.join(WAREHOUSE_DIR, `periods/${latestOk}.json`);
-        const latestDst = path.join(WAREHOUSE_DIR, 'latest.json');
-        fs.copyFileSync(latestSrc, latestDst);
+    // убрать legacy ключ periods если был
+    if (manifest.periods) {
+        delete manifest.periods;
     }
+    saveManifest(manifest);
 
     console.log(`\nDone. ok=${ok} failed=${failed.length} changed=${changed}`);
     console.log(`manifest: ${MANIFEST_PATH}`);

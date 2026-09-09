@@ -1,920 +1,1728 @@
 {
-  "version": "1.0",
+  "version": "2.0",
   "schemaVersion": "2.0",
-  "generatedAt": "2026-09-08T08:22:34.998Z",
+  "warehouseVersion": "2.0",
+  "generatedAt": "2026-09-09T09:28:22.696Z",
   "coverage": {
     "from": "2021-01",
     "to": "2026-09",
     "count": 69
   },
+  "datasets": {
+    "main.profit": {
+      "path": "main/profit",
+      "coverage": {
+        "from": "2021-01",
+        "to": "2026-09",
+        "count": 69
+      },
+      "periods": {
+        "2021-01": {
+          "fetchedAt": "2026-09-08T07:35:22.303Z",
+          "checksum": "ae09312d6f8e69e2",
+          "file": "main/profit/2021-01.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2021-01.json"
+        },
+        "2021-02": {
+          "fetchedAt": "2026-09-08T07:35:52.191Z",
+          "checksum": "728f97e4e94ef2c0",
+          "file": "main/profit/2021-02.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2021-02.json"
+        },
+        "2021-03": {
+          "fetchedAt": "2026-09-08T07:36:22.606Z",
+          "checksum": "4cbee726a5ac3e8b",
+          "file": "main/profit/2021-03.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2021-03.json"
+        },
+        "2021-04": {
+          "fetchedAt": "2026-09-08T07:36:52.057Z",
+          "checksum": "82828229f15a4d1e",
+          "file": "main/profit/2021-04.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2021-04.json"
+        },
+        "2021-05": {
+          "fetchedAt": "2026-09-08T07:37:22.439Z",
+          "checksum": "c9174a917f193ac7",
+          "file": "main/profit/2021-05.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2021-05.json"
+        },
+        "2021-06": {
+          "fetchedAt": "2026-09-08T07:37:51.648Z",
+          "checksum": "e1d549a42e8bb921",
+          "file": "main/profit/2021-06.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2021-06.json"
+        },
+        "2021-07": {
+          "fetchedAt": "2026-09-08T07:38:23.835Z",
+          "checksum": "50c158dca39bfbb6",
+          "file": "main/profit/2021-07.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2021-07.json"
+        },
+        "2021-08": {
+          "fetchedAt": "2026-09-08T07:38:43.265Z",
+          "checksum": "919ea4b2953d5a3e",
+          "file": "main/profit/2021-08.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2021-08.json"
+        },
+        "2021-09": {
+          "fetchedAt": "2026-09-08T07:39:18.831Z",
+          "checksum": "88c47658259340c8",
+          "file": "main/profit/2021-09.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2021-09.json"
+        },
+        "2021-10": {
+          "fetchedAt": "2026-09-08T07:39:56.601Z",
+          "checksum": "ebcff553d9e0a535",
+          "file": "main/profit/2021-10.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2021-10.json"
+        },
+        "2021-11": {
+          "fetchedAt": "2026-09-08T07:40:34.792Z",
+          "checksum": "9d9e3dd61de0f95d",
+          "file": "main/profit/2021-11.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2021-11.json"
+        },
+        "2021-12": {
+          "fetchedAt": "2026-09-08T07:41:13.234Z",
+          "checksum": "1fbfc99e53e9ed72",
+          "file": "main/profit/2021-12.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2021-12.json"
+        },
+        "2022-01": {
+          "fetchedAt": "2026-09-08T07:41:37.011Z",
+          "checksum": "bd2d32df7a866d46",
+          "file": "main/profit/2022-01.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2022-01.json"
+        },
+        "2022-02": {
+          "fetchedAt": "2026-09-08T07:42:08.807Z",
+          "checksum": "ca3d503c775d8752",
+          "file": "main/profit/2022-02.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2022-02.json"
+        },
+        "2022-03": {
+          "fetchedAt": "2026-09-08T07:42:40.341Z",
+          "checksum": "939c07e44461933c",
+          "file": "main/profit/2022-03.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2022-03.json"
+        },
+        "2022-04": {
+          "fetchedAt": "2026-09-08T07:43:10.647Z",
+          "checksum": "0906e42f7a8acb04",
+          "file": "main/profit/2022-04.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2022-04.json"
+        },
+        "2022-05": {
+          "fetchedAt": "2026-09-08T07:43:42.627Z",
+          "checksum": "34636643bfc0a0f7",
+          "file": "main/profit/2022-05.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2022-05.json"
+        },
+        "2022-06": {
+          "fetchedAt": "2026-09-08T07:44:15.435Z",
+          "checksum": "ba0ef2ae60cedfba",
+          "file": "main/profit/2022-06.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2022-06.json"
+        },
+        "2022-07": {
+          "fetchedAt": "2026-09-08T07:44:51.043Z",
+          "checksum": "70464ac73bd88d7d",
+          "file": "main/profit/2022-07.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2022-07.json"
+        },
+        "2022-08": {
+          "fetchedAt": "2026-09-08T07:45:15.964Z",
+          "checksum": "7ef3f89ac7bec04e",
+          "file": "main/profit/2022-08.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2022-08.json"
+        },
+        "2022-09": {
+          "fetchedAt": "2026-09-08T07:45:58.965Z",
+          "checksum": "c854d637ae4a7ba4",
+          "file": "main/profit/2022-09.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2022-09.json"
+        },
+        "2022-10": {
+          "fetchedAt": "2026-09-08T07:46:46.276Z",
+          "checksum": "8304d5240b28f673",
+          "file": "main/profit/2022-10.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2022-10.json"
+        },
+        "2022-11": {
+          "fetchedAt": "2026-09-08T07:47:33.555Z",
+          "checksum": "590fad26a7c75aa9",
+          "file": "main/profit/2022-11.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2022-11.json"
+        },
+        "2022-12": {
+          "fetchedAt": "2026-09-08T07:48:23.353Z",
+          "checksum": "10090c29700db396",
+          "file": "main/profit/2022-12.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2022-12.json"
+        },
+        "2023-01": {
+          "fetchedAt": "2026-09-08T07:48:48.060Z",
+          "checksum": "9408ea5488d680e2",
+          "file": "main/profit/2023-01.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2023-01.json"
+        },
+        "2023-02": {
+          "fetchedAt": "2026-09-08T07:49:33.119Z",
+          "checksum": "94a7747c5673cbc7",
+          "file": "main/profit/2023-02.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2023-02.json"
+        },
+        "2023-03": {
+          "fetchedAt": "2026-09-08T07:50:31.994Z",
+          "checksum": "26ebe600bda97df6",
+          "file": "main/profit/2023-03.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2023-03.json"
+        },
+        "2023-04": {
+          "fetchedAt": "2026-09-08T07:51:29.203Z",
+          "checksum": "97ab469b4b0eb847",
+          "file": "main/profit/2023-04.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2023-04.json"
+        },
+        "2023-05": {
+          "fetchedAt": "2026-09-08T07:52:24.022Z",
+          "checksum": "d7706d9944161870",
+          "file": "main/profit/2023-05.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2023-05.json"
+        },
+        "2023-06": {
+          "fetchedAt": "2026-09-08T07:53:19.657Z",
+          "checksum": "52ee854c7886b540",
+          "file": "main/profit/2023-06.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2023-06.json"
+        },
+        "2023-07": {
+          "fetchedAt": "2026-09-08T07:54:13.286Z",
+          "checksum": "d8545610faa32cc4",
+          "file": "main/profit/2023-07.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2023-07.json"
+        },
+        "2023-08": {
+          "fetchedAt": "2026-09-08T07:54:41.661Z",
+          "checksum": "861f1dcb9a8c6a35",
+          "file": "main/profit/2023-08.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2023-08.json"
+        },
+        "2023-09": {
+          "fetchedAt": "2026-09-08T07:55:28.084Z",
+          "checksum": "a3143508b89289f0",
+          "file": "main/profit/2023-09.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2023-09.json"
+        },
+        "2023-10": {
+          "fetchedAt": "2026-09-08T07:56:04.941Z",
+          "checksum": "e17596a1b3208cd6",
+          "file": "main/profit/2023-10.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2023-10.json"
+        },
+        "2023-11": {
+          "fetchedAt": "2026-09-08T07:56:44.372Z",
+          "checksum": "cf5a9102c17bbc0b",
+          "file": "main/profit/2023-11.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2023-11.json"
+        },
+        "2023-12": {
+          "fetchedAt": "2026-09-08T07:57:23.533Z",
+          "checksum": "f45bad4e9a590e58",
+          "file": "main/profit/2023-12.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2023-12.json"
+        },
+        "2024-01": {
+          "fetchedAt": "2026-09-08T07:57:41.472Z",
+          "checksum": "382c3b371fb741ec",
+          "file": "main/profit/2024-01.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2024-01.json"
+        },
+        "2024-02": {
+          "fetchedAt": "2026-09-08T07:58:18.482Z",
+          "checksum": "dd4a429a7777e1d4",
+          "file": "main/profit/2024-02.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2024-02.json"
+        },
+        "2024-03": {
+          "fetchedAt": "2026-09-08T07:58:59.712Z",
+          "checksum": "933ada0321b7a6e4",
+          "file": "main/profit/2024-03.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2024-03.json"
+        },
+        "2024-04": {
+          "fetchedAt": "2026-09-08T07:59:38.091Z",
+          "checksum": "c964020a85b809b0",
+          "file": "main/profit/2024-04.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2024-04.json"
+        },
+        "2024-05": {
+          "fetchedAt": "2026-09-08T08:00:28.334Z",
+          "checksum": "c68dede1834b447f",
+          "file": "main/profit/2024-05.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2024-05.json"
+        },
+        "2024-06": {
+          "fetchedAt": "2026-09-08T08:22:34.992Z",
+          "checksum": "a10ba5c7580efc90",
+          "file": "main/profit/2024-06.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2024-06.json"
+        },
+        "2024-07": {
+          "fetchedAt": "2026-09-08T08:09:24.056Z",
+          "checksum": "8f789ca19c601bd0",
+          "file": "main/profit/2024-07.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2024-07.json"
+        },
+        "2024-08": {
+          "fetchedAt": "2026-09-08T08:09:45.830Z",
+          "checksum": "6ee64816295907b2",
+          "file": "main/profit/2024-08.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2024-08.json"
+        },
+        "2024-09": {
+          "fetchedAt": "2026-09-08T08:10:25.635Z",
+          "checksum": "02053c8c63328aa6",
+          "file": "main/profit/2024-09.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2024-09.json"
+        },
+        "2024-10": {
+          "fetchedAt": "2026-09-08T08:11:06.893Z",
+          "checksum": "36376ccec6f2eda4",
+          "file": "main/profit/2024-10.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2024-10.json"
+        },
+        "2024-11": {
+          "fetchedAt": "2026-09-08T08:11:47.517Z",
+          "checksum": "854ddb54b74c9306",
+          "file": "main/profit/2024-11.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2024-11.json"
+        },
+        "2024-12": {
+          "fetchedAt": "2026-09-08T08:12:22.757Z",
+          "checksum": "7a839b7bd9365156",
+          "file": "main/profit/2024-12.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2024-12.json"
+        },
+        "2025-01": {
+          "fetchedAt": "2026-09-08T08:12:41.727Z",
+          "checksum": "c6da275d9ffdee69",
+          "file": "main/profit/2025-01.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2025-01.json"
+        },
+        "2025-02": {
+          "fetchedAt": "2026-09-08T08:13:13.797Z",
+          "checksum": "2a9f77077a8a97c1",
+          "file": "main/profit/2025-02.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2025-02.json"
+        },
+        "2025-03": {
+          "fetchedAt": "2026-09-08T08:13:41.930Z",
+          "checksum": "9dab93aa0eeb08e5",
+          "file": "main/profit/2025-03.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2025-03.json"
+        },
+        "2025-04": {
+          "fetchedAt": "2026-09-08T08:14:11.550Z",
+          "checksum": "eddf05c2b8cddd70",
+          "file": "main/profit/2025-04.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2025-04.json"
+        },
+        "2025-05": {
+          "fetchedAt": "2026-09-08T08:14:40.543Z",
+          "checksum": "2efbb7a6acd48013",
+          "file": "main/profit/2025-05.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2025-05.json"
+        },
+        "2025-06": {
+          "fetchedAt": "2026-09-08T08:15:09.587Z",
+          "checksum": "14df98cd321a446e",
+          "file": "main/profit/2025-06.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2025-06.json"
+        },
+        "2025-07": {
+          "fetchedAt": "2026-09-08T08:15:40.687Z",
+          "checksum": "dcf4760bb3347803",
+          "file": "main/profit/2025-07.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2025-07.json"
+        },
+        "2025-08": {
+          "fetchedAt": "2026-09-08T08:15:58.515Z",
+          "checksum": "8c59db17501c22bd",
+          "file": "main/profit/2025-08.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2025-08.json"
+        },
+        "2025-09": {
+          "fetchedAt": "2026-09-08T08:16:30.136Z",
+          "checksum": "662203373705d0aa",
+          "file": "main/profit/2025-09.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2025-09.json"
+        },
+        "2025-10": {
+          "fetchedAt": "2026-09-08T08:17:09.527Z",
+          "checksum": "4e5a7dca23e0ed4a",
+          "file": "main/profit/2025-10.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2025-10.json"
+        },
+        "2025-11": {
+          "fetchedAt": "2026-09-08T08:17:47.676Z",
+          "checksum": "5235f43679d04548",
+          "file": "main/profit/2025-11.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2025-11.json"
+        },
+        "2025-12": {
+          "fetchedAt": "2026-09-08T08:18:24.867Z",
+          "checksum": "4dfbfe40c4b03632",
+          "file": "main/profit/2025-12.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2025-12.json"
+        },
+        "2026-01": {
+          "fetchedAt": "2026-09-08T08:18:45.910Z",
+          "checksum": "8d39a74d157bf7ad",
+          "file": "main/profit/2026-01.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2026-01.json"
+        },
+        "2026-02": {
+          "fetchedAt": "2026-09-08T08:19:28.795Z",
+          "checksum": "4118a5ffc525e39a",
+          "file": "main/profit/2026-02.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2026-02.json"
+        },
+        "2026-03": {
+          "fetchedAt": "2026-09-08T08:20:11.789Z",
+          "checksum": "17a66211aaf97978",
+          "file": "main/profit/2026-03.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2026-03.json"
+        },
+        "2026-04": {
+          "fetchedAt": "2026-09-08T08:20:16.916Z",
+          "checksum": "66d8d794ae810200",
+          "file": "main/profit/2026-04.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2026-04.json"
+        },
+        "2026-05": {
+          "fetchedAt": "2026-09-08T08:20:54.242Z",
+          "checksum": "a6d21c0572bf9655",
+          "file": "main/profit/2026-05.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2026-05.json"
+        },
+        "2026-06": {
+          "fetchedAt": "2026-09-08T08:21:32.658Z",
+          "checksum": "2fcc890f0516397d",
+          "file": "main/profit/2026-06.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2026-06.json"
+        },
+        "2026-07": {
+          "fetchedAt": "2026-09-08T08:21:52.377Z",
+          "checksum": "2c1095fd9bf387dd",
+          "file": "main/profit/2026-07.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2026-07.json"
+        },
+        "2026-08": {
+          "fetchedAt": "2026-09-08T08:21:57.495Z",
+          "checksum": "981fe9d8991e21e4",
+          "file": "main/profit/2026-08.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2026-08.json"
+        },
+        "2026-09": {
+          "fetchedAt": "2026-09-08T08:22:21.963Z",
+          "checksum": "c120b9deb21f1047",
+          "file": "main/profit/2026-09.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2026-09.json"
+        }
+      }
+    },
+    "owner.marketing": {
+      "path": "owner/marketing",
+      "coverage": {
+        "from": "2021-01",
+        "to": "2026-09",
+        "count": 69
+      },
+      "periods": {
+        "2021-01": {
+          "fetchedAt": "2026-09-08T07:35:22.303Z",
+          "checksum": "f0101213960e1dae",
+          "file": "owner/marketing/2021-01.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2021-01.json"
+        },
+        "2021-02": {
+          "fetchedAt": "2026-09-08T07:35:52.191Z",
+          "checksum": "3112a50d75e30e1f",
+          "file": "owner/marketing/2021-02.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2021-02.json"
+        },
+        "2021-03": {
+          "fetchedAt": "2026-09-08T07:36:22.606Z",
+          "checksum": "3309ae122f553f80",
+          "file": "owner/marketing/2021-03.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2021-03.json"
+        },
+        "2021-04": {
+          "fetchedAt": "2026-09-08T07:36:52.057Z",
+          "checksum": "5b047ceea0e65c8f",
+          "file": "owner/marketing/2021-04.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2021-04.json"
+        },
+        "2021-05": {
+          "fetchedAt": "2026-09-08T07:37:22.439Z",
+          "checksum": "3c59d1ac0b9e0352",
+          "file": "owner/marketing/2021-05.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2021-05.json"
+        },
+        "2021-06": {
+          "fetchedAt": "2026-09-08T07:37:51.648Z",
+          "checksum": "978ee2e967b3116a",
+          "file": "owner/marketing/2021-06.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2021-06.json"
+        },
+        "2021-07": {
+          "fetchedAt": "2026-09-08T07:38:23.835Z",
+          "checksum": "ceccf5ee37161af8",
+          "file": "owner/marketing/2021-07.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2021-07.json"
+        },
+        "2021-08": {
+          "fetchedAt": "2026-09-08T07:38:43.265Z",
+          "checksum": "0350beb239117133",
+          "file": "owner/marketing/2021-08.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2021-08.json"
+        },
+        "2021-09": {
+          "fetchedAt": "2026-09-08T07:39:18.831Z",
+          "checksum": "bdd56c95ae1a20bf",
+          "file": "owner/marketing/2021-09.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2021-09.json"
+        },
+        "2021-10": {
+          "fetchedAt": "2026-09-08T07:39:56.601Z",
+          "checksum": "076235c89aee6ded",
+          "file": "owner/marketing/2021-10.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2021-10.json"
+        },
+        "2021-11": {
+          "fetchedAt": "2026-09-08T07:40:34.792Z",
+          "checksum": "533bb88390b60391",
+          "file": "owner/marketing/2021-11.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2021-11.json"
+        },
+        "2021-12": {
+          "fetchedAt": "2026-09-08T07:41:13.234Z",
+          "checksum": "a181f2e43cdfe4b3",
+          "file": "owner/marketing/2021-12.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2021-12.json"
+        },
+        "2022-01": {
+          "fetchedAt": "2026-09-08T07:41:37.011Z",
+          "checksum": "7913e0d215b6623a",
+          "file": "owner/marketing/2022-01.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2022-01.json"
+        },
+        "2022-02": {
+          "fetchedAt": "2026-09-08T07:42:08.807Z",
+          "checksum": "cc0c7894be172a7b",
+          "file": "owner/marketing/2022-02.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2022-02.json"
+        },
+        "2022-03": {
+          "fetchedAt": "2026-09-08T07:42:40.341Z",
+          "checksum": "2b0753a1ff5e9b2b",
+          "file": "owner/marketing/2022-03.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2022-03.json"
+        },
+        "2022-04": {
+          "fetchedAt": "2026-09-08T07:43:10.647Z",
+          "checksum": "fc6b00d74e097315",
+          "file": "owner/marketing/2022-04.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2022-04.json"
+        },
+        "2022-05": {
+          "fetchedAt": "2026-09-08T07:43:42.627Z",
+          "checksum": "de9883136af161c9",
+          "file": "owner/marketing/2022-05.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2022-05.json"
+        },
+        "2022-06": {
+          "fetchedAt": "2026-09-08T07:44:15.435Z",
+          "checksum": "c71b2772dcfe5d88",
+          "file": "owner/marketing/2022-06.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2022-06.json"
+        },
+        "2022-07": {
+          "fetchedAt": "2026-09-08T07:44:51.043Z",
+          "checksum": "f0fc1014e3a58607",
+          "file": "owner/marketing/2022-07.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2022-07.json"
+        },
+        "2022-08": {
+          "fetchedAt": "2026-09-08T07:45:15.964Z",
+          "checksum": "933288dbe4f301af",
+          "file": "owner/marketing/2022-08.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2022-08.json"
+        },
+        "2022-09": {
+          "fetchedAt": "2026-09-08T07:45:58.965Z",
+          "checksum": "9111845f16d709cd",
+          "file": "owner/marketing/2022-09.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2022-09.json"
+        },
+        "2022-10": {
+          "fetchedAt": "2026-09-08T07:46:46.276Z",
+          "checksum": "62f4229802fd8bca",
+          "file": "owner/marketing/2022-10.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2022-10.json"
+        },
+        "2022-11": {
+          "fetchedAt": "2026-09-08T07:47:33.555Z",
+          "checksum": "92131b2a3ec35626",
+          "file": "owner/marketing/2022-11.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2022-11.json"
+        },
+        "2022-12": {
+          "fetchedAt": "2026-09-08T07:48:23.353Z",
+          "checksum": "5aac7e3cdbed9790",
+          "file": "owner/marketing/2022-12.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2022-12.json"
+        },
+        "2023-01": {
+          "fetchedAt": "2026-09-08T07:48:48.060Z",
+          "checksum": "c87bf753448b0f40",
+          "file": "owner/marketing/2023-01.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2023-01.json"
+        },
+        "2023-02": {
+          "fetchedAt": "2026-09-08T07:49:33.119Z",
+          "checksum": "e2928716d189225e",
+          "file": "owner/marketing/2023-02.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2023-02.json"
+        },
+        "2023-03": {
+          "fetchedAt": "2026-09-08T07:50:31.994Z",
+          "checksum": "9679d974af99e0e6",
+          "file": "owner/marketing/2023-03.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2023-03.json"
+        },
+        "2023-04": {
+          "fetchedAt": "2026-09-08T07:51:29.203Z",
+          "checksum": "8d82712a49f454a5",
+          "file": "owner/marketing/2023-04.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2023-04.json"
+        },
+        "2023-05": {
+          "fetchedAt": "2026-09-08T07:52:24.022Z",
+          "checksum": "9e3bf14c3c444251",
+          "file": "owner/marketing/2023-05.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2023-05.json"
+        },
+        "2023-06": {
+          "fetchedAt": "2026-09-08T07:53:19.657Z",
+          "checksum": "065177e15429b807",
+          "file": "owner/marketing/2023-06.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2023-06.json"
+        },
+        "2023-07": {
+          "fetchedAt": "2026-09-08T07:54:13.286Z",
+          "checksum": "9978e8cf257e0184",
+          "file": "owner/marketing/2023-07.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2023-07.json"
+        },
+        "2023-08": {
+          "fetchedAt": "2026-09-08T07:54:41.661Z",
+          "checksum": "6043c47750dffc77",
+          "file": "owner/marketing/2023-08.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2023-08.json"
+        },
+        "2023-09": {
+          "fetchedAt": "2026-09-08T07:55:28.084Z",
+          "checksum": "b89105568714ce59",
+          "file": "owner/marketing/2023-09.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2023-09.json"
+        },
+        "2023-10": {
+          "fetchedAt": "2026-09-08T07:56:04.941Z",
+          "checksum": "1ffb8ad53cb4db87",
+          "file": "owner/marketing/2023-10.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2023-10.json"
+        },
+        "2023-11": {
+          "fetchedAt": "2026-09-08T07:56:44.372Z",
+          "checksum": "8981abacc55cff96",
+          "file": "owner/marketing/2023-11.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2023-11.json"
+        },
+        "2023-12": {
+          "fetchedAt": "2026-09-08T07:57:23.533Z",
+          "checksum": "0847cd2af822aede",
+          "file": "owner/marketing/2023-12.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2023-12.json"
+        },
+        "2024-01": {
+          "fetchedAt": "2026-09-08T07:57:41.472Z",
+          "checksum": "099f315f657f2663",
+          "file": "owner/marketing/2024-01.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2024-01.json"
+        },
+        "2024-02": {
+          "fetchedAt": "2026-09-08T07:58:18.482Z",
+          "checksum": "633f993c6c712952",
+          "file": "owner/marketing/2024-02.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2024-02.json"
+        },
+        "2024-03": {
+          "fetchedAt": "2026-09-08T07:58:59.712Z",
+          "checksum": "fa4c3ba8f0d6c4e9",
+          "file": "owner/marketing/2024-03.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2024-03.json"
+        },
+        "2024-04": {
+          "fetchedAt": "2026-09-08T07:59:38.091Z",
+          "checksum": "aa305fe71c80309b",
+          "file": "owner/marketing/2024-04.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2024-04.json"
+        },
+        "2024-05": {
+          "fetchedAt": "2026-09-08T08:00:28.334Z",
+          "checksum": "f8a4c88c10c2a4ad",
+          "file": "owner/marketing/2024-05.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2024-05.json"
+        },
+        "2024-06": {
+          "fetchedAt": "2026-09-08T08:22:34.992Z",
+          "checksum": "e5b64bdc7fcb15cc",
+          "file": "owner/marketing/2024-06.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2024-06.json"
+        },
+        "2024-07": {
+          "fetchedAt": "2026-09-08T08:09:24.056Z",
+          "checksum": "78e9afcb1b2aab60",
+          "file": "owner/marketing/2024-07.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2024-07.json"
+        },
+        "2024-08": {
+          "fetchedAt": "2026-09-08T08:09:45.830Z",
+          "checksum": "7844d8e69b24c1f2",
+          "file": "owner/marketing/2024-08.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2024-08.json"
+        },
+        "2024-09": {
+          "fetchedAt": "2026-09-08T08:10:25.635Z",
+          "checksum": "8cccafcafa6907e4",
+          "file": "owner/marketing/2024-09.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2024-09.json"
+        },
+        "2024-10": {
+          "fetchedAt": "2026-09-08T08:11:06.893Z",
+          "checksum": "7eba103d09e5c8a2",
+          "file": "owner/marketing/2024-10.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2024-10.json"
+        },
+        "2024-11": {
+          "fetchedAt": "2026-09-08T08:11:47.517Z",
+          "checksum": "1d3220dbe290d6a2",
+          "file": "owner/marketing/2024-11.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2024-11.json"
+        },
+        "2024-12": {
+          "fetchedAt": "2026-09-08T08:12:22.757Z",
+          "checksum": "67870db789faa35b",
+          "file": "owner/marketing/2024-12.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2024-12.json"
+        },
+        "2025-01": {
+          "fetchedAt": "2026-09-08T08:12:41.727Z",
+          "checksum": "4d7696e181306403",
+          "file": "owner/marketing/2025-01.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2025-01.json"
+        },
+        "2025-02": {
+          "fetchedAt": "2026-09-08T08:13:13.797Z",
+          "checksum": "86001ac7ca6c413d",
+          "file": "owner/marketing/2025-02.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2025-02.json"
+        },
+        "2025-03": {
+          "fetchedAt": "2026-09-08T08:13:41.930Z",
+          "checksum": "30d481d804721101",
+          "file": "owner/marketing/2025-03.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2025-03.json"
+        },
+        "2025-04": {
+          "fetchedAt": "2026-09-08T08:14:11.550Z",
+          "checksum": "19b25a01a702df77",
+          "file": "owner/marketing/2025-04.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2025-04.json"
+        },
+        "2025-05": {
+          "fetchedAt": "2026-09-08T08:14:40.543Z",
+          "checksum": "d0e0b5d2a6713acc",
+          "file": "owner/marketing/2025-05.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2025-05.json"
+        },
+        "2025-06": {
+          "fetchedAt": "2026-09-08T08:15:09.587Z",
+          "checksum": "81f176223459500a",
+          "file": "owner/marketing/2025-06.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2025-06.json"
+        },
+        "2025-07": {
+          "fetchedAt": "2026-09-08T08:15:40.687Z",
+          "checksum": "74dc57acf1da6344",
+          "file": "owner/marketing/2025-07.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2025-07.json"
+        },
+        "2025-08": {
+          "fetchedAt": "2026-09-08T08:15:58.515Z",
+          "checksum": "8c35393d46399677",
+          "file": "owner/marketing/2025-08.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2025-08.json"
+        },
+        "2025-09": {
+          "fetchedAt": "2026-09-08T08:16:30.136Z",
+          "checksum": "d1d0004d053f5c8a",
+          "file": "owner/marketing/2025-09.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2025-09.json"
+        },
+        "2025-10": {
+          "fetchedAt": "2026-09-08T08:17:09.527Z",
+          "checksum": "e20f2bf4811cbe8e",
+          "file": "owner/marketing/2025-10.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2025-10.json"
+        },
+        "2025-11": {
+          "fetchedAt": "2026-09-08T08:17:47.676Z",
+          "checksum": "abc10b58976b9683",
+          "file": "owner/marketing/2025-11.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2025-11.json"
+        },
+        "2025-12": {
+          "fetchedAt": "2026-09-08T08:18:24.867Z",
+          "checksum": "1a28405bc600169c",
+          "file": "owner/marketing/2025-12.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2025-12.json"
+        },
+        "2026-01": {
+          "fetchedAt": "2026-09-08T08:18:45.910Z",
+          "checksum": "e15ce5a1b188dd59",
+          "file": "owner/marketing/2026-01.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2026-01.json"
+        },
+        "2026-02": {
+          "fetchedAt": "2026-09-08T08:19:28.795Z",
+          "checksum": "63016bcc2f1230db",
+          "file": "owner/marketing/2026-02.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2026-02.json"
+        },
+        "2026-03": {
+          "fetchedAt": "2026-09-08T08:20:11.789Z",
+          "checksum": "853ff8827cb71d9e",
+          "file": "owner/marketing/2026-03.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2026-03.json"
+        },
+        "2026-04": {
+          "fetchedAt": "2026-09-08T08:20:16.916Z",
+          "checksum": "b400edf0442c24ae",
+          "file": "owner/marketing/2026-04.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2026-04.json"
+        },
+        "2026-05": {
+          "fetchedAt": "2026-09-08T08:20:54.242Z",
+          "checksum": "3ade84b629c9e976",
+          "file": "owner/marketing/2026-05.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2026-05.json"
+        },
+        "2026-06": {
+          "fetchedAt": "2026-09-08T08:21:32.658Z",
+          "checksum": "454c562ab7cae608",
+          "file": "owner/marketing/2026-06.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2026-06.json"
+        },
+        "2026-07": {
+          "fetchedAt": "2026-09-08T08:21:52.377Z",
+          "checksum": "e6418addfd461282",
+          "file": "owner/marketing/2026-07.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2026-07.json"
+        },
+        "2026-08": {
+          "fetchedAt": "2026-09-08T08:21:57.495Z",
+          "checksum": "6986fafb9f3e74e2",
+          "file": "owner/marketing/2026-08.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2026-08.json"
+        },
+        "2026-09": {
+          "fetchedAt": "2026-09-08T08:22:21.963Z",
+          "checksum": "5d8c46d6004c7af4",
+          "file": "owner/marketing/2026-09.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2026-09.json"
+        }
+      }
+    },
+    "activity.summary": {
+      "path": "activity/summary",
+      "coverage": {
+        "from": "2021-01",
+        "to": "2026-09",
+        "count": 69
+      },
+      "periods": {
+        "2021-01": {
+          "fetchedAt": "2026-09-08T07:35:22.303Z",
+          "checksum": "12d284db29e1fe54",
+          "file": "activity/summary/2021-01.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2021-01.json"
+        },
+        "2021-02": {
+          "fetchedAt": "2026-09-08T07:35:52.191Z",
+          "checksum": "3b55b2f789b41c90",
+          "file": "activity/summary/2021-02.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2021-02.json"
+        },
+        "2021-03": {
+          "fetchedAt": "2026-09-08T07:36:22.606Z",
+          "checksum": "25fc94c737a51ff5",
+          "file": "activity/summary/2021-03.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2021-03.json"
+        },
+        "2021-04": {
+          "fetchedAt": "2026-09-08T07:36:52.057Z",
+          "checksum": "c4e30a24e5c10bb3",
+          "file": "activity/summary/2021-04.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2021-04.json"
+        },
+        "2021-05": {
+          "fetchedAt": "2026-09-08T07:37:22.439Z",
+          "checksum": "6599c068032a6f30",
+          "file": "activity/summary/2021-05.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2021-05.json"
+        },
+        "2021-06": {
+          "fetchedAt": "2026-09-08T07:37:51.648Z",
+          "checksum": "612aea0254f73968",
+          "file": "activity/summary/2021-06.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2021-06.json"
+        },
+        "2021-07": {
+          "fetchedAt": "2026-09-08T07:38:23.835Z",
+          "checksum": "0195489975aeef5d",
+          "file": "activity/summary/2021-07.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2021-07.json"
+        },
+        "2021-08": {
+          "fetchedAt": "2026-09-08T07:38:43.265Z",
+          "checksum": "1c51dc5ed6b3eeda",
+          "file": "activity/summary/2021-08.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2021-08.json"
+        },
+        "2021-09": {
+          "fetchedAt": "2026-09-08T07:39:18.831Z",
+          "checksum": "18844348ca71bde3",
+          "file": "activity/summary/2021-09.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2021-09.json"
+        },
+        "2021-10": {
+          "fetchedAt": "2026-09-08T07:39:56.601Z",
+          "checksum": "3e0c54c93caa124b",
+          "file": "activity/summary/2021-10.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2021-10.json"
+        },
+        "2021-11": {
+          "fetchedAt": "2026-09-08T07:40:34.792Z",
+          "checksum": "d4d6a47776cc8bba",
+          "file": "activity/summary/2021-11.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2021-11.json"
+        },
+        "2021-12": {
+          "fetchedAt": "2026-09-08T07:41:13.234Z",
+          "checksum": "2eb7d724d77d35ba",
+          "file": "activity/summary/2021-12.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2021-12.json"
+        },
+        "2022-01": {
+          "fetchedAt": "2026-09-08T07:41:37.011Z",
+          "checksum": "ccca8dc3b6fffbb3",
+          "file": "activity/summary/2022-01.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2022-01.json"
+        },
+        "2022-02": {
+          "fetchedAt": "2026-09-08T07:42:08.807Z",
+          "checksum": "8c6c870724dec7cd",
+          "file": "activity/summary/2022-02.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2022-02.json"
+        },
+        "2022-03": {
+          "fetchedAt": "2026-09-08T07:42:40.341Z",
+          "checksum": "e208a5671e950207",
+          "file": "activity/summary/2022-03.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2022-03.json"
+        },
+        "2022-04": {
+          "fetchedAt": "2026-09-08T07:43:10.647Z",
+          "checksum": "28fa594675471878",
+          "file": "activity/summary/2022-04.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2022-04.json"
+        },
+        "2022-05": {
+          "fetchedAt": "2026-09-08T07:43:42.627Z",
+          "checksum": "0d77924dfd858ee5",
+          "file": "activity/summary/2022-05.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2022-05.json"
+        },
+        "2022-06": {
+          "fetchedAt": "2026-09-08T07:44:15.435Z",
+          "checksum": "7d452cc3a8a10a54",
+          "file": "activity/summary/2022-06.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2022-06.json"
+        },
+        "2022-07": {
+          "fetchedAt": "2026-09-08T07:44:51.043Z",
+          "checksum": "4fbf221d8f1a2536",
+          "file": "activity/summary/2022-07.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2022-07.json"
+        },
+        "2022-08": {
+          "fetchedAt": "2026-09-08T07:45:15.964Z",
+          "checksum": "28c91aba6d948dd7",
+          "file": "activity/summary/2022-08.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2022-08.json"
+        },
+        "2022-09": {
+          "fetchedAt": "2026-09-08T07:45:58.965Z",
+          "checksum": "e8db77a09d6a4fa4",
+          "file": "activity/summary/2022-09.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2022-09.json"
+        },
+        "2022-10": {
+          "fetchedAt": "2026-09-08T07:46:46.276Z",
+          "checksum": "c11adb08f35be6f5",
+          "file": "activity/summary/2022-10.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2022-10.json"
+        },
+        "2022-11": {
+          "fetchedAt": "2026-09-08T07:47:33.555Z",
+          "checksum": "25528a302a2387bd",
+          "file": "activity/summary/2022-11.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2022-11.json"
+        },
+        "2022-12": {
+          "fetchedAt": "2026-09-08T07:48:23.353Z",
+          "checksum": "c1f4d01c4fa86a6e",
+          "file": "activity/summary/2022-12.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2022-12.json"
+        },
+        "2023-01": {
+          "fetchedAt": "2026-09-08T07:48:48.060Z",
+          "checksum": "af60246ffebfa58c",
+          "file": "activity/summary/2023-01.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2023-01.json"
+        },
+        "2023-02": {
+          "fetchedAt": "2026-09-08T07:49:33.119Z",
+          "checksum": "1d0a7581eb21e393",
+          "file": "activity/summary/2023-02.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2023-02.json"
+        },
+        "2023-03": {
+          "fetchedAt": "2026-09-08T07:50:31.994Z",
+          "checksum": "0e9219ae6fe3f774",
+          "file": "activity/summary/2023-03.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2023-03.json"
+        },
+        "2023-04": {
+          "fetchedAt": "2026-09-08T07:51:29.203Z",
+          "checksum": "f83d9e6f87550506",
+          "file": "activity/summary/2023-04.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2023-04.json"
+        },
+        "2023-05": {
+          "fetchedAt": "2026-09-08T07:52:24.022Z",
+          "checksum": "71cbc7c7e8e133fe",
+          "file": "activity/summary/2023-05.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2023-05.json"
+        },
+        "2023-06": {
+          "fetchedAt": "2026-09-08T07:53:19.657Z",
+          "checksum": "066104490718ab05",
+          "file": "activity/summary/2023-06.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2023-06.json"
+        },
+        "2023-07": {
+          "fetchedAt": "2026-09-08T07:54:13.286Z",
+          "checksum": "f45f6ada693a1081",
+          "file": "activity/summary/2023-07.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2023-07.json"
+        },
+        "2023-08": {
+          "fetchedAt": "2026-09-08T07:54:41.661Z",
+          "checksum": "0fd47fc3662d7725",
+          "file": "activity/summary/2023-08.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2023-08.json"
+        },
+        "2023-09": {
+          "fetchedAt": "2026-09-08T07:55:28.084Z",
+          "checksum": "76c69103b241e968",
+          "file": "activity/summary/2023-09.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2023-09.json"
+        },
+        "2023-10": {
+          "fetchedAt": "2026-09-08T07:56:04.941Z",
+          "checksum": "a02f43d246a1a44e",
+          "file": "activity/summary/2023-10.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2023-10.json"
+        },
+        "2023-11": {
+          "fetchedAt": "2026-09-08T07:56:44.372Z",
+          "checksum": "b722d8f6fcf59d08",
+          "file": "activity/summary/2023-11.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2023-11.json"
+        },
+        "2023-12": {
+          "fetchedAt": "2026-09-08T07:57:23.533Z",
+          "checksum": "9cec64692e6fa129",
+          "file": "activity/summary/2023-12.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2023-12.json"
+        },
+        "2024-01": {
+          "fetchedAt": "2026-09-08T07:57:41.472Z",
+          "checksum": "ba1ac342c2345a4f",
+          "file": "activity/summary/2024-01.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2024-01.json"
+        },
+        "2024-02": {
+          "fetchedAt": "2026-09-08T07:58:18.482Z",
+          "checksum": "2eae74fa36adc16d",
+          "file": "activity/summary/2024-02.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2024-02.json"
+        },
+        "2024-03": {
+          "fetchedAt": "2026-09-08T07:58:59.712Z",
+          "checksum": "c3574c77b6201d03",
+          "file": "activity/summary/2024-03.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2024-03.json"
+        },
+        "2024-04": {
+          "fetchedAt": "2026-09-08T07:59:38.091Z",
+          "checksum": "c42e3a00880ac796",
+          "file": "activity/summary/2024-04.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2024-04.json"
+        },
+        "2024-05": {
+          "fetchedAt": "2026-09-08T08:00:28.334Z",
+          "checksum": "5207c0d5b4ad661c",
+          "file": "activity/summary/2024-05.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2024-05.json"
+        },
+        "2024-06": {
+          "fetchedAt": "2026-09-08T08:22:34.992Z",
+          "checksum": "15ab5e720b980a10",
+          "file": "activity/summary/2024-06.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2024-06.json"
+        },
+        "2024-07": {
+          "fetchedAt": "2026-09-08T08:09:24.056Z",
+          "checksum": "f43241d79bb0ed5e",
+          "file": "activity/summary/2024-07.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2024-07.json"
+        },
+        "2024-08": {
+          "fetchedAt": "2026-09-08T08:09:45.830Z",
+          "checksum": "3ef91ad7ba8ba0a2",
+          "file": "activity/summary/2024-08.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2024-08.json"
+        },
+        "2024-09": {
+          "fetchedAt": "2026-09-08T08:10:25.635Z",
+          "checksum": "a779ea9a3121bfe3",
+          "file": "activity/summary/2024-09.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2024-09.json"
+        },
+        "2024-10": {
+          "fetchedAt": "2026-09-08T08:11:06.893Z",
+          "checksum": "b5798f86b2b59173",
+          "file": "activity/summary/2024-10.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2024-10.json"
+        },
+        "2024-11": {
+          "fetchedAt": "2026-09-08T08:11:47.517Z",
+          "checksum": "21a184f3811f41a6",
+          "file": "activity/summary/2024-11.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2024-11.json"
+        },
+        "2024-12": {
+          "fetchedAt": "2026-09-08T08:12:22.757Z",
+          "checksum": "4b5359616b2e6aa6",
+          "file": "activity/summary/2024-12.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2024-12.json"
+        },
+        "2025-01": {
+          "fetchedAt": "2026-09-08T08:12:41.727Z",
+          "checksum": "a880f1ae6fbe45a2",
+          "file": "activity/summary/2025-01.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2025-01.json"
+        },
+        "2025-02": {
+          "fetchedAt": "2026-09-08T08:13:13.797Z",
+          "checksum": "44d0eba173bc93fc",
+          "file": "activity/summary/2025-02.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2025-02.json"
+        },
+        "2025-03": {
+          "fetchedAt": "2026-09-08T08:13:41.930Z",
+          "checksum": "b3d543135bfb0e68",
+          "file": "activity/summary/2025-03.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2025-03.json"
+        },
+        "2025-04": {
+          "fetchedAt": "2026-09-08T08:14:11.550Z",
+          "checksum": "40e619656a0afb01",
+          "file": "activity/summary/2025-04.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2025-04.json"
+        },
+        "2025-05": {
+          "fetchedAt": "2026-09-08T08:14:40.543Z",
+          "checksum": "7682fe4b5835f860",
+          "file": "activity/summary/2025-05.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2025-05.json"
+        },
+        "2025-06": {
+          "fetchedAt": "2026-09-08T08:15:09.587Z",
+          "checksum": "b8780787662b7b3f",
+          "file": "activity/summary/2025-06.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2025-06.json"
+        },
+        "2025-07": {
+          "fetchedAt": "2026-09-08T08:15:40.687Z",
+          "checksum": "f72dad289395ba42",
+          "file": "activity/summary/2025-07.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2025-07.json"
+        },
+        "2025-08": {
+          "fetchedAt": "2026-09-08T08:15:58.515Z",
+          "checksum": "ad99240d2eee4f6f",
+          "file": "activity/summary/2025-08.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2025-08.json"
+        },
+        "2025-09": {
+          "fetchedAt": "2026-09-08T08:16:30.136Z",
+          "checksum": "aa1c400b02cfedaf",
+          "file": "activity/summary/2025-09.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2025-09.json"
+        },
+        "2025-10": {
+          "fetchedAt": "2026-09-08T08:17:09.527Z",
+          "checksum": "321d5c2fe16c904a",
+          "file": "activity/summary/2025-10.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2025-10.json"
+        },
+        "2025-11": {
+          "fetchedAt": "2026-09-08T08:17:47.676Z",
+          "checksum": "436caf57937c58bf",
+          "file": "activity/summary/2025-11.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2025-11.json"
+        },
+        "2025-12": {
+          "fetchedAt": "2026-09-08T08:18:24.867Z",
+          "checksum": "1999603ffc6c23fb",
+          "file": "activity/summary/2025-12.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2025-12.json"
+        },
+        "2026-01": {
+          "fetchedAt": "2026-09-08T08:18:45.910Z",
+          "checksum": "a8182c8608ed0c8d",
+          "file": "activity/summary/2026-01.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2026-01.json"
+        },
+        "2026-02": {
+          "fetchedAt": "2026-09-08T08:19:28.795Z",
+          "checksum": "a968e19a42bc620b",
+          "file": "activity/summary/2026-02.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2026-02.json"
+        },
+        "2026-03": {
+          "fetchedAt": "2026-09-08T08:20:11.789Z",
+          "checksum": "53d771299a0c358b",
+          "file": "activity/summary/2026-03.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2026-03.json"
+        },
+        "2026-04": {
+          "fetchedAt": "2026-09-08T08:20:16.916Z",
+          "checksum": "76bf023608778587",
+          "file": "activity/summary/2026-04.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2026-04.json"
+        },
+        "2026-05": {
+          "fetchedAt": "2026-09-08T08:20:54.242Z",
+          "checksum": "89043f4aa8ddef2c",
+          "file": "activity/summary/2026-05.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2026-05.json"
+        },
+        "2026-06": {
+          "fetchedAt": "2026-09-08T08:21:32.658Z",
+          "checksum": "36aa44aa0fd7b64c",
+          "file": "activity/summary/2026-06.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2026-06.json"
+        },
+        "2026-07": {
+          "fetchedAt": "2026-09-08T08:21:52.377Z",
+          "checksum": "57c2f6402650db84",
+          "file": "activity/summary/2026-07.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2026-07.json"
+        },
+        "2026-08": {
+          "fetchedAt": "2026-09-08T08:21:57.495Z",
+          "checksum": "0d9a399c23e8c99c",
+          "file": "activity/summary/2026-08.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2026-08.json"
+        },
+        "2026-09": {
+          "fetchedAt": "2026-09-08T08:22:21.963Z",
+          "checksum": "014335cbee229de6",
+          "file": "activity/summary/2026-09.json",
+          "changed": true,
+          "durationMs": null,
+          "migratedFrom": "periods/2026-09.json"
+        }
+      }
+    },
+    "activity.drill.manual_human": {
+      "path": "activity/drill/manual_human",
+      "coverage": {
+        "from": "2026-08",
+        "to": "2026-08",
+        "count": 1
+      },
+      "periods": {
+        "2026-08": {
+          "fetchedAt": "2026-09-09T09:28:22.684Z",
+          "checksum": "f58cd0da2c0c9cdc",
+          "file": "activity/drill/manual_human/2026-08.json",
+          "changed": true,
+          "durationMs": 29314
+        }
+      }
+    }
+  },
   "lastRun": {
     "mode": "refresh",
     "tabs": [
-      "owner"
+      "activity-drill"
     ],
-    "at": "2026-09-08T08:22:34.998Z",
+    "at": "2026-09-09T09:28:22.696Z",
     "ok": 1,
     "failed": [],
     "changed": 1,
-    "monthsRequested": 1
-  },
-  "periods": {
-    "2026-08": {
-      "fetchedAt": "2026-09-08T08:21:57.495Z",
-      "checksum": "acfe53e2a0118a15",
-      "file": "periods/2026-08.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": false,
-      "durationMs": 116,
-      "sectionsFailed": null
-    },
-    "2021-01": {
-      "fetchedAt": "2026-09-08T07:35:22.303Z",
-      "checksum": "05b106f100f7759f",
-      "file": "periods/2021-01.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 21661,
-      "sectionsFailed": null
-    },
-    "2021-02": {
-      "fetchedAt": "2026-09-08T07:35:52.191Z",
-      "checksum": "06ac047612a8a9f1",
-      "file": "periods/2021-02.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 24884,
-      "sectionsFailed": null
-    },
-    "2021-03": {
-      "fetchedAt": "2026-09-08T07:36:22.606Z",
-      "checksum": "bbe59d511409665f",
-      "file": "periods/2021-03.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 25414,
-      "sectionsFailed": null
-    },
-    "2021-04": {
-      "fetchedAt": "2026-09-08T07:36:52.057Z",
-      "checksum": "6f871554f2df96cb",
-      "file": "periods/2021-04.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 24448,
-      "sectionsFailed": null
-    },
-    "2021-05": {
-      "fetchedAt": "2026-09-08T07:37:22.439Z",
-      "checksum": "7853fdcc109bba09",
-      "file": "periods/2021-05.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 25382,
-      "sectionsFailed": null
-    },
-    "2021-06": {
-      "fetchedAt": "2026-09-08T07:37:51.648Z",
-      "checksum": "3c6263602958646e",
-      "file": "periods/2021-06.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 24204,
-      "sectionsFailed": null
-    },
-    "2021-07": {
-      "fetchedAt": "2026-09-08T07:38:23.835Z",
-      "checksum": "62aaa81741d0cb3a",
-      "file": "periods/2021-07.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 27186,
-      "sectionsFailed": null
-    },
-    "2021-08": {
-      "fetchedAt": "2026-09-08T07:38:43.265Z",
-      "checksum": "736d4b3bd4a50d37",
-      "file": "periods/2021-08.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 14429,
-      "sectionsFailed": null
-    },
-    "2021-09": {
-      "fetchedAt": "2026-09-08T07:39:18.831Z",
-      "checksum": "eb72be2685d2d72a",
-      "file": "periods/2021-09.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 30566,
-      "sectionsFailed": null
-    },
-    "2021-10": {
-      "fetchedAt": "2026-09-08T07:39:56.601Z",
-      "checksum": "68b445b384298619",
-      "file": "periods/2021-10.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 32769,
-      "sectionsFailed": null
-    },
-    "2021-11": {
-      "fetchedAt": "2026-09-08T07:40:34.792Z",
-      "checksum": "2b20feb163a13c5b",
-      "file": "periods/2021-11.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 33190,
-      "sectionsFailed": null
-    },
-    "2021-12": {
-      "fetchedAt": "2026-09-08T07:41:13.234Z",
-      "checksum": "4a7e9a623251835d",
-      "file": "periods/2021-12.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 33440,
-      "sectionsFailed": null
-    },
-    "2022-01": {
-      "fetchedAt": "2026-09-08T07:41:37.011Z",
-      "checksum": "e5822c0f1a3df134",
-      "file": "periods/2022-01.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 18777,
-      "sectionsFailed": null
-    },
-    "2022-02": {
-      "fetchedAt": "2026-09-08T07:42:08.807Z",
-      "checksum": "787e689e87c1323b",
-      "file": "periods/2022-02.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 26796,
-      "sectionsFailed": null
-    },
-    "2022-03": {
-      "fetchedAt": "2026-09-08T07:42:40.341Z",
-      "checksum": "11c8932c7477f2de",
-      "file": "periods/2022-03.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 26534,
-      "sectionsFailed": null
-    },
-    "2022-04": {
-      "fetchedAt": "2026-09-08T07:43:10.647Z",
-      "checksum": "822213e9c775d21e",
-      "file": "periods/2022-04.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 25304,
-      "sectionsFailed": null
-    },
-    "2022-05": {
-      "fetchedAt": "2026-09-08T07:43:42.627Z",
-      "checksum": "1da1f4faaf939a97",
-      "file": "periods/2022-05.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 26981,
-      "sectionsFailed": null
-    },
-    "2022-06": {
-      "fetchedAt": "2026-09-08T07:44:15.435Z",
-      "checksum": "4ae57376767f7fd4",
-      "file": "periods/2022-06.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 27805,
-      "sectionsFailed": null
-    },
-    "2022-07": {
-      "fetchedAt": "2026-09-08T07:44:51.043Z",
-      "checksum": "58cd0e8d8f8b5e24",
-      "file": "periods/2022-07.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 30609,
-      "sectionsFailed": null
-    },
-    "2022-08": {
-      "fetchedAt": "2026-09-08T07:45:15.964Z",
-      "checksum": "58e906f5e5ad857e",
-      "file": "periods/2022-08.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 19919,
-      "sectionsFailed": null
-    },
-    "2022-09": {
-      "fetchedAt": "2026-09-08T07:45:58.965Z",
-      "checksum": "86f209461f01b44f",
-      "file": "periods/2022-09.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 38003,
-      "sectionsFailed": null
-    },
-    "2022-10": {
-      "fetchedAt": "2026-09-08T07:46:46.276Z",
-      "checksum": "edd38b5271d1d417",
-      "file": "periods/2022-10.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 42306,
-      "sectionsFailed": null
-    },
-    "2022-11": {
-      "fetchedAt": "2026-09-08T07:47:33.555Z",
-      "checksum": "2bc39147c31ee486",
-      "file": "periods/2022-11.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 42281,
-      "sectionsFailed": null
-    },
-    "2022-12": {
-      "fetchedAt": "2026-09-08T07:48:23.353Z",
-      "checksum": "4dfdde7b6233d9e5",
-      "file": "periods/2022-12.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 44794,
-      "sectionsFailed": null
-    },
-    "2023-01": {
-      "fetchedAt": "2026-09-08T07:48:48.060Z",
-      "checksum": "ca2b8717fc98ff62",
-      "file": "periods/2023-01.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 19707,
-      "sectionsFailed": null
-    },
-    "2023-02": {
-      "fetchedAt": "2026-09-08T07:49:33.119Z",
-      "checksum": "10d671bf9acb08c7",
-      "file": "periods/2023-02.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 40055,
-      "sectionsFailed": null
-    },
-    "2023-03": {
-      "fetchedAt": "2026-09-08T07:50:31.994Z",
-      "checksum": "9342083ae5fef987",
-      "file": "periods/2023-03.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 53876,
-      "sectionsFailed": null
-    },
-    "2023-04": {
-      "fetchedAt": "2026-09-08T07:51:29.203Z",
-      "checksum": "b1a4c3db78153475",
-      "file": "periods/2023-04.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 52207,
-      "sectionsFailed": null
-    },
-    "2023-05": {
-      "fetchedAt": "2026-09-08T07:52:24.022Z",
-      "checksum": "ad1a8ad9379045ef",
-      "file": "periods/2023-05.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 49820,
-      "sectionsFailed": null
-    },
-    "2023-06": {
-      "fetchedAt": "2026-09-08T07:53:19.657Z",
-      "checksum": "b16f5e2fadb89cef",
-      "file": "periods/2023-06.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 50633,
-      "sectionsFailed": null
-    },
-    "2023-07": {
-      "fetchedAt": "2026-09-08T07:54:13.286Z",
-      "checksum": "63b0dccb45bf5b7e",
-      "file": "periods/2023-07.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 48629,
-      "sectionsFailed": null
-    },
-    "2023-08": {
-      "fetchedAt": "2026-09-08T07:54:41.661Z",
-      "checksum": "ee48e03d9a36a012",
-      "file": "periods/2023-08.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 23372,
-      "sectionsFailed": null
-    },
-    "2023-09": {
-      "fetchedAt": "2026-09-08T07:55:28.084Z",
-      "checksum": "7100052611f54a79",
-      "file": "periods/2023-09.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 41425,
-      "sectionsFailed": null
-    },
-    "2023-10": {
-      "fetchedAt": "2026-09-08T07:56:04.941Z",
-      "checksum": "8305bfa6f2a7106f",
-      "file": "periods/2023-10.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 31854,
-      "sectionsFailed": null
-    },
-    "2023-11": {
-      "fetchedAt": "2026-09-08T07:56:44.372Z",
-      "checksum": "fc62a7ce759b3c42",
-      "file": "periods/2023-11.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 34431,
-      "sectionsFailed": null
-    },
-    "2024-01": {
-      "fetchedAt": "2026-09-08T07:57:41.472Z",
-      "checksum": "b38d30bfc456ccfa",
-      "file": "periods/2024-01.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 12939,
-      "sectionsFailed": null
-    },
-    "2024-02": {
-      "fetchedAt": "2026-09-08T07:58:18.482Z",
-      "checksum": "160dcb7244af2883",
-      "file": "periods/2024-02.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 32010,
-      "sectionsFailed": null
-    },
-    "2024-03": {
-      "fetchedAt": "2026-09-08T07:58:59.712Z",
-      "checksum": "f7fac40967f85cf3",
-      "file": "periods/2024-03.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 36231,
-      "sectionsFailed": null
-    },
-    "2024-04": {
-      "fetchedAt": "2026-09-08T07:59:38.091Z",
-      "checksum": "b7dbc565fef35d91",
-      "file": "periods/2024-04.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 33376,
-      "sectionsFailed": null
-    },
-    "2024-05": {
-      "fetchedAt": "2026-09-08T08:00:28.334Z",
-      "checksum": "baa10eb1c6c06c29",
-      "file": "periods/2024-05.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 45243,
-      "sectionsFailed": null
-    },
-    "2024-06": {
-      "fetchedAt": "2026-09-08T08:22:34.992Z",
-      "checksum": "3890c63fb97cf9ec",
-      "file": "periods/2024-06.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 116,
-      "sectionsFailed": null
-    },
-    "2024-07": {
-      "fetchedAt": "2026-09-08T08:09:24.056Z",
-      "checksum": "49fc1bed71486f06",
-      "file": "periods/2024-07.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 224723,
-      "sectionsFailed": null
-    },
-    "2024-08": {
-      "fetchedAt": "2026-09-08T08:09:45.830Z",
-      "checksum": "bcb7402c8aef1093",
-      "file": "periods/2024-08.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 16771,
-      "sectionsFailed": null
-    },
-    "2024-09": {
-      "fetchedAt": "2026-09-08T08:10:25.635Z",
-      "checksum": "883298fd2718ad89",
-      "file": "periods/2024-09.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 34805,
-      "sectionsFailed": null
-    },
-    "2024-10": {
-      "fetchedAt": "2026-09-08T08:11:06.893Z",
-      "checksum": "8ff0af2b103ebf8c",
-      "file": "periods/2024-10.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 36257,
-      "sectionsFailed": null
-    },
-    "2024-11": {
-      "fetchedAt": "2026-09-08T08:11:47.517Z",
-      "checksum": "020a868b6096fbe2",
-      "file": "periods/2024-11.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 35623,
-      "sectionsFailed": null
-    },
-    "2024-12": {
-      "fetchedAt": "2026-09-08T08:12:22.757Z",
-      "checksum": "65e20265378d58ad",
-      "file": "periods/2024-12.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 30239,
-      "sectionsFailed": null
-    },
-    "2025-01": {
-      "fetchedAt": "2026-09-08T08:12:41.727Z",
-      "checksum": "9c9ace30fdb0eb54",
-      "file": "periods/2025-01.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 13971,
-      "sectionsFailed": null
-    },
-    "2025-02": {
-      "fetchedAt": "2026-09-08T08:13:13.797Z",
-      "checksum": "9c91f8f8287a071f",
-      "file": "periods/2025-02.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 27069,
-      "sectionsFailed": null
-    },
-    "2025-03": {
-      "fetchedAt": "2026-09-08T08:13:41.930Z",
-      "checksum": "323e071470b09846",
-      "file": "periods/2025-03.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 23133,
-      "sectionsFailed": null
-    },
-    "2025-04": {
-      "fetchedAt": "2026-09-08T08:14:11.550Z",
-      "checksum": "ccbb59141aa823b0",
-      "file": "periods/2025-04.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 24618,
-      "sectionsFailed": null
-    },
-    "2025-05": {
-      "fetchedAt": "2026-09-08T08:14:40.543Z",
-      "checksum": "559c9aa1b5010bf3",
-      "file": "periods/2025-05.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 23991,
-      "sectionsFailed": null
-    },
-    "2025-06": {
-      "fetchedAt": "2026-09-08T08:15:09.587Z",
-      "checksum": "505d99477fe8a531",
-      "file": "periods/2025-06.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 24043,
-      "sectionsFailed": null
-    },
-    "2025-07": {
-      "fetchedAt": "2026-09-08T08:15:40.687Z",
-      "checksum": "82aee6c8c049ba2e",
-      "file": "periods/2025-07.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 26100,
-      "sectionsFailed": null
-    },
-    "2025-08": {
-      "fetchedAt": "2026-09-08T08:15:58.515Z",
-      "checksum": "5e8d19db80227ad3",
-      "file": "periods/2025-08.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 12825,
-      "sectionsFailed": null
-    },
-    "2025-09": {
-      "fetchedAt": "2026-09-08T08:16:30.136Z",
-      "checksum": "0b6e740c5e0f222c",
-      "file": "periods/2025-09.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 26622,
-      "sectionsFailed": null
-    },
-    "2025-10": {
-      "fetchedAt": "2026-09-08T08:17:09.527Z",
-      "checksum": "919210603425873c",
-      "file": "periods/2025-10.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 34388,
-      "sectionsFailed": null
-    },
-    "2025-11": {
-      "fetchedAt": "2026-09-08T08:17:47.676Z",
-      "checksum": "890512b62fa5c6d6",
-      "file": "periods/2025-11.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 33152,
-      "sectionsFailed": null
-    },
-    "2025-12": {
-      "fetchedAt": "2026-09-08T08:18:24.867Z",
-      "checksum": "3edaf401497597af",
-      "file": "periods/2025-12.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 32188,
-      "sectionsFailed": null
-    },
-    "2026-01": {
-      "fetchedAt": "2026-09-08T08:18:45.910Z",
-      "checksum": "b3c715be057bb7a9",
-      "file": "periods/2026-01.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 16042,
-      "sectionsFailed": null
-    },
-    "2026-02": {
-      "fetchedAt": "2026-09-08T08:19:28.795Z",
-      "checksum": "52e13321b1aefd48",
-      "file": "periods/2026-02.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 37883,
-      "sectionsFailed": null
-    },
-    "2026-03": {
-      "fetchedAt": "2026-09-08T08:20:11.789Z",
-      "checksum": "cd81dc4e3b14adf9",
-      "file": "periods/2026-03.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 37993,
-      "sectionsFailed": null
-    },
-    "2026-04": {
-      "fetchedAt": "2026-09-08T08:20:16.916Z",
-      "checksum": "f8bb87525aeab1d5",
-      "file": "periods/2026-04.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 126,
-      "sectionsFailed": null
-    },
-    "2026-05": {
-      "fetchedAt": "2026-09-08T08:20:54.242Z",
-      "checksum": "bad5083e9a127907",
-      "file": "periods/2026-05.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 32326,
-      "sectionsFailed": null
-    },
-    "2026-06": {
-      "fetchedAt": "2026-09-08T08:21:32.658Z",
-      "checksum": "345e8afddf103b1b",
-      "file": "periods/2026-06.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 33413,
-      "sectionsFailed": null
-    },
-    "2026-07": {
-      "fetchedAt": "2026-09-08T08:21:52.377Z",
-      "checksum": "dbcf74dfedeb3ac3",
-      "file": "periods/2026-07.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 14718,
-      "sectionsFailed": null
-    },
-    "2026-09": {
-      "fetchedAt": "2026-09-08T08:22:21.963Z",
-      "checksum": "ff8d0ac0455457d9",
-      "file": "periods/2026-09.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 19468,
-      "sectionsFailed": null
-    },
-    "2023-12": {
-      "fetchedAt": "2026-09-08T07:57:23.533Z",
-      "checksum": "d457e6ceb4c4c991",
-      "file": "periods/2023-12.json",
-      "tabs": [
-        "activity",
-        "main",
-        "owner"
-      ],
-      "changed": true,
-      "durationMs": 34160,
-      "sectionsFailed": null
-    }
+    "jobsRequested": 1,
+    "requests": 1
   }
 }

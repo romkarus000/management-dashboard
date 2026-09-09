@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Drill — активность партнёров</title>
     <link rel="stylesheet" href="./assets/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body class="management-dashboard">
     <header class="management-dashboard__header">
@@ -16,10 +17,35 @@
     </header>
 
     <div class="management-dashboard__actions">
+        <button id="btn-load-warehouse" type="button" class="management-dashboard__btn management-dashboard__btn--secondary">Из warehouse</button>
+        <button id="btn-refresh-live" type="button" class="management-dashboard__btn">Обновить с API</button>
         <span id="dashboard-status" class="management-dashboard__status">Загрузка…</span>
     </div>
 
     <div id="periods-info" class="management-dashboard__periods"></div>
+    <div id="source-info" class="management-dashboard__periods"></div>
+
+    <section class="management-dashboard__section">
+        <h2 class="management-dashboard__section-title">KPI за период</h2>
+        <p class="management-dashboard__section-hint">
+            Сумма по партнёрам корзины: регистрации 1 линии и чистая выручка.
+            Сравнение — с предыдущим периодом.
+        </p>
+        <div id="drill-kpi" class="management-dashboard__kpi-grid management-dashboard__kpi-grid--overview"></div>
+    </section>
+
+    <section class="management-dashboard__section">
+        <h2 class="management-dashboard__section-title">Год по месяцам</h2>
+        <p class="management-dashboard__section-hint" id="drill-charts-hint">
+            Серии из warehouse: activity/drill/{type}/YYYY-MM.json
+        </p>
+        <div class="management-dashboard__chart-wrap management-dashboard__chart-wrap--tall">
+            <canvas id="drill-reg-chart"></canvas>
+        </div>
+        <div class="management-dashboard__chart-wrap management-dashboard__chart-wrap--tall">
+            <canvas id="drill-revenue-chart"></canvas>
+        </div>
+    </section>
 
     <section class="management-dashboard__section">
         <h2 class="management-dashboard__section-title">Партнёры корзины</h2>

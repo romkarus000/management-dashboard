@@ -46,16 +46,28 @@ deploy_file() {
 }
 
 deploy_warehouse() {
-    ssh "${SERVER}" "mkdir -p ${REMOTE_ROOT}/warehouse/periods ${REMOTE_ROOT}/scripts"
+    ssh "${SERVER}" "mkdir -p ${REMOTE_ROOT}/warehouse/main/profit ${REMOTE_ROOT}/warehouse/owner/marketing ${REMOTE_ROOT}/warehouse/activity/summary ${REMOTE_ROOT}/warehouse/activity/drill ${REMOTE_ROOT}/scripts"
     deploy_file "warehouse/manifest.json" || true
     if [[ -f "${LOCAL_ROOT}/warehouse/filters.json" ]]; then
         deploy_file "warehouse/filters.json" || true
     fi
-    if [[ -f "${LOCAL_ROOT}/warehouse/latest.json" ]]; then
-        deploy_file "warehouse/latest.json" || true
+    if [[ -f "${LOCAL_ROOT}/docs/warehouse-v2-contract.md" ]]; then
+        ssh "${SERVER}" "mkdir -p ${REMOTE_ROOT}/docs"
+        deploy_file "docs/warehouse-v2-contract.md" || true
     fi
-    if [[ -d "${LOCAL_ROOT}/warehouse/periods" ]]; then
-        echo "→ warehouse/periods/ (rsync)"
+    for rel in main/profit owner/marketing activity/summary; do
+        if [[ -d "${LOCAL_ROOT}/warehouse/${rel}" ]]; then
+            echo "→ warehouse/${rel}/ (rsync)"
+            rsync -az --delete "${LOCAL_ROOT}/warehouse/${rel}/" "${SERVER}:${REMOTE_ROOT}/warehouse/${rel}/"
+        fi
+    done
+    if [[ -d "${LOCAL_ROOT}/warehouse/activity/drill" ]]; then
+        echo "→ warehouse/activity/drill/ (rsync)"
+        rsync -az --delete "${LOCAL_ROOT}/warehouse/activity/drill/" "${SERVER}:${REMOTE_ROOT}/warehouse/activity/drill/"
+    fi
+    # legacy v1 — только если явно попросили (по умолчанию не деплоим)
+    if [[ "${MGMT_DEPLOY_LEGACY_PERIODS:-0}" == "1" && -d "${LOCAL_ROOT}/warehouse/periods" ]]; then
+        echo "→ warehouse/periods/ legacy (rsync)"
         rsync -az --delete "${LOCAL_ROOT}/warehouse/periods/" "${SERVER}:${REMOTE_ROOT}/warehouse/periods/"
     fi
 }

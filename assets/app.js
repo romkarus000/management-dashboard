@@ -8,6 +8,13 @@
     var WAREHOUSE_BASE = window.MGMT_WAREHOUSE_BASE || './warehouse';
     var TOKEN_STORAGE_KEY = 'mgmtReportApiToken';
 
+    /** Warehouse v2: датасеты по папкам (docs/warehouse-v2-contract.md). */
+    var DATASET_PATHS = {
+        'main.profit': 'main/profit',
+        'owner.marketing': 'owner/marketing',
+        'activity.summary': 'activity/summary'
+    };
+
     var EARNED_KEYS = [
         'purchase', 'registration', 'hybrid', 'adv', 'club',
         'partner_registration', 'product_education', 'overlap'
@@ -15,6 +22,7 @@
     var MANUAL_KEYS = [
         'manual_ambassador',
         'manual_barter_influence',
+        'manual_cross_marketing',
         'manual_barter_solo',
         'manual_coach',
         'manual_human'
@@ -39,6 +47,7 @@
         overlap: { label: 'Несколько способов', hint: 'Больше одного earned', group: 'earned', rare: true },
         manual_ambassador: { label: 'Амбассадоры Fitstars', hint: 'parent 4264877 / амбассадор*', group: 'manual' },
         manual_barter_influence: { label: 'Бартер Инфлюенс', hint: 'Группа 3823', group: 'manual' },
+        manual_cross_marketing: { label: 'Кросс-маркетинг', hint: 'Группа 3829', group: 'manual' },
         manual_barter_solo: { label: 'Бартер самостоятельный', hint: 'блогер*', group: 'manual' },
         manual_coach: { label: 'Коучи / наставники', hint: 'коуч/наставник/куратор', group: 'manual' },
         manual_human: { label: 'Аккаунты компании', hint: 'Без других оснований', group: 'manual' }
@@ -48,8 +57,8 @@
         'total', 'earned', 'manual',
         'purchase', 'registration', 'hybrid', 'adv', 'club',
         'partner_registration', 'product_education', 'overlap',
-        'manual_ambassador', 'manual_barter_influence', 'manual_barter_solo',
-        'manual_coach', 'manual_human'
+        'manual_ambassador', 'manual_barter_influence', 'manual_cross_marketing',
+        'manual_barter_solo', 'manual_coach', 'manual_human'
     ];
 
     var OWNER_METRICS = [
@@ -501,16 +510,66 @@
     }
 
     /**
-     * Достаёт summary.current из warehouse-артефакта месяца.
+     * URL файла датасета warehouse v2.
+     *
+     * @param {string} datasetId
+     * @param {string} ym
+     * @returns {string}
+     */
+    function datasetUrl(datasetId, ym) {
+        var rel = DATASET_PATHS[datasetId];
+        if (!rel) {
+            throw new Error('Неизвестный dataset: ' + datasetId);
+        }
+        return WAREHOUSE_BASE + '/' + rel + '/' + ym + '.json?_=' + Date.now();
+    }
+
+    /**
+     * @param {string} datasetId
+     * @param {string} ym
+     * @returns {Promise<Object|null>}
+     */
+    function fetchDatasetEnvelope(datasetId, ym) {
+        return fetch(datasetUrl(datasetId, ym))
+            .then(function (response) {
+                if (!response.ok) {
+                    return null;
+                }
+                return response.json();
+            })
+            .catch(function () {
+                return null;
+            });
+    }
+
+    /**
+     * Достаёт блок data из envelope v2 или legacy blocks.
+     *
+     * @param {Object|null} envelope
+     * @returns {Object|null}
+     */
+    function envelopeData(envelope) {
+        if (!envelope) {
+            return null;
+        }
+        if (envelope.data) {
+            return envelope.data;
+        }
+        return null;
+    }
+
+    /**
+     * Достаёт summary.current из envelope main.profit (v2) или legacy artifact.
      *
      * @param {Object} artifact
      * @returns {Object|null}
      */
     function extractProfitCurrent(artifact) {
-        var profit = artifact
-            && artifact.blocks
-            && artifact.blocks.main
-            && artifact.blocks.main.profit;
+        var profit = envelopeData(artifact)
+            || (artifact
+                && artifact.blocks
+                && artifact.blocks.main
+                && artifact.blocks.main.profit);
         if (!profit) {
             return null;
         }
@@ -527,7 +586,54 @@
     }
 
     /**
-     * Загружает 12 месяцев выбранного года из warehouse.
+     * Собирает payload {blocks} из трёх датасетов месяца.
+     *
+     * @param {string} ym
+     * @param {{profit: Object|null, marketing: Object|null, activity: Object|null}} parts
+     * @returns {Object}
+     */
+    function assembleMonthPayload(ym, parts) {
+        var profitEnv = parts.profit;
+        var marketingEnv = parts.marketing;
+        var activityEnv = parts.activity;
+        var any = profitEnv || marketingEnv || activityEnv;
+        if (!any) {
+            throw new Error('warehouse ' + ym + ' не найден');
+        }
+        return {
+            warehouseVersion: '2.0',
+            period: ym,
+            fetchedAt: (profitEnv && profitEnv.fetchedAt)
+                || (marketingEnv && marketingEnv.fetchedAt)
+                || (activityEnv && activityEnv.fetchedAt)
+                || null,
+            checksum: [
+                profitEnv && profitEnv.checksum,
+                marketingEnv && marketingEnv.checksum,
+                activityEnv && activityEnv.checksum
+            ].filter(Boolean).join('+') || null,
+            filters: (profitEnv && profitEnv.filters)
+                || (marketingEnv && marketingEnv.filters)
+                || (activityEnv && activityEnv.filters)
+                || { periodType: 'month', period: ym, compareMode: 'previous', companyId: 0 },
+            meta: (profitEnv && profitEnv.meta)
+                || (marketingEnv && marketingEnv.meta)
+                || (activityEnv && activityEnv.meta)
+                || null,
+            blocks: {
+                main: {
+                    profit: envelopeData(profitEnv) || null
+                },
+                owner: {
+                    companyMarketing: envelopeData(marketingEnv) || null,
+                    partnerActivity: envelopeData(activityEnv) || null
+                }
+            }
+        };
+    }
+
+    /**
+     * Загружает 12 месяцев выбранного года из warehouse (main.profit).
      *
      * @param {number} year
      * @returns {Promise<{labels: string[], months: string[], rows: Array<Object|null>}>}
@@ -544,19 +650,9 @@
             var ym = year + '-' + String(month).padStart(2, '0');
             months.push(ym);
             fetches.push(
-                fetch(WAREHOUSE_BASE + '/periods/' + ym + '.json?_=' + Date.now())
-                    .then(function (response) {
-                        if (!response.ok) {
-                            return null;
-                        }
-                        return response.json();
-                    })
-                    .then(function (artifact) {
-                        return artifact ? extractProfitCurrent(artifact) : null;
-                    })
-                    .catch(function () {
-                        return null;
-                    })
+                fetchDatasetEnvelope('main.profit', ym).then(function (artifact) {
+                    return artifact ? extractProfitCurrent(artifact) : null;
+                })
             );
         }
 
@@ -884,6 +980,28 @@
             ' | Сравнение (' + (labels.previous || '') + '): ' + previous.from + ' — ' + previous.to;
     }
 
+    /**
+     * Запись месяца в любом summary-датасете manifest v2 (или legacy periods).
+     *
+     * @param {string} ym
+     * @returns {Object|null}
+     */
+    function findManifestPeriodEntry(ym) {
+        if (!state.manifest) {
+            return null;
+        }
+        if (state.manifest.datasets) {
+            var ids = Object.keys(DATASET_PATHS);
+            for (var i = 0; i < ids.length; i += 1) {
+                var ds = state.manifest.datasets[ids[i]];
+                if (ds && ds.periods && ds.periods[ym]) {
+                    return ds.periods[ym];
+                }
+            }
+        }
+        return (state.manifest.periods && state.manifest.periods[ym]) || null;
+    }
+
     function renderWarehouseInfo() {
         var node = el('warehouse-info');
         if (!state.manifest) {
@@ -891,19 +1009,20 @@
             return;
         }
         var ym = formatSelectedPeriod();
-        var entry = state.manifest.periods && state.manifest.periods[ym];
+        var entry = findManifestPeriodEntry(ym);
         var cov = state.manifest.coverage || {};
         var last = state.manifest.lastRun || {};
+        var ver = state.manifest.warehouseVersion || '1.0';
         if (entry) {
             node.textContent =
-                'Warehouse ' + ym + ': fetched ' + (entry.fetchedAt || '—') +
+                'Warehouse v' + ver + ' ' + ym + ': fetched ' + (entry.fetchedAt || '—') +
                 ' | checksum ' + (entry.checksum || '—') +
                 ' | coverage ' + (cov.from || '?') + '…' + (cov.to || '?') +
                 ' (' + (cov.count || 0) + ')' +
                 (last.mode ? ' | lastRun=' + last.mode : '');
         } else {
             node.textContent =
-                'Warehouse: месяца ' + ym + ' нет. Coverage ' +
+                'Warehouse v' + ver + ': месяца ' + ym + ' нет. Coverage ' +
                 (cov.from || '—') + '…' + (cov.to || '—') +
                 '. Нажми «Обновить с API» или запусти sync.';
         }
@@ -1216,32 +1335,34 @@
     }
 
     function loadWarehousePeriod(ym) {
-        return fetch(WAREHOUSE_BASE + '/periods/' + ym + '.json?_=' + Date.now())
-            .then(function (response) {
-                if (!response.ok) {
-                    throw new Error('warehouse ' + ym + ' не найден');
-                }
-                return response.json();
-            })
-            .then(function (artifact) {
-                if (artifact.filters && artifact.filters.period) {
-                    var parts = String(artifact.filters.period).split('-');
-                    if (parts.length === 2) {
-                        var nextYear = Number(parts[0]);
-                        if (state.selectedYear !== nextYear) {
-                            state.profitYearCache = null;
-                            state.profitYearCacheKey = null;
-                        }
-                        state.selectedYear = nextYear;
-                        state.selectedMonth = Number(parts[1]);
-                        renderPeriodButtons();
-                    }
-                }
-                // Месячный файл мог обновиться — сбрасываем кэш серии года.
-                state.profitYearCache = null;
-                state.profitYearCacheKey = null;
-                renderDashboard(artifact, 'warehouse');
+        return Promise.all([
+            fetchDatasetEnvelope('main.profit', ym),
+            fetchDatasetEnvelope('owner.marketing', ym),
+            fetchDatasetEnvelope('activity.summary', ym)
+        ]).then(function (parts) {
+            var artifact = assembleMonthPayload(ym, {
+                profit: parts[0],
+                marketing: parts[1],
+                activity: parts[2]
             });
+            if (artifact.filters && artifact.filters.period) {
+                var periodParts = String(artifact.filters.period).split('-');
+                if (periodParts.length === 2) {
+                    var nextYear = Number(periodParts[0]);
+                    if (state.selectedYear !== nextYear) {
+                        state.profitYearCache = null;
+                        state.profitYearCacheKey = null;
+                    }
+                    state.selectedYear = nextYear;
+                    state.selectedMonth = Number(periodParts[1]);
+                    renderPeriodButtons();
+                }
+            }
+            // Месячный файл мог обновиться — сбрасываем кэш серии года.
+            state.profitYearCache = null;
+            state.profitYearCacheKey = null;
+            renderDashboard(artifact, 'warehouse');
+        });
     }
 
     /**

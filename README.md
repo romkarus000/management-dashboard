@@ -8,7 +8,9 @@
 2. **`management.html`** — блок «Управление»: вкладки owner / main / активности.
 3. **`drill.html`** — drill активностей.
 
-Данные: live API монолита или **warehouse** (месячные JSON + manifest).
+Данные: live API монолита или **warehouse v2** (датасеты по папкам + manifest).
+
+Контракт: [`docs/warehouse-v2-contract.md`](docs/warehouse-v2-contract.md).
 
 ## Prod
 
@@ -23,32 +25,46 @@
 
 ```
 .
-├── index.html                 # каталог по отделам
-├── management.html            # блок «Управление»
+├── index.html
+├── management.html
 ├── drill.html
-├── snapshot.json
+├── docs/
+│   └── warehouse-v2-contract.md
 ├── warehouse/
 │   ├── manifest.json
-│   ├── latest.json
-│   └── periods/YYYY-MM.json
+│   ├── filters.json
+│   ├── main/profit/YYYY-MM.json
+│   ├── owner/marketing/YYYY-MM.json
+│   ├── activity/summary/YYYY-MM.json
+│   └── activity/drill/{type}/YYYY-MM.json
 ├── assets/
 │   ├── app.js
 │   ├── drill.js
 │   └── styles.css
 └── scripts/
     ├── sync-warehouse.mjs
+    ├── migrate-warehouse-v2.mjs
     └── deploy.sh
 ```
 
 ## Warehouse sync
 
-Один API-запрос = один месяц (`query-batch`: profit + companyMarketing + partnerActivity).
-
 ```bash
 export MGMT_REPORT_API_TOKEN='…'
 
-node scripts/sync-warehouse.mjs --mode=mass --from=2021-01 --to=2026-08
-node scripts/sync-warehouse.mjs --mode=refresh --include-previous
+node scripts/sync-warehouse.mjs --mode=mass --tabs=main,owner,activity --from=2021-01 --to=2026-08
+node scripts/sync-warehouse.mjs --mode=refresh --tabs=all --include-previous
+
+# drill-витрина (отдельно, тяжелее; бэкенд отдаёт totals/previous/delta)
+node scripts/sync-warehouse.mjs --tabs=activity-drill --drill-types=manual_human --months=2026-08
+```
+
+Миграция со старых `periods/` (уже разложено в v2-папки):
+
+```bash
+node scripts/migrate-warehouse-v2.mjs
+# когда UI проверен на v2 — удалить legacy:
+node scripts/migrate-warehouse-v2.mjs --delete-legacy
 ```
 
 После sync:
@@ -64,8 +80,10 @@ node scripts/sync-warehouse.mjs --mode=refresh --include-previous
 - Старт: список отделов → клик «Управление» → `management.html`.
 - Вкладки: owner / main / activity.
 - «Из warehouse» / «Обновить с API».
-- Token: `?token=…` пробрасывается между страницами.
+- Drill: warehouse first (`activity/drill/{type}/`), KPI + годовые графики; fallback — live API.
+- Token: один раз `?token=…` → localStorage (из URL убирается).
 
 ## Связь с монолитом
 
-Backend: `ManagementReportController`, `common/models/services/managementReport/*`.
+Backend: `ManagementReportController`, `common/models/services/managementReport/*`.  
+Drill KPI: `GET …/partner-activity/drill` отдаёт `totals` / `previous` / `delta` (см. контракт).

@@ -5,6 +5,9 @@
 .env
 .env.*
 
-# Warehouse: большие period-файлы не коммитим (manifest можно).
+# Warehouse: большие датасеты не коммитим (manifest + filters + CONTRACT — можно).
 warehouse/periods/
+warehouse/main/
+warehouse/owner/
+warehouse/activity/
 warehouse/latest.json
