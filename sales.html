@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Отдел продаж</title>
+    <link rel="stylesheet" href="./assets/styles.css">
+</head>
+<body class="management-dashboard">
+    <header class="management-dashboard__header">
+        <p class="management-dashboard__breadcrumb">
+            <a href="./index.html" id="link-home">Дашборды</a>
+            <span aria-hidden="true"> / </span>
+            <span>Продажи</span>
+        </p>
+        <h1 class="management-dashboard__title">Отдел продаж</h1>
+        <p class="management-dashboard__subtitle">C2 · средний чек · реакция · нагрузка · экономика отдела</p>
+    </header>
+
+    <section class="management-dashboard__filters">
+        <div class="management-dashboard__field management-dashboard__field--period">
+            <span class="management-dashboard__field-label">Год</span>
+            <div id="filter-year-buttons" class="management-dashboard__chips" role="group" aria-label="Год"></div>
+        </div>
+        <div class="management-dashboard__field management-dashboard__field--period">
+            <span class="management-dashboard__field-label">Месяц</span>
+            <div id="filter-month-buttons" class="management-dashboard__chips" role="group" aria-label="Месяц"></div>
+        </div>
+        <div class="management-dashboard__field">
+            <label for="filter-company">Компания</label>
+            <select id="filter-company">
+                <option value="0">Все</option>
+            </select>
+        </div>
+    </section>
+
+    <div class="management-dashboard__actions">
+        <button id="btn-reload" type="button" class="management-dashboard__btn management-dashboard__btn--secondary">Обновить</button>
+        <span id="dashboard-status" class="management-dashboard__status">Инициализация…</span>
+    </div>
+
+    <div id="period-info" class="management-dashboard__periods"></div>
+
+    <section class="management-dashboard__section">
+        <h2 class="management-dashboard__section-title">Ключевые метрики</h2>
+        <p class="management-dashboard__section-hint">
+            Сначала общее по компании и месяцу. Источник C2 / ср.чека — MCP (`mcp_segment_orders`),
+            канон в n8n-corp `tool_mcp_edprobiz/docs/sales-c2-contract.md`. Пока значения пустые —
+            заполним после доступа к расчёту чистого итога.
+        </p>
+        <div id="kpi-grid" class="management-dashboard__kpi-grid"></div>
+    </section>
+
+    <section class="management-dashboard__section">
+        <h2 class="management-dashboard__section-title">Таблица метрик</h2>
+        <div class="management-dashboard__table-wrap">
+            <table class="management-dashboard__table">
+                <thead>
+                    <tr>
+                        <th>Метрика</th>
+                        <th class="is-num">Текущий</th>
+                        <th class="is-num">Сравнение</th>
+                        <th class="is-num">Δ</th>
+                    </tr>
+                </thead>
+                <tbody id="metrics-table-body"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <script src="./assets/sales.js"></script>
+</body>
+</html>

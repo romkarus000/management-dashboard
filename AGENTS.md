@@ -13,6 +13,9 @@
 
 1. **`index.html`** — каталог дашбордов по отделам.
 2. **`management.html`** — блок «Управление»: owner / main / активности + drill.
+3. **`marketing.html`** — блок «CRM Маркетинг»: обзор / коммуникации / база / воронка / RFM (warehouse `crm.*`).
+4. **`sales.html`** — блок «Отдел продаж»: C2 / ср.чек / SLA / … (пока карточки-заглушки; данные из MCP).
+5. **`development.html`** — блок «Отдел разработки» (Asana flow metrics, warehouse `dev/*`).
 
 ## Warehouse sync (v2)
 
@@ -30,8 +33,9 @@ node scripts/migrate-warehouse-v2.mjs
 # node scripts/migrate-warehouse-v2.mjs --delete-legacy
 ```
 
-Файлы: `main/profit/`, `owner/marketing/`, `activity/summary/`, `activity/drill/{type}/`.  
-Реестр: `warehouse/manifest.json`. Контракт: `docs/warehouse-v2-contract.md`.
+Файлы: `main/profit/`, `owner/marketing/`, `activity/summary/`, `activity/drill/{type}/`, `crm/leading|base|rfm/`, `dev/*`.  
+Реестр: `warehouse/manifest.json`. Контракты: `docs/warehouse-v2-contract.md`, `docs/crm-warehouse-contract.md`, `docs/dev-flow-contract.md`.  
+CRM primary: n8n `[CRM] Leading Metrics Daily` → HTTP ingest → `warehouse/crm/` (каналы enKod/Salebot/BotHelp пока carry).
 
 ## Как действуем
 

@@ -9,7 +9,7 @@
 <body class="dashboard-home">
     <header class="dashboard-home__header">
         <h1 class="dashboard-home__title">Дашборды</h1>
-        <p class="dashboard-home__subtitle">Отчёты по отделам. Сейчас доступен блок «Управление».</p>
+        <p class="dashboard-home__subtitle">Отчёты по отделам</p>
     </header>
 
     <section class="dashboard-home__department" aria-labelledby="dept-management">
@@ -24,18 +24,46 @@
         </div>
     </section>
 
+    <section class="dashboard-home__department" aria-labelledby="dept-dev">
+        <h2 id="dept-dev" class="dashboard-home__dept-title">Разработка</h2>
+        <p class="dashboard-home__dept-hint">Поток задач Asana · Lead · Cycle · TTM · MTTR · WIP</p>
+        <div class="dashboard-home__grid">
+            <a class="dashboard-home__card" href="./development.html">
+                <span class="dashboard-home__card-title">Отдел разработки</span>
+                <span class="dashboard-home__card-desc">Lead · Cycle · TTM · MTTR · Throughput · WIP</span>
+                <span class="dashboard-home__card-meta">warehouse daily</span>
+            </a>
+        </div>
+    </section>
+
+    <section class="dashboard-home__department" aria-labelledby="dept-marketing">
+        <h2 id="dept-marketing" class="dashboard-home__dept-title">Маркетинг</h2>
+        <p class="dashboard-home__dept-hint">CRM-коммуникации и опережающие метрики</p>
+        <div class="dashboard-home__grid">
+            <a class="dashboard-home__card" href="./marketing.html">
+                <span class="dashboard-home__card-title">CRM Маркетинг</span>
+                <span class="dashboard-home__card-desc">Обзор · Коммуникации · База · Воронка · RFM</span>
+                <span class="dashboard-home__card-meta">warehouse snapshot авг/сен 2026</span>
+            </a>
+        </div>
+    </section>
+
+    <section class="dashboard-home__department" aria-labelledby="dept-sales">
+        <h2 id="dept-sales" class="dashboard-home__dept-title">Продажи</h2>
+        <p class="dashboard-home__dept-hint">C2 · средний чек · реакция · нагрузка · экономика отдела</p>
+        <div class="dashboard-home__grid">
+            <a class="dashboard-home__card" href="./sales.html">
+                <span class="dashboard-home__card-title">Отдел продаж</span>
+                <span class="dashboard-home__card-desc">C2 · ср.чек · SLA · НДЗ · ФОТ</span>
+                <span class="dashboard-home__card-meta">MCP · пока без данных</span>
+            </a>
+        </div>
+    </section>
+
     <section class="dashboard-home__department dashboard-home__department--soon" aria-labelledby="dept-soon">
         <h2 id="dept-soon" class="dashboard-home__dept-title">Другие отделы</h2>
         <p class="dashboard-home__dept-hint">Появятся по мере подключения</p>
         <div class="dashboard-home__grid">
-            <div class="dashboard-home__card is-disabled" aria-disabled="true">
-                <span class="dashboard-home__card-title">Маркетинг</span>
-                <span class="dashboard-home__card-desc">Скоро</span>
-            </div>
-            <div class="dashboard-home__card is-disabled" aria-disabled="true">
-                <span class="dashboard-home__card-title">Продажи</span>
-                <span class="dashboard-home__card-desc">Скоро</span>
-            </div>
             <div class="dashboard-home__card is-disabled" aria-disabled="true">
                 <span class="dashboard-home__card-title">Партнёрка</span>
                 <span class="dashboard-home__card-desc">Скоро</span>
