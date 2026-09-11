@@ -28,7 +28,7 @@
         {
             key: 'qual_leads_mop_day',
             label: 'Квал. лидов на МОП / день',
-            hint: 'скоро',
+            hint: 'v2 + qualified_cc=Да · дата op_call_date ÷ неуволенные МОП',
             format: 'num'
         },
         {
