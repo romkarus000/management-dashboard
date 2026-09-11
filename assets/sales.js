@@ -315,7 +315,20 @@
         return fetch(url, { cache: 'no-store' }).then(function (res) {
             if (res.status === 404) return null;
             if (!res.ok) throw new Error(url + ': HTTP ' + res.status);
-            return res.json();
+            var ctype = (res.headers.get('content-type') || '').toLowerCase();
+            return res.text().then(function (text) {
+                var trimmed = (text || '').trim();
+                // Нет файла: nginx/SPA отдаёт HTML 200 вместо 404.
+                if (!trimmed || trimmed.charAt(0) === '<') return null;
+                if (ctype && ctype.indexOf('json') === -1 && trimmed.charAt(0) !== '{' && trimmed.charAt(0) !== '[') {
+                    return null;
+                }
+                try {
+                    return JSON.parse(trimmed);
+                } catch (err) {
+                    return null;
+                }
+            });
         });
     }
 
