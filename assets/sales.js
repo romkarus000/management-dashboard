@@ -29,7 +29,7 @@
         {
             key: 'qual_leads_mop_day',
             label: 'Квал. лидов на МОП / день',
-            hint: 'v2 + Да · op_call_date · ОП-отделы Академии (без КЦ)',
+            hint: 'v2 + Да · op_call_date · линейки ОП [5,7,9,23,25,27]',
             format: 'num'
         },
         {
@@ -93,7 +93,7 @@
     var state = {
         year: 2026,
         month: 8,
-        companyId: 0,
+        companyId: 3,
         companies: [{ id: 0, name: 'Все' }],
         availablePeriods: [],
         values: {},

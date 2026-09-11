@@ -161,10 +161,7 @@ function firstGroup(res) {
 async function fetchCompanyMonth(mcp, companyId, ym) {
   const { from, to, toPaid } = monthRange(ym);
   const companyArg = companyId === 0 ? {} : { company_id: companyId };
-  const deptArg =
-    companyId === ACADEMY_COMPANY_ID
-      ? { sales_department_ids: ACADEMY_OP_DEPARTMENT_IDS }
-      : {};
+  const deptArg = { sales_department_ids: ACADEMY_OP_DEPARTMENT_IDS };
 
   const apps = await mcp.call('mcp_segment_orders', {
     date_from: from,
