@@ -43,10 +43,22 @@ function monthRange(ym) {
   const [y, m] = ym.split('-').map(Number);
   const last = new Date(Date.UTC(y, m, 0)).getUTCDate();
   const mm = String(m).padStart(2, '0');
+  const from = `${y}-${mm}-01`;
+  let toDay = last;
+  // Текущий месяц (МСК): среднее только до сегодняшнего числа.
+  const nowMsk = new Date(
+    new Date().toLocaleString('en-US', { timeZone: 'Europe/Moscow' }),
+  );
+  const curYm = `${nowMsk.getFullYear()}-${String(nowMsk.getMonth() + 1).padStart(2, '0')}`;
+  if (ym === curYm) {
+    toDay = Math.min(last, nowMsk.getDate());
+  }
+  const to = `${y}-${mm}-${String(toDay).padStart(2, '0')}`;
   return {
-    from: `${y}-${mm}-01`,
-    to: `${y}-${mm}-${String(last).padStart(2, '0')}`,
-    toPaid: `${y}-${mm}-${String(last).padStart(2, '0')} 23:59:59`,
+    from,
+    to,
+    toPaid: `${to} 23:59:59`,
+    capped_to_today: ym === curYm,
   };
 }
 
@@ -159,7 +171,7 @@ function firstGroup(res) {
 }
 
 async function fetchCompanyMonth(mcp, companyId, ym) {
-  const { from, to, toPaid } = monthRange(ym);
+  const { from, to, toPaid, capped_to_today } = monthRange(ym);
   const companyArg = companyId === 0 ? {} : { company_id: companyId };
   const deptArg = { sales_department_ids: ACADEMY_OP_DEPARTMENT_IDS };
 
@@ -221,9 +233,12 @@ async function fetchCompanyMonth(mcp, companyId, ym) {
     qualified_leads: Number(qual.qualified_leads ?? 0),
     mop_count: Number(qual.mop_count ?? 0),
     calendar_days: Number(qual.calendar_days ?? 0),
+    mean_leads_per_mop:
+      qual.mean_leads_per_mop == null ? null : Number(qual.mean_leads_per_mop),
     qual_leads_mop_day:
       qual.leads_per_mop_per_day == null ? null : Number(qual.leads_per_mop_per_day),
     sales_department_ids: qual.sales_department_ids ?? null,
+    qual_period: { from, to, capped_to_today: !!capped_to_today },
   };
 }
 

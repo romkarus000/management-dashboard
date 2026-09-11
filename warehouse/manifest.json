@@ -1883,25 +1883,81 @@
     "sales.kpis": {
       "path": "sales/kpis",
       "coverage": {
-        "from": "2026-07",
-        "to": "2026-08",
-        "count": 2
+        "from": "2026-01",
+        "to": "2026-09",
+        "count": 9
       },
       "periods": {
         "2026-07": {
-          "fetchedAt": "2026-09-11T14:25:54.760Z",
-          "checksum": "15ee6611b49fdcb7",
+          "fetchedAt": "2026-09-11T14:48:48.432Z",
+          "checksum": "2d77ce6fd4212e7b",
           "file": "sales/kpis/2026-07.json",
           "changed": true,
-          "durationMs": 8729,
+          "durationMs": 10969,
           "source": "sync-sales-warehouse.mjs"
         },
         "2026-08": {
-          "fetchedAt": "2026-09-11T14:26:01.979Z",
-          "checksum": "b66804bb385c2c7a",
+          "fetchedAt": "2026-09-11T14:48:59.775Z",
+          "checksum": "661f1b170e7ea2f6",
           "file": "sales/kpis/2026-08.json",
           "changed": true,
-          "durationMs": 7215,
+          "durationMs": 11343,
+          "source": "sync-sales-warehouse.mjs"
+        },
+        "2026-01": {
+          "fetchedAt": "2026-09-11T14:47:36.367Z",
+          "checksum": "3f4bcafeadb2160b",
+          "file": "sales/kpis/2026-01.json",
+          "changed": true,
+          "durationMs": 13067,
+          "source": "sync-sales-warehouse.mjs"
+        },
+        "2026-02": {
+          "fetchedAt": "2026-09-11T14:47:48.138Z",
+          "checksum": "26c720f4c752409d",
+          "file": "sales/kpis/2026-02.json",
+          "changed": true,
+          "durationMs": 11770,
+          "source": "sync-sales-warehouse.mjs"
+        },
+        "2026-03": {
+          "fetchedAt": "2026-09-11T14:48:00.874Z",
+          "checksum": "309eb03333c4aabb",
+          "file": "sales/kpis/2026-03.json",
+          "changed": true,
+          "durationMs": 12737,
+          "source": "sync-sales-warehouse.mjs"
+        },
+        "2026-04": {
+          "fetchedAt": "2026-09-11T14:48:14.205Z",
+          "checksum": "8e1036c5dd4279ae",
+          "file": "sales/kpis/2026-04.json",
+          "changed": true,
+          "durationMs": 13328,
+          "source": "sync-sales-warehouse.mjs"
+        },
+        "2026-05": {
+          "fetchedAt": "2026-09-11T14:48:26.281Z",
+          "checksum": "489de288faf9cc1e",
+          "file": "sales/kpis/2026-05.json",
+          "changed": true,
+          "durationMs": 12076,
+          "source": "sync-sales-warehouse.mjs"
+        },
+        "2026-06": {
+          "fetchedAt": "2026-09-11T14:48:37.463Z",
+          "checksum": "d1911166da16e535",
+          "file": "sales/kpis/2026-06.json",
+          "changed": true,
+          "durationMs": 11181,
+          "source": "sync-sales-warehouse.mjs"
+        },
+        "2026-09": {
+          "fetchedAt": "2026-09-11T14:49:10.525Z",
+          "checksum": "80697b4ecc4cf6c8",
+          "file": "sales/kpis/2026-09.json",
+          "changed": true,
+          "durationMs": 10751,
           "source": "sync-sales-warehouse.mjs"
         }
       }
@@ -1919,5 +1975,5 @@
     "jobsRequested": 2,
     "requests": 2
   },
-  "updatedAt": "2026-09-11T14:26:01.981Z"
+  "updatedAt": "2026-09-11T14:49:10.528Z"
 }

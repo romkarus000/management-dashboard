@@ -38,8 +38,10 @@ Sync: `node scripts/sync-sales-warehouse.mjs --from=2026-07 --to=2026-08 --compa
 | `payment_net_sum` | чистый итог (`with_payment_net`) |
 | `completed_paid_count` | знаменатель ср.чека |
 | `avg_check` | `avg_payment_net` |
-| `qualified_leads` / `mop_count` / `calendar_days` | числитель/знаменатель квал.лидов |
-| `qual_leads_mop_day` | `round(Σ / mop / days)` целое |
-| `sales_department_ids` | для Академии (3) — линейки ОП без КЦ |
+| `qualified_leads` / `mop_count` / `calendar_days` | сумма лидов; снимок МОП; число дней в среднем |
+| `mean_leads_per_mop` | среднее `leads_d/mop` (дробь) |
+| `qual_leads_mop_day` | `round(mean(leads_d/mop))` по дням 1…N; N=сегодня в текущем месяце |
+| `qual_period` | `{ from, to, capped_to_today }` — фактическое окно квал.лидов |
+| `sales_department_ids` | линейки ОП `[5,7,9,23,25,27]` |
 
 Фронт `assets/sales.js` читает `byCompany[companyId]` (fallback на `"0"`).
