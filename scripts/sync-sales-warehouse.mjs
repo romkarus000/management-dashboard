@@ -216,8 +216,11 @@ async function fetchCompanyMonth(mcp, companyId, ym) {
   const pg = firstGroup(pays);
   const ng = firstGroup(net);
   const applications = ag ? Number(ag.orders_count) : 0;
+  const applicationUsers = ag ? Number(ag.distinct_users) : 0;
   const payments = pg ? Number(pg.orders_count) : 0;
-  const c2 = applications > 0 ? payments / applications : null;
+  const paymentUsers = pg ? Number(pg.distinct_users) : 0;
+  // C2 по уникальным клиентам: иначе ~3 заявки/клиента занижают конверсию.
+  const c2 = applicationUsers > 0 ? paymentUsers / applicationUsers : null;
   const avgCheck = ng && ng.avg_payment_net != null ? Number(ng.avg_payment_net) : null;
   const paymentNetSum = ng && ng.payment_net_sum != null ? Number(ng.payment_net_sum) : null;
   const completedPaid = ng && ng.completed_paid_count != null ? Number(ng.completed_paid_count) : null;
@@ -225,7 +228,9 @@ async function fetchCompanyMonth(mcp, companyId, ym) {
   return {
     company_id: companyId,
     applications,
+    application_users: applicationUsers,
     payments,
+    payment_users: paymentUsers,
     c2,
     payment_net_sum: paymentNetSum,
     completed_paid_count: completedPaid,

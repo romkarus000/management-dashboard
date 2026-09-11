@@ -32,9 +32,9 @@ Sync: `node scripts/sync-sales-warehouse.mjs --from=2026-07 --to=2026-08 --compa
 
 | Ключ | Смысл |
 |------|--------|
-| `applications` | заявки C2 (`created` + cat 15/19/45 + offer_or_ads) |
-| `payments` | оплаты C2 (`paid` + cat 17/29 + status 20 + paid_only) |
-| `c2` | `payments / applications` (доля 0…1) |
+| `applications` / `application_users` | заявки C2: заказы и уник. клиенты |
+| `payments` / `payment_users` | оплаты C2: заказы и уник. клиенты |
+| `c2` | `payment_users / application_users` (доля 0…1) |
 | `payment_net_sum` | чистый итог (`with_payment_net`) |
 | `completed_paid_count` | знаменатель ср.чека |
 | `avg_check` | `avg_payment_net` |
