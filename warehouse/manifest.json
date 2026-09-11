@@ -2,7 +2,7 @@
   "version": "2.0",
   "schemaVersion": "2.0",
   "warehouseVersion": "2.0",
-  "generatedAt": "2026-09-09T09:28:22.696Z",
+  "generatedAt": "2026-09-10T11:05:18.692Z",
   "coverage": {
     "from": "2021-01",
     "to": "2026-09",
@@ -1678,20 +1678,18 @@
           "migratedFrom": "periods/2026-07.json"
         },
         "2026-08": {
-          "fetchedAt": "2026-09-08T08:21:57.495Z",
-          "checksum": "0d9a399c23e8c99c",
+          "fetchedAt": "2026-09-09T11:03:14.839Z",
+          "checksum": "47bdf62dd06ff44f",
           "file": "activity/summary/2026-08.json",
           "changed": true,
-          "durationMs": null,
-          "migratedFrom": "periods/2026-08.json"
+          "durationMs": 81172
         },
         "2026-09": {
-          "fetchedAt": "2026-09-08T08:22:21.963Z",
-          "checksum": "014335cbee229de6",
+          "fetchedAt": "2026-09-09T11:03:17.716Z",
+          "checksum": "0c8c0d451451b94a",
           "file": "activity/summary/2026-09.json",
           "changed": true,
-          "durationMs": null,
-          "migratedFrom": "periods/2026-09.json"
+          "durationMs": 867
         }
       }
     },
@@ -1711,6 +1709,202 @@
           "durationMs": 29314
         }
       }
+    },
+    "activity.drill.manual_cross_marketing": {
+      "path": "activity/drill/manual_cross_marketing",
+      "coverage": {
+        "from": "2026-08",
+        "to": "2026-09",
+        "count": 2
+      },
+      "periods": {
+        "2026-08": {
+          "fetchedAt": "2026-09-09T11:03:27.931Z",
+          "checksum": "a52a0b8f523c5484",
+          "file": "activity/drill/manual_cross_marketing/2026-08.json",
+          "changed": true,
+          "durationMs": 9925
+        },
+        "2026-09": {
+          "fetchedAt": "2026-09-09T11:03:39.404Z",
+          "checksum": "49d047c0feeaeb9a",
+          "file": "activity/drill/manual_cross_marketing/2026-09.json",
+          "changed": true,
+          "durationMs": 9468
+        }
+      }
+    },
+    "crm.leading": {
+      "path": "crm/leading",
+      "coverage": {
+        "from": "2026-08",
+        "to": "2026-09",
+        "count": 2
+      },
+      "periods": {
+        "2026-08": {
+          "fetchedAt": "2026-09-08T16:00:00.000Z",
+          "checksum": "2b26a365aaddadeb",
+          "file": "crm/leading/2026-08.json",
+          "changed": true,
+          "durationMs": null,
+          "source": "crm-leading-dashboard snapshot"
+        },
+        "2026-09": {
+          "fetchedAt": "2026-09-08T16:00:00.000Z",
+          "checksum": "8b072b5438f5b530",
+          "file": "crm/leading/2026-09.json",
+          "changed": true,
+          "durationMs": null,
+          "source": "crm-leading-dashboard snapshot"
+        }
+      }
+    },
+    "crm.base": {
+      "path": "crm/base",
+      "coverage": {
+        "from": "2026-08",
+        "to": "2026-09",
+        "count": 2
+      },
+      "periods": {
+        "2026-08": {
+          "fetchedAt": "2026-09-08T16:00:00.000Z",
+          "checksum": "2fc344333bde0050",
+          "file": "crm/base/2026-08.json",
+          "changed": true,
+          "durationMs": null,
+          "source": "crm-leading-dashboard snapshot"
+        },
+        "2026-09": {
+          "fetchedAt": "2026-09-08T16:00:00.000Z",
+          "checksum": "2fc344333bde0050",
+          "file": "crm/base/2026-09.json",
+          "changed": true,
+          "durationMs": null,
+          "source": "crm-leading-dashboard snapshot"
+        }
+      }
+    },
+    "crm.rfm": {
+      "path": "crm/rfm",
+      "coverage": {
+        "from": "2026-08",
+        "to": "2026-09",
+        "count": 2
+      },
+      "periods": {
+        "2026-08": {
+          "fetchedAt": "2026-09-08T16:00:00.000Z",
+          "checksum": "16bf04adb1b84b63",
+          "file": "crm/rfm/2026-08.json",
+          "changed": true,
+          "durationMs": null,
+          "source": "crm-leading-dashboard snapshot"
+        },
+        "2026-09": {
+          "fetchedAt": "2026-09-08T16:00:00.000Z",
+          "checksum": "16bf04adb1b84b63",
+          "file": "crm/rfm/2026-09.json",
+          "changed": true,
+          "durationMs": null,
+          "source": "crm-leading-dashboard snapshot"
+        }
+      }
+    },
+    "dev.card": {
+      "path": "dev/card",
+      "periodGranularity": "day",
+      "coverage": {
+        "from": "2026-09-10",
+        "to": "2026-09-10",
+        "count": 1
+      },
+      "periods": {
+        "2026-09-10": {
+          "fetchedAt": "2026-09-10T11:05:18.689Z",
+          "checksum": "dac0fbc030e0b2a5",
+          "file": "dev/card/2026-09-10.json",
+          "changed": true
+        }
+      }
+    },
+    "dev.series": {
+      "path": "dev/series",
+      "periodGranularity": "day",
+      "coverage": {
+        "from": "2026-09-10",
+        "to": "2026-09-10",
+        "count": 1
+      },
+      "periods": {
+        "2026-09-10": {
+          "fetchedAt": "2026-09-10T11:05:18.689Z",
+          "checksum": "32b090028cd221a2",
+          "file": "dev/series/2026-09-10.json",
+          "changed": true
+        }
+      }
+    },
+    "dev.wip": {
+      "path": "dev/wip",
+      "periodGranularity": "day",
+      "coverage": {
+        "from": "2026-09-10",
+        "to": "2026-09-10",
+        "count": 1
+      },
+      "periods": {
+        "2026-09-10": {
+          "fetchedAt": "2026-09-10T11:05:18.690Z",
+          "checksum": "b638027986f67c25",
+          "file": "dev/wip/2026-09-10.json",
+          "changed": true
+        }
+      }
+    },
+    "dev.tasks_closed": {
+      "path": "dev/tasks_closed",
+      "periodGranularity": "day",
+      "coverage": {
+        "from": "2026-09-10",
+        "to": "2026-09-10",
+        "count": 1
+      },
+      "periods": {
+        "2026-09-10": {
+          "fetchedAt": "2026-09-10T11:05:18.690Z",
+          "checksum": "d50c2c04ad87b98f",
+          "file": "dev/tasks_closed/2026-09-10.json",
+          "changed": true
+        }
+      }
+    },
+    "sales.kpis": {
+      "path": "sales/kpis",
+      "coverage": {
+        "from": "2026-07",
+        "to": "2026-08",
+        "count": 2
+      },
+      "periods": {
+        "2026-07": {
+          "fetchedAt": "2026-09-11T14:25:54.760Z",
+          "checksum": "15ee6611b49fdcb7",
+          "file": "sales/kpis/2026-07.json",
+          "changed": true,
+          "durationMs": 8729,
+          "source": "sync-sales-warehouse.mjs"
+        },
+        "2026-08": {
+          "fetchedAt": "2026-09-11T14:26:01.979Z",
+          "checksum": "b66804bb385c2c7a",
+          "file": "sales/kpis/2026-08.json",
+          "changed": true,
+          "durationMs": 7215,
+          "source": "sync-sales-warehouse.mjs"
+        }
+      }
     }
   },
   "lastRun": {
@@ -1718,11 +1912,12 @@
     "tabs": [
       "activity-drill"
     ],
-    "at": "2026-09-09T09:28:22.696Z",
-    "ok": 1,
+    "at": "2026-09-09T11:03:39.406Z",
+    "ok": 2,
     "failed": [],
-    "changed": 1,
-    "jobsRequested": 1,
-    "requests": 1
-  }
+    "changed": 2,
+    "jobsRequested": 2,
+    "requests": 2
+  },
+  "updatedAt": "2026-09-11T14:26:01.981Z"
 }

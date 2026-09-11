@@ -10,4 +10,10 @@ warehouse/periods/
 warehouse/main/
 warehouse/owner/
 warehouse/activity/
+warehouse/dev/
+warehouse/crm/
+warehouse/sales/
 warehouse/latest.json
+
+# Кэш timestamps Asana stories для sync-dev-warehouse
+.cache/

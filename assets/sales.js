@@ -1,17 +1,18 @@
 /**
- * Отдел продаж: KPI-карточки (пока без данных).
- * Канон C2 / ср.чека: n8n-corp tool_mcp_edprobiz/docs/sales-c2-contract.md
+ * Отдел продаж: KPI из warehouse/sales/kpis/{YYYY-MM}.json
+ * Канон: docs/sales-warehouse-contract.md + n8n-corp sales-c2-contract.md
  */
 (function () {
     'use strict';
 
-    var FILTERS_URL = './warehouse/filters.json';
+    var WAREHOUSE_BASE = window.MGMT_WAREHOUSE_BASE || './warehouse';
+    var FILTERS_URL = WAREHOUSE_BASE + '/filters.json';
+    var MANIFEST_URL = WAREHOUSE_BASE + '/manifest.json';
     var MONTH_LABELS = [
         'Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн',
         'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'
     ];
 
-    /** Карточки первого экрана — от общего к частному. value: null = пусто. */
     var METRICS = [
         {
             key: 'c2',
@@ -28,7 +29,7 @@
         {
             key: 'qual_leads_mop_day',
             label: 'Квал. лидов на МОП / день',
-            hint: 'v2 + qualified_cc=Да · дата op_call_date ÷ неуволенные МОП',
+            hint: 'v2 + Да · op_call_date · ОП-отделы Академии (без КЦ)',
             format: 'num'
         },
         {
@@ -87,14 +88,17 @@
         }
     ];
 
+    var VALUE_KEYS = ['c2', 'avg_check', 'qual_leads_mop_day'];
+
     var state = {
         year: 2026,
         month: 8,
         companyId: 0,
         companies: [{ id: 0, name: 'Все' }],
-        /** @type {Record<string, number|null>} */
+        availablePeriods: [],
         values: {},
-        previous: {}
+        previous: {},
+        meta: null
     };
 
     function el(id) {
@@ -116,6 +120,15 @@
         return out;
     }
 
+    function ymKey(year, month) {
+        return year + '-' + String(month).padStart(2, '0');
+    }
+
+    function prevYm(year, month) {
+        if (month <= 1) return { year: year - 1, month: 12 };
+        return { year: year, month: month - 1 };
+    }
+
     function fmtValue(value, format) {
         if (value == null || Number.isNaN(Number(value))) return '—';
         var n = Number(value);
@@ -125,7 +138,24 @@
         if (format === 'money') {
             return Math.round(n).toLocaleString('ru-RU') + ' ₽';
         }
-        return n.toLocaleString('ru-RU');
+        return Math.round(n).toLocaleString('ru-RU');
+    }
+
+    function fmtDelta(cur, prev, format) {
+        if (cur == null || prev == null || Number.isNaN(Number(cur)) || Number.isNaN(Number(prev))) {
+            return '—';
+        }
+        var c = Number(cur);
+        var p = Number(prev);
+        if (format === 'pct') {
+            var dpp = (c - p) * 100;
+            var sign = dpp > 0 ? '+' : '';
+            return sign + (Math.round(dpp * 10) / 10).toLocaleString('ru-RU') + ' п.п.';
+        }
+        if (p === 0) return '—';
+        var pct = (100 * (c - p)) / p;
+        var s = pct > 0 ? '+' : '';
+        return s + (Math.round(pct * 10) / 10).toLocaleString('ru-RU') + '%';
     }
 
     function periodLabel() {
@@ -142,12 +172,16 @@
     function renderPeriodInfo() {
         var node = el('period-info');
         if (!node) return;
+        var src = state.meta && state.meta.fetchedAt
+            ? ' · warehouse ' + state.meta.fetchedAt.slice(0, 16).replace('T', ' ')
+            : '';
         node.textContent =
             'Период: ' +
             periodLabel() +
             ' · Компания: ' +
             companyLabel() +
-            ' · Данные: пока не подключены';
+            ' · Данные: sales.kpis' +
+            src;
     }
 
     function renderKpis() {
@@ -190,7 +224,7 @@
                 metric.label,
                 fmtValue(state.values[metric.key], metric.format),
                 fmtValue(state.previous[metric.key], metric.format),
-                '—'
+                fmtDelta(state.values[metric.key], state.previous[metric.key], metric.format)
             ];
             cells.forEach(function (text, i) {
                 var td = document.createElement('td');
@@ -260,14 +294,73 @@
         });
     }
 
-    /**
-     * Заглушка загрузки метрик. Позже: MCP / warehouse sales/*.
-     * @returns {Promise<void>}
-     */
+    function pickCompanyRow(byCompany, companyId) {
+        if (!byCompany || typeof byCompany !== 'object') return null;
+        var key = String(companyId);
+        if (byCompany[key]) return byCompany[key];
+        if (byCompany['0']) return byCompany['0'];
+        return null;
+    }
+
+    function rowToValues(row) {
+        var out = emptyValues();
+        if (!row) return out;
+        VALUE_KEYS.forEach(function (k) {
+            out[k] = row[k] == null ? null : Number(row[k]);
+        });
+        return out;
+    }
+
+    function fetchJson(url) {
+        return fetch(url, { cache: 'no-store' }).then(function (res) {
+            if (res.status === 404) return null;
+            if (!res.ok) throw new Error(url + ': HTTP ' + res.status);
+            return res.json();
+        });
+    }
+
+    function loadPeriodFile(ym) {
+        return fetchJson(WAREHOUSE_BASE + '/sales/kpis/' + ym + '.json');
+    }
+
     function loadMetrics() {
-        state.values = emptyValues();
-        state.previous = emptyValues();
-        return Promise.resolve();
+        var curYm = ymKey(state.year, state.month);
+        var prev = prevYm(state.year, state.month);
+        var prevKey = ymKey(prev.year, prev.month);
+
+        return Promise.all([loadPeriodFile(curYm), loadPeriodFile(prevKey)]).then(function (pair) {
+            var curFile = pair[0];
+            var prevFile = pair[1];
+            if (!curFile) {
+                state.values = emptyValues();
+                state.previous = emptyValues();
+                state.meta = null;
+                throw new Error('Нет sales.kpis для ' + curYm + ' — запусти sync-sales-warehouse.mjs');
+            }
+            var curRow = pickCompanyRow(curFile.data && curFile.data.byCompany, state.companyId);
+            var prevRow = prevFile
+                ? pickCompanyRow(prevFile.data && prevFile.data.byCompany, state.companyId)
+                : null;
+            // Если выбранной компании нет в срезе — явно пусто, не подменяем «Все»
+            if (
+                state.companyId !== 0 &&
+                curFile.data &&
+                curFile.data.byCompany &&
+                !curFile.data.byCompany[String(state.companyId)]
+            ) {
+                state.values = emptyValues();
+                state.previous = emptyValues();
+                state.meta = { fetchedAt: curFile.fetchedAt, missingCompany: true };
+                return;
+            }
+            state.values = rowToValues(curRow);
+            state.previous = rowToValues(prevRow);
+            state.meta = {
+                fetchedAt: curFile.fetchedAt,
+                checksum: curFile.checksum,
+                period: curFile.period
+            };
+        });
     }
 
     function refresh() {
@@ -277,27 +370,41 @@
                 renderPeriodInfo();
                 renderKpis();
                 renderTable();
-                setStatus('Карточки готовы · значения пока пустые');
+                if (state.meta && state.meta.missingCompany) {
+                    setStatus('Для этой компании среза нет (есть 0/Академия) — пересинхронизируй', true);
+                } else {
+                    setStatus('Готово · ' + periodLabel());
+                }
             })
             .catch(function (err) {
+                renderPeriodInfo();
+                renderKpis();
+                renderTable();
                 setStatus(err.message || String(err), true);
             });
     }
 
     function loadFilters() {
-        return fetch(FILTERS_URL, { cache: 'no-store' })
-            .then(function (res) {
-                if (!res.ok) throw new Error('filters.json: HTTP ' + res.status);
-                return res.json();
-            })
-            .then(function (data) {
-                if (Array.isArray(data.companies) && data.companies.length) {
-                    state.companies = data.companies;
+        return fetchJson(FILTERS_URL).then(function (data) {
+            if (data && Array.isArray(data.companies) && data.companies.length) {
+                state.companies = data.companies;
+            }
+        });
+    }
+
+    function loadManifestPeriods() {
+        return fetchJson(MANIFEST_URL).then(function (man) {
+            var ds = man && man.datasets && man.datasets['sales.kpis'];
+            if (ds && ds.periods) {
+                state.availablePeriods = Object.keys(ds.periods).sort();
+                if (state.availablePeriods.length) {
+                    var last = state.availablePeriods[state.availablePeriods.length - 1];
+                    var parts = last.split('-');
+                    state.year = Number(parts[0]);
+                    state.month = Number(parts[1]);
                 }
-            })
-            .catch(function () {
-                /* оставляем дефолт «Все» */
-            });
+            }
+        });
     }
 
     function bind() {
@@ -320,11 +427,11 @@
         state.values = emptyValues();
         state.previous = emptyValues();
         bind();
-        renderYearMonth();
         setStatus('Инициализация…');
-        loadFilters()
+        Promise.all([loadFilters(), loadManifestPeriods()])
             .then(function () {
                 renderCompanies();
+                renderYearMonth();
                 return refresh();
             })
             .catch(function (err) {

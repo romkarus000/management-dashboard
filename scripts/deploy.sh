@@ -46,7 +46,7 @@ deploy_file() {
 }
 
 deploy_warehouse() {
-    ssh "${SERVER}" "mkdir -p ${REMOTE_ROOT}/warehouse/main/profit ${REMOTE_ROOT}/warehouse/owner/marketing ${REMOTE_ROOT}/warehouse/activity/summary ${REMOTE_ROOT}/warehouse/activity/drill ${REMOTE_ROOT}/warehouse/crm/leading ${REMOTE_ROOT}/warehouse/crm/base ${REMOTE_ROOT}/warehouse/crm/rfm ${REMOTE_ROOT}/warehouse/dev/card ${REMOTE_ROOT}/warehouse/dev/series ${REMOTE_ROOT}/warehouse/dev/wip ${REMOTE_ROOT}/warehouse/dev/tasks_closed ${REMOTE_ROOT}/scripts"
+    ssh "${SERVER}" "mkdir -p ${REMOTE_ROOT}/warehouse/main/profit ${REMOTE_ROOT}/warehouse/owner/marketing ${REMOTE_ROOT}/warehouse/activity/summary ${REMOTE_ROOT}/warehouse/activity/drill ${REMOTE_ROOT}/warehouse/crm/leading ${REMOTE_ROOT}/warehouse/crm/base ${REMOTE_ROOT}/warehouse/crm/rfm ${REMOTE_ROOT}/warehouse/sales/kpis ${REMOTE_ROOT}/warehouse/dev/card ${REMOTE_ROOT}/warehouse/dev/series ${REMOTE_ROOT}/warehouse/dev/wip ${REMOTE_ROOT}/warehouse/dev/tasks_closed ${REMOTE_ROOT}/scripts"
     deploy_file "warehouse/manifest.json" || true
     if [[ -f "${LOCAL_ROOT}/warehouse/filters.json" ]]; then
         deploy_file "warehouse/filters.json" || true
@@ -59,12 +59,16 @@ deploy_warehouse() {
         ssh "${SERVER}" "mkdir -p ${REMOTE_ROOT}/docs"
         deploy_file "docs/dev-flow-contract.md" || true
     fi
-    for rel in main/profit owner/marketing activity/summary crm/leading crm/base crm/rfm; do
+    for rel in main/profit owner/marketing activity/summary crm/leading crm/base crm/rfm sales/kpis; do
         if [[ -d "${LOCAL_ROOT}/warehouse/${rel}" ]]; then
             echo "→ warehouse/${rel}/ (rsync)"
             rsync -az --delete "${LOCAL_ROOT}/warehouse/${rel}/" "${SERVER}:${REMOTE_ROOT}/warehouse/${rel}/"
         fi
     done
+    if [[ -f "${LOCAL_ROOT}/docs/sales-warehouse-contract.md" ]]; then
+        ssh "${SERVER}" "mkdir -p ${REMOTE_ROOT}/docs"
+        deploy_file "docs/sales-warehouse-contract.md" || true
+    fi
     if [[ -d "${LOCAL_ROOT}/warehouse/activity/drill" ]]; then
         echo "→ warehouse/activity/drill/ (rsync)"
         rsync -az --delete "${LOCAL_ROOT}/warehouse/activity/drill/" "${SERVER}:${REMOTE_ROOT}/warehouse/activity/drill/"
@@ -126,6 +130,7 @@ case "${TARGET}" in
     sync-script)
         deploy_file "scripts/sync-warehouse.mjs"
         deploy_file "scripts/sync-dev-warehouse.mjs" || true
+        deploy_file "scripts/sync-sales-warehouse.mjs" || true
         deploy_file "scripts/ingest_dev_warehouse.py" || true
         ;;
     all)
@@ -143,6 +148,7 @@ case "${TARGET}" in
         deploy_file "assets/styles.css"
         deploy_file "scripts/sync-warehouse.mjs"
         deploy_file "scripts/sync-dev-warehouse.mjs" || true
+        deploy_file "scripts/sync-sales-warehouse.mjs" || true
         deploy_file "scripts/ingest_dev_warehouse.py" || true
         deploy_warehouse
         ;;
