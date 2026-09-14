@@ -23,6 +23,16 @@ const MANIFEST_PATH = join(ROOT, 'warehouse', 'manifest.json');
 const ACADEMY_OP_DEPARTMENT_IDS = [5, 7, 9, 23, 25, 27];
 const ACADEMY_COMPANY_ID = 3;
 
+/**
+ * Воронки funnel.version=v2 (по имени «V2»), без тестовой.
+ * Discovery: mcp_funnel_list(search=v2, entity=order).
+ */
+const SALES_V2_FUNNEL_IDS = [257, 337, 339, 341, 343, 345, 347, 631];
+const NDZ_SUBSTATUS = 'Клиент не берет телефон';
+const NDZ_EXCLUDE_STAGE = 'В работе КЦ';
+/** Причины отказа в «Закрыто…», которые считаем НДЗ. */
+const NDZ_CLOSED_REASONS = ['Недозвон (НДЗ = 10)', 'Контакт не состоялся'];
+
 function parseArgs(argv) {
   const out = { from: null, to: null, companies: [0, 3] };
   for (const a of argv) {
@@ -170,7 +180,62 @@ function firstGroup(res) {
   return g || null;
 }
 
-async function fetchCompanyMonth(mcp, companyId, ym) {
+/**
+ * % недозвона (НДЗ) по снимку воронок V2.
+ * Числитель:
+ *   1) статус «Клиент не берет телефон» вне этапа «В работе КЦ»;
+ *   2) этап «Закрыто…» + причина отказа из NDZ_CLOSED_REASONS
+ *      («Недозвон (НДЗ = 10)» / «Контакт не состоялся»).
+ * Знаменатель: все заказы в V2 за период входа, кроме этапа «В работе КЦ».
+ * Период — funnel_entered; этап/статус/причина — текущий снимок.
+ */
+function computeNdzShare(funnelSummary) {
+  const byStatus = funnelSummary?.by_status || [];
+  let ndzOpen = 0;
+  let ndzClosed = 0;
+  let ndzOrdersInCc = 0;
+  let baseOrders = 0;
+  const closedByReason = Object.fromEntries(NDZ_CLOSED_REASONS.map((r) => [r, 0]));
+
+  for (const row of byStatus) {
+    const stage = row.status_name || row['Этап воронки'] || '';
+    const stageCount = Number(row.orders_count) || 0;
+    const isClosed = stage.includes('Закрыто');
+    if (stage !== NDZ_EXCLUDE_STAGE) {
+      baseOrders += stageCount;
+    }
+    for (const sub of row.substatuses || []) {
+      const statusName = sub.funnel_substatus || sub['Статус воронки'] || '';
+      const reason = sub.substatus || '';
+      const c = Number(sub.orders_count) || 0;
+
+      if (statusName === NDZ_SUBSTATUS) {
+        if (stage === NDZ_EXCLUDE_STAGE) {
+          ndzOrdersInCc += c;
+        } else {
+          ndzOpen += c;
+        }
+      }
+      if (isClosed && NDZ_CLOSED_REASONS.includes(reason)) {
+        ndzClosed += c;
+        closedByReason[reason] = (closedByReason[reason] || 0) + c;
+      }
+    }
+  }
+
+  const ndzOrders = ndzOpen + ndzClosed;
+  return {
+    ndz_orders_open: ndzOpen,
+    ndz_orders_closed: ndzClosed,
+    ndz_orders_closed_by_reason: closedByReason,
+    ndz_orders: ndzOrders,
+    ndz_orders_in_cc: ndzOrdersInCc,
+    ndz_base_orders: baseOrders,
+    ndz_share: baseOrders > 0 ? ndzOrders / baseOrders : null,
+  };
+}
+
+async function fetchCompanyMonth(mcp, companyId, ym, ndz = null) {
   const { from, to, toPaid, capped_to_today } = monthRange(ym);
   const companyArg = companyId === 0 ? {} : { company_id: companyId };
   const deptArg = { sales_department_ids: ACADEMY_OP_DEPARTMENT_IDS };
@@ -211,6 +276,11 @@ async function fetchCompanyMonth(mcp, companyId, ym) {
     ...companyArg,
     ...deptArg,
   });
+  const sla = await mcp.call('mcp_sales_op_sla_first_call', {
+    date_from: from,
+    date_to: toPaid,
+    ...companyArg,
+  });
 
   const ag = firstGroup(apps);
   const pg = firstGroup(pays);
@@ -244,7 +314,44 @@ async function fetchCompanyMonth(mcp, companyId, ym) {
       qual.leads_per_mop_per_day == null ? null : Number(qual.leads_per_mop_per_day),
     sales_department_ids: qual.sales_department_ids ?? null,
     qual_period: { from, to, capped_to_today: !!capped_to_today },
+    sla_first_call_hours:
+      sla.avg_hours == null || !Number.isFinite(Number(sla.avg_hours))
+        ? null
+        : Number(sla.avg_hours),
+    sla_first_call_minutes:
+      sla.avg_minutes == null || !Number.isFinite(Number(sla.avg_minutes))
+        ? null
+        : Number(sla.avg_minutes),
+    sla_orders_with_call: Number(sla.orders_with_sla ?? 0),
+    // НДЗ пока без среза company_id (mcp_funnel_statistics не фильтрует по компании).
+    ...(ndz || {
+      ndz_orders_open: null,
+      ndz_orders_closed: null,
+      ndz_orders_closed_by_reason: null,
+      ndz_orders: null,
+      ndz_orders_in_cc: null,
+      ndz_base_orders: null,
+      ndz_share: null,
+    }),
   };
+}
+
+async function fetchNdzForMonth(mcp, ym) {
+  const { from, toPaid } = monthRange(ym);
+  const summary = await mcp.call('mcp_funnel_statistics', {
+    funnel_ids: SALES_V2_FUNNEL_IDS,
+    date_from: from,
+    date_to: toPaid,
+    date_field: 'funnel_entered',
+    mode: 'summary',
+    channel: 'none',
+  });
+  if (!Array.isArray(summary?.by_status)) {
+    throw new Error(
+      `mcp_funnel_statistics: нет by_status для ${ym} (total=${summary?.total_orders ?? '—'})`,
+    );
+  }
+  return computeNdzShare(summary);
 }
 
 async function writePeriod(ym, byCompany) {
@@ -258,9 +365,14 @@ async function writePeriod(ym, byCompany) {
     checksum: '',
     filters: { periodType: 'month', period: ym },
     meta: {
-      source: 'mcp_segment_orders + mcp_sales_qual_leads_per_mop',
+      source:
+        'mcp_segment_orders + mcp_sales_qual_leads_per_mop + mcp_sales_op_sla_first_call + mcp_funnel_statistics',
       canon: 'tool_mcp_edprobiz/docs/sales-c2-contract.md',
       academy_op_department_ids: ACADEMY_OP_DEPARTMENT_IDS,
+      sales_v2_funnel_ids: SALES_V2_FUNNEL_IDS,
+      ndz_substatus: NDZ_SUBSTATUS,
+      ndz_exclude_stage: NDZ_EXCLUDE_STAGE,
+      ndz_closed_reasons: NDZ_CLOSED_REASONS,
     },
     data,
   };
@@ -326,11 +438,16 @@ async function main() {
   for (const ym of months) {
     const t0 = Date.now();
     const byCompany = {};
+    process.stdout.write(`  ${ym} ndz… `);
+    const ndz = await fetchNdzForMonth(mcp, ym);
+    console.log(
+      `share=${ndz.ndz_share == null ? '—' : (ndz.ndz_share * 100).toFixed(2) + '%'} (${ndz.ndz_orders}/${ndz.ndz_base_orders}; open=${ndz.ndz_orders_open} closed=${ndz.ndz_orders_closed} in_cc=${ndz.ndz_orders_in_cc})`,
+    );
     for (const cid of companies) {
       process.stdout.write(`  ${ym} company=${cid}… `);
-      byCompany[String(cid)] = await fetchCompanyMonth(mcp, cid, ym);
+      byCompany[String(cid)] = await fetchCompanyMonth(mcp, cid, ym, ndz);
       console.log(
-        `c2=${byCompany[String(cid)].c2?.toFixed?.(4) ?? '—'} avg=${byCompany[String(cid)].avg_check ?? '—'} qual=${byCompany[String(cid)].qual_leads_mop_day ?? '—'}`,
+        `c2=${byCompany[String(cid)].c2?.toFixed?.(4) ?? '—'} avg=${byCompany[String(cid)].avg_check ?? '—'} qual=${byCompany[String(cid)].qual_leads_mop_day ?? '—'} sla_h=${byCompany[String(cid)].sla_first_call_hours ?? '—'} ndz=${byCompany[String(cid)].ndz_share == null ? '—' : (byCompany[String(cid)].ndz_share * 100).toFixed(2) + '%'}`,
       );
     }
     const meta = await writePeriod(ym, byCompany);

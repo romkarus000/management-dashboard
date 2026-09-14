@@ -34,9 +34,9 @@
         },
         {
             key: 'sla_first_call',
-            label: 'SLA 1 звонка',
-            hint: 'скоро',
-            format: 'pct'
+            label: 'SLA 1 звонка ОП',
+            hint: 'ср. LEAST(CRM op_sla, первый timeline) · часы',
+            format: 'hours'
         },
         {
             key: 'target_call_duration',
@@ -59,7 +59,7 @@
         {
             key: 'ndz_share',
             label: '% недозвона (НДЗ)',
-            hint: 'скоро',
+            hint: 'статус «не берет» + закрыто НДЗ/«Контакт не состоялся» ÷ V2 без «В работе КЦ»',
             format: 'pct'
         },
         {
@@ -88,7 +88,7 @@
         }
     ];
 
-    var VALUE_KEYS = ['c2', 'avg_check', 'qual_leads_mop_day'];
+    var VALUE_KEYS = ['c2', 'avg_check', 'qual_leads_mop_day', 'sla_first_call', 'ndz_share'];
 
     var state = {
         year: 2026,
@@ -134,6 +134,9 @@
         var n = Number(value);
         if (format === 'pct') {
             return (Math.round(n * 1000) / 10).toLocaleString('ru-RU') + '%';
+        }
+        if (format === 'hours') {
+            return (Math.round(n * 10) / 10).toLocaleString('ru-RU') + ' ч';
         }
         if (format === 'money') {
             return Math.round(n).toLocaleString('ru-RU') + ' ₽';
@@ -305,8 +308,12 @@
     function rowToValues(row) {
         var out = emptyValues();
         if (!row) return out;
-        VALUE_KEYS.forEach(function (k) {
-            out[k] = row[k] == null ? null : Number(row[k]);
+            VALUE_KEYS.forEach(function (k) {
+            if (k === 'sla_first_call') {
+                out[k] = row.sla_first_call_hours == null ? null : Number(row.sla_first_call_hours);
+            } else {
+                out[k] = row[k] == null ? null : Number(row[k]);
+            }
         });
         return out;
     }
