@@ -17,8 +17,20 @@
         {
             key: 'c2',
             label: 'C2 в оплату',
-            hint: 'уник. клиенты: оплаты ÷ заявки · cat 17/29 ÷ 15/19/45 (+ads)',
+            hint: 'оплаты-заказы ÷ пары клиент×курс (subline) · cat 17/29 ÷ 15/19/45 (+ads)',
             format: 'pct'
+        },
+        {
+            key: 'application_client_sublines',
+            label: 'Заявки (клиент×курс)',
+            hint: 'Σ уник. клиентов по subline · created · cat 15/19/45 + ads',
+            format: 'num'
+        },
+        {
+            key: 'payments',
+            label: 'Оплаты (заказы)',
+            hint: 'заказы · paid · cat 17/29 · status 20 · price_paid>0',
+            format: 'num'
         },
         {
             key: 'avg_check',
@@ -59,7 +71,7 @@
         {
             key: 'ndz_share',
             label: '% недозвона (НДЗ)',
-            hint: 'статус «не берет» + закрыто НДЗ/«Контакт не состоялся» ÷ V2 без «В работе КЦ»',
+            hint: 'посл. 7 дней месяца · статус «не берет» + закрыто НДЗ/«Контакт не состоялся» ÷ V2 без «В работе КЦ»',
             format: 'pct'
         },
         {
@@ -88,7 +100,19 @@
         }
     ];
 
-    var VALUE_KEYS = ['c2', 'avg_check', 'qual_leads_mop_day', 'sla_first_call', 'ndz_share'];
+    var VALUE_KEYS = [
+        'c2',
+        'c2_users',
+        'application_client_sublines',
+        'application_users',
+        'payment_users',
+        'applications',
+        'payments',
+        'avg_check',
+        'qual_leads_mop_day',
+        'sla_first_call',
+        'ndz_share'
+    ];
 
     var state = {
         year: 2026,
@@ -114,8 +138,11 @@
 
     function emptyValues() {
         var out = {};
+        VALUE_KEYS.forEach(function (k) {
+            out[k] = null;
+        });
         METRICS.forEach(function (m) {
-            out[m.key] = null;
+            if (!(m.key in out)) out[m.key] = null;
         });
         return out;
     }
@@ -208,12 +235,101 @@
 
             var hint = document.createElement('div');
             hint.className = 'management-dashboard__kpi-hint';
-            hint.textContent = metric.hint;
+            if (metric.key === 'application_client_sublines') {
+                hint.textContent =
+                    metric.hint +
+                    ' · заказов: ' +
+                    fmtValue(state.values.applications, 'num') +
+                    ' · уник. клиентов: ' +
+                    fmtValue(state.values.application_users, 'num');
+            } else if (metric.key === 'payments') {
+                hint.textContent =
+                    metric.hint +
+                    ' · уник. клиентов: ' +
+                    fmtValue(state.values.payment_users, 'num');
+            } else if (metric.key === 'c2') {
+                hint.textContent =
+                    fmtValue(state.values.payments, 'num') +
+                    ' ÷ ' +
+                    fmtValue(state.values.application_client_sublines, 'num') +
+                    ' · ' +
+                    metric.hint;
+            } else {
+                hint.textContent = metric.hint;
+            }
 
             card.appendChild(label);
             card.appendChild(value);
             card.appendChild(hint);
             grid.appendChild(card);
+        });
+        renderC2Control();
+    }
+
+    function renderC2Control() {
+        var list = el('c2-control-list');
+        if (!list) return;
+        var cur = state.values;
+        var prev = state.previous;
+        var rows = [
+            {
+                label: 'Заявки · клиент×курс',
+                cur: cur.application_client_sublines,
+                prev: prev.application_client_sublines,
+                extra:
+                    'заказов: ' +
+                    fmtValue(cur.applications, 'num') +
+                    ' · уник. клиентов: ' +
+                    fmtValue(cur.application_users, 'num')
+            },
+            {
+                label: 'Оплаты · заказы',
+                cur: cur.payments,
+                prev: prev.payments,
+                extra:
+                    'уник. клиентов: ' +
+                    fmtValue(cur.payment_users, 'num')
+            },
+            {
+                label: 'C2 = заказы ÷ (клиент×курс)',
+                cur: cur.c2,
+                prev: prev.c2,
+                format: 'pct',
+                extra:
+                    fmtValue(cur.payments, 'num') +
+                    ' / ' +
+                    fmtValue(cur.application_client_sublines, 'num')
+            },
+            {
+                label: 'C2 (старый) · уник. клиенты',
+                cur: cur.c2_users,
+                prev: prev.c2_users,
+                format: 'pct',
+                extra:
+                    fmtValue(cur.payment_users, 'num') +
+                    ' / ' +
+                    fmtValue(cur.application_users, 'num')
+            }
+        ];
+        list.innerHTML = '';
+        rows.forEach(function (row) {
+            var li = document.createElement('li');
+            li.className = 'sales-c2-control__item';
+            var format = row.format || 'num';
+            li.innerHTML =
+                '<span class="sales-c2-control__label">' +
+                row.label +
+                '</span>' +
+                '<span class="sales-c2-control__value">' +
+                fmtValue(row.cur, format) +
+                '</span>' +
+                '<span class="sales-c2-control__delta">' +
+                fmtDelta(row.cur, row.prev, format) +
+                '</span>' +
+                '<span class="sales-c2-control__extra">' +
+                row.extra +
+                '</span>';
+            list.appendChild(li);
         });
     }
 
@@ -308,7 +424,7 @@
     function rowToValues(row) {
         var out = emptyValues();
         if (!row) return out;
-            VALUE_KEYS.forEach(function (k) {
+        VALUE_KEYS.forEach(function (k) {
             if (k === 'sla_first_call') {
                 out[k] = row.sla_first_call_hours == null ? null : Number(row.sla_first_call_hours);
             } else {

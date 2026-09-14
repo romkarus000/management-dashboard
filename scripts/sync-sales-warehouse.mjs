@@ -72,6 +72,28 @@ function monthRange(ym) {
   };
 }
 
+/**
+ * Последние 7 календарных дней выбранного месяца (МСК).
+ * Текущий месяц: окно заканчивается сегодня; прошлый — в последний день месяца.
+ * Пример: авг → 25–31; сен (сегодня 14) → 8–14.
+ */
+function lastWeekOfMonthRange(ym) {
+  const { to, capped_to_today } = monthRange(ym);
+  const [y, m, d] = to.split('-').map(Number);
+  const end = new Date(Date.UTC(y, m - 1, d));
+  const start = new Date(end);
+  start.setUTCDate(start.getUTCDate() - 6);
+  const fmt = (dt) =>
+    `${dt.getUTCFullYear()}-${String(dt.getUTCMonth() + 1).padStart(2, '0')}-${String(dt.getUTCDate()).padStart(2, '0')}`;
+  const from = fmt(start);
+  return {
+    from,
+    to,
+    toPaid: `${to} 23:59:59`,
+    capped_to_today: !!capped_to_today,
+  };
+}
+
 function listMonths(fromYm, toYm) {
   const out = [];
   let [y, m] = fromYm.split('-').map(Number);
@@ -175,6 +197,16 @@ class McpClient {
   }
 }
 
+/** Σ distinct_users по группам dimension = пары (клиент × значение dimension). */
+function sumDistinctUsers(res) {
+  const groups = res?.groups || [];
+  let sum = 0;
+  for (const g of groups) {
+    sum += Number(g.distinct_users) || 0;
+  }
+  return sum;
+}
+
 function firstGroup(res) {
   const g = (res.groups || [])[0];
   return g || null;
@@ -186,8 +218,8 @@ function firstGroup(res) {
  *   1) статус «Клиент не берет телефон» вне этапа «В работе КЦ»;
  *   2) этап «Закрыто…» + причина отказа из NDZ_CLOSED_REASONS
  *      («Недозвон (НДЗ = 10)» / «Контакт не состоялся»).
- * Знаменатель: все заказы в V2 за период входа, кроме этапа «В работе КЦ».
- * Период — funnel_entered; этап/статус/причина — текущий снимок.
+ * Знаменатель: все заказы в V2 за окно входа (посл. 7 дней месяца), кроме этапа «В работе КЦ».
+ * Окно — lastWeekOfMonthRange; этап/статус/причина — текущий снимок.
  */
 function computeNdzShare(funnelSummary) {
   const byStatus = funnelSummary?.by_status || [];
@@ -250,6 +282,17 @@ async function fetchCompanyMonth(mcp, companyId, ym, ndz = null) {
     application_match: 'offer_or_ads',
     ...companyArg,
   });
+  // Пары (клиент × курс): Σ distinct_users по subline_id.
+  const appsBySubline = await mcp.call('mcp_segment_orders', {
+    date_from: from,
+    date_to: toPaid,
+    date_field: 'created',
+    mode: 'summary',
+    dimension: 'subline_id',
+    offer_categories: [15, 19, 45],
+    application_match: 'offer_or_ads',
+    ...companyArg,
+  });
   const pays = await mcp.call('mcp_segment_orders', {
     date_from: from,
     date_to: toPaid,
@@ -287,10 +330,15 @@ async function fetchCompanyMonth(mcp, companyId, ym, ndz = null) {
   const ng = firstGroup(net);
   const applications = ag ? Number(ag.orders_count) : 0;
   const applicationUsers = ag ? Number(ag.distinct_users) : 0;
+  const applicationClientSublines = sumDistinctUsers(appsBySubline);
   const payments = pg ? Number(pg.orders_count) : 0;
   const paymentUsers = pg ? Number(pg.distinct_users) : 0;
-  // C2 по уникальным клиентам: иначе ~3 заявки/клиента занижают конверсию.
-  const c2 = applicationUsers > 0 ? paymentUsers / applicationUsers : null;
+  // C2: оплаченные заказы ÷ уникальные заявки (клиент × курс/subline).
+  const c2 =
+    applicationClientSublines > 0 ? payments / applicationClientSublines : null;
+  // Старый канон (уник. клиенты) — для сверки.
+  const c2Users =
+    applicationUsers > 0 ? paymentUsers / applicationUsers : null;
   const avgCheck = ng && ng.avg_payment_net != null ? Number(ng.avg_payment_net) : null;
   const paymentNetSum = ng && ng.payment_net_sum != null ? Number(ng.payment_net_sum) : null;
   const completedPaid = ng && ng.completed_paid_count != null ? Number(ng.completed_paid_count) : null;
@@ -299,9 +347,11 @@ async function fetchCompanyMonth(mcp, companyId, ym, ndz = null) {
     company_id: companyId,
     applications,
     application_users: applicationUsers,
+    application_client_sublines: applicationClientSublines,
     payments,
     payment_users: paymentUsers,
     c2,
+    c2_users: c2Users,
     payment_net_sum: paymentNetSum,
     completed_paid_count: completedPaid,
     avg_check: avgCheck,
@@ -332,26 +382,35 @@ async function fetchCompanyMonth(mcp, companyId, ym, ndz = null) {
       ndz_orders_in_cc: null,
       ndz_base_orders: null,
       ndz_share: null,
+      ndz_period: null,
     }),
   };
 }
 
 async function fetchNdzForMonth(mcp, ym) {
-  const { from, toPaid } = monthRange(ym);
+  const week = lastWeekOfMonthRange(ym);
   const summary = await mcp.call('mcp_funnel_statistics', {
     funnel_ids: SALES_V2_FUNNEL_IDS,
-    date_from: from,
-    date_to: toPaid,
+    date_from: week.from,
+    date_to: week.toPaid,
     date_field: 'funnel_entered',
     mode: 'summary',
     channel: 'none',
   });
   if (!Array.isArray(summary?.by_status)) {
     throw new Error(
-      `mcp_funnel_statistics: нет by_status для ${ym} (total=${summary?.total_orders ?? '—'})`,
+      `mcp_funnel_statistics: нет by_status для ${ym} week ${week.from}…${week.to} (total=${summary?.total_orders ?? '—'})`,
     );
   }
-  return computeNdzShare(summary);
+  return {
+    ...computeNdzShare(summary),
+    ndz_period: {
+      from: week.from,
+      to: week.to,
+      capped_to_today: week.capped_to_today,
+      window: 'last_7_days_of_month',
+    },
+  };
 }
 
 async function writePeriod(ym, byCompany) {
@@ -441,7 +500,7 @@ async function main() {
     process.stdout.write(`  ${ym} ndz… `);
     const ndz = await fetchNdzForMonth(mcp, ym);
     console.log(
-      `share=${ndz.ndz_share == null ? '—' : (ndz.ndz_share * 100).toFixed(2) + '%'} (${ndz.ndz_orders}/${ndz.ndz_base_orders}; open=${ndz.ndz_orders_open} closed=${ndz.ndz_orders_closed} in_cc=${ndz.ndz_orders_in_cc})`,
+      `share=${ndz.ndz_share == null ? '—' : (ndz.ndz_share * 100).toFixed(2) + '%'} (${ndz.ndz_orders}/${ndz.ndz_base_orders}; open=${ndz.ndz_orders_open} closed=${ndz.ndz_orders_closed} in_cc=${ndz.ndz_orders_in_cc}; week ${ndz.ndz_period?.from}…${ndz.ndz_period?.to})`,
     );
     for (const cid of companies) {
       process.stdout.write(`  ${ym} company=${cid}… `);

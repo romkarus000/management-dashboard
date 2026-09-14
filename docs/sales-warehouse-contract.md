@@ -37,8 +37,10 @@ Sync: `node scripts/sync-sales-warehouse.mjs --from=2026-07 --to=2026-08 --compa
 | Ключ | Смысл |
 |------|--------|
 | `applications` / `application_users` | заявки C2: заказы и уник. клиенты |
+| `application_client_sublines` | уник. заявки как пары клиент×курс: Σ `distinct_users` по `dimension=subline_id` |
 | `payments` / `payment_users` | оплаты C2: заказы и уник. клиенты |
-| `c2` | `payment_users / application_users` (доля 0…1) |
+| `c2` | `payments / application_client_sublines` (доля 0…1) |
+| `c2_users` | старый канон: `payment_users / application_users` (для сверки) |
 | `payment_net_sum` | чистый итог (`with_payment_net`) |
 | `completed_paid_count` | знаменатель ср.чека |
 | `avg_check` | `avg_payment_net` |
@@ -54,12 +56,16 @@ Sync: `node scripts/sync-sales-warehouse.mjs --from=2026-07 --to=2026-08 --compa
 | `ndz_orders_closed_by_reason` | разбивка закрытых НДЗ по причинам |
 | `ndz_orders` | `ndz_orders_open + ndz_orders_closed` |
 | `ndz_orders_in_cc` | статус «Клиент не берет телефон» на этапе «В работе КЦ» (в долю не входят) |
-| `ndz_base_orders` | все заказы в воронках V2 за период входа, **кроме** этапа «В работе КЦ» |
+| `ndz_base_orders` | заказы в воронках V2 за окно НДЗ, **кроме** этапа «В работе КЦ» |
 | `ndz_share` | `ndz_orders / ndz_base_orders` (доля 0…1) |
+| `ndz_period` | `{ from, to, capped_to_today, window: "last_7_days_of_month" }` — фактическое окно НДЗ |
 
 ### % недозвона (НДЗ)
 
 - Источник: `mcp_funnel_statistics` (`mode=summary`, `date_field=funnel_entered`, `channel=none`).
+- **Окно:** последние **7 календарных дней** выбранного месяца (не весь месяц).  
+  Прошлый месяц — до последнего дня; текущий — до сегодня (МСК).  
+  Примеры: авг → `2026-08-25…31`; сен (14-е) → `2026-09-08…14`.
 - Воронки: `funnel.version=v2` по каталогу (ids в `meta.sales_v2_funnel_ids`), без «Тестовая воронка V2».
 - **Статус** = `funnel_substatus.name` (не этап `funnel_status`).
 - **Причины отказа** (`funnel_order.status_reason` → в summary поле `substatus`), точное равенство:
@@ -67,7 +73,7 @@ Sync: `node scripts/sync-sales-warehouse.mjs --from=2026-07 --to=2026-08 --compa
   - **`Контакт не состоялся`**.
   Ручные «ндз» / «НДЗ, но читает сообщения» не входят.
 - **Этап** «В работе КЦ» исключается из знаменателя; открытый НДЗ на этом этапе — в `ndz_orders_in_cc`.
-- Период — дата входа в воронку; этап/статус/причина — **текущий снимок** на момент sync.
+- Этап/статус/причина — **текущий снимок** на момент sync; период фильтра — дата **входа** в воронку.
 - Срез `company_id` пока общий (тул не фильтрует по компании): одно значение для `0` и `3`.
 
 Фронт `assets/sales.js` читает `byCompany[companyId]` (fallback на `"0"`).
