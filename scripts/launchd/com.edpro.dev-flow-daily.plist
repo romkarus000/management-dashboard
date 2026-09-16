@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.edpro.dev-flow-daily</string>
+
+  <key>WorkingDirectory</key>
+  <string>/Users/rodionakovlev/management-dashboard</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>/Users/rodionakovlev/management-dashboard/scripts/run-dev-flow-daily.sh</string>
+    <string>--if-stale</string>
+  </array>
+
+  <!-- 06:15 Europe/Moscow — Mac должен быть в TZ MSK (или сработает при ближайшем wake) -->
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key>
+    <integer>6</integer>
+    <key>Minute</key>
+    <integer>15</integer>
+  </dict>
+
+  <!-- После логина/пробуждения: прогон только если за сегодня ещё не было (--if-stale) -->
+  <key>RunAtLoad</key>
+  <true/>
+
+  <key>StandardOutPath</key>
+  <string>/Users/rodionakovlev/management-dashboard/logs/launchd-dev-flow-daily.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/rodionakovlev/management-dashboard/logs/launchd-dev-flow-daily.err.log</string>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    <key>HOME</key>
+    <string>/Users/rodionakovlev</string>
+    <key>MGMT_DASHBOARD_SERVER</key>
+    <string>root@46.149.70.15</string>
+    <key>MGMT_DASHBOARD_PATH</key>
+    <string>/var/www/management-report</string>
+  </dict>
+</dict>
+</plist>

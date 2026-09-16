@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Отдел разработки — поток задач</title>
+    <link rel="stylesheet" href="./assets/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body class="management-dashboard">
+    <header class="management-dashboard__header">
+        <p class="management-dashboard__breadcrumb">
+            <a href="./index.html">Дашборды</a>
+            <span aria-hidden="true"> / </span>
+            <span>Разработка</span>
+        </p>
+        <h1 class="management-dashboard__title">Отдел разработки</h1>
+        <p class="management-dashboard__subtitle">Поток Asana · Lead · Cycle · TTM · MTTR · Throughput · WIP</p>
+    </header>
+
+    <div class="management-dashboard__actions">
+        <button id="btn-reload" type="button" class="management-dashboard__btn">Обновить из warehouse</button>
+        <span id="dashboard-status" class="management-dashboard__status">Инициализация…</span>
+    </div>
+
+    <div id="meta-info" class="management-dashboard__periods"></div>
+
+    <section class="management-dashboard__section">
+        <h2 class="management-dashboard__section-title">Ключевые метрики</h2>
+        <p class="management-dashboard__section-hint">
+            Lead/Cycle/TTM/TTC — p50 за 30 дней (без [INC] и Текучки). MTTR — p50 за 7 дней по [INC].
+            Для времени ростание p50 — хуже.
+        </p>
+        <div id="kpi-grid" class="management-dashboard__kpi-grid"></div>
+    </section>
+
+    <section class="management-dashboard__section">
+        <h2 class="management-dashboard__section-title">Throughput по неделям</h2>
+        <p class="management-dashboard__section-hint">Серии: Разработка · Баги · Оперативка · [INC]</p>
+        <div class="management-dashboard__chart-wrap management-dashboard__chart-wrap--tall">
+            <canvas id="chart-throughput"></canvas>
+        </div>
+    </section>
+
+    <section class="management-dashboard__section">
+        <h2 class="management-dashboard__section-title">WIP активной воронки</h2>
+        <p class="management-dashboard__section-hint">Без «Входящие» и «Закрыто»</p>
+        <div id="wip-aging" class="management-dashboard__kpi-grid" style="margin-bottom: 12px"></div>
+        <div class="management-dashboard__chart-wrap management-dashboard__chart-wrap--tall">
+            <canvas id="chart-wip"></canvas>
+        </div>
+    </section>
+
+    <section class="management-dashboard__section">
+        <h2 class="management-dashboard__section-title">Таблица метрик</h2>
+        <div class="management-dashboard__table-wrap">
+            <table class="management-dashboard__table">
+                <thead>
+                    <tr>
+                        <th>Метрика</th>
+                        <th class="is-num">p50</th>
+                        <th class="is-num">p90</th>
+                        <th class="is-num">n</th>
+                        <th class="is-num">Δ p50</th>
+                    </tr>
+                </thead>
+                <tbody id="metrics-table-body"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="management-dashboard__section">
+        <h2 class="management-dashboard__section-title">Старейшие в активной воронке</h2>
+        <div class="management-dashboard__table-wrap">
+            <table class="management-dashboard__table">
+                <thead>
+                    <tr>
+                        <th>Задача</th>
+                        <th>Секция</th>
+                        <th>Тип</th>
+                        <th class="is-num">Возраст, д</th>
+                    </tr>
+                </thead>
+                <tbody id="oldest-table-body"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="management-dashboard__section">
+        <h2 class="management-dashboard__section-title">На что влиять</h2>
+        <p class="management-dashboard__section-hint">Рычаги из канона метрик</p>
+        <ul id="playbook-list" class="dev-playbook"></ul>
+    </section>
+
+    <script>
+        window.DEV_WAREHOUSE_BASE = './warehouse';
+    </script>
+    <script src="./assets/development.js"></script>
+</body>
+</html>

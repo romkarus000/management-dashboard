@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Боты — воронки участников</title>
+    <link rel="stylesheet" href="./assets/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body class="management-dashboard">
+    <header class="management-dashboard__header">
+        <p class="management-dashboard__breadcrumb">
+            <a href="./index.html" id="link-home">Дашборды</a>
+            <span aria-hidden="true"> / </span>
+            <span>Боты</span>
+        </p>
+        <h1 class="management-dashboard__title">Боты</h1>
+        <p class="management-dashboard__subtitle">Помогатор · Достигатор СП · Достигатор внешний рынок</p>
+    </header>
+
+    <section class="management-dashboard__filters">
+        <div class="management-dashboard__field management-dashboard__field--period">
+            <span class="management-dashboard__field-label">Дата снимка</span>
+            <div id="filter-period" class="management-dashboard__chips" role="group" aria-label="Дата"></div>
+        </div>
+        <div class="management-dashboard__field management-dashboard__field--period">
+            <span class="management-dashboard__field-label">Бот</span>
+            <div id="filter-bot" class="management-dashboard__chips" role="group" aria-label="Бот"></div>
+        </div>
+    </section>
+
+    <div class="management-dashboard__actions">
+        <button id="btn-reload" type="button" class="management-dashboard__btn management-dashboard__btn--secondary">Перечитать warehouse</button>
+        <span id="dashboard-status" class="management-dashboard__status">Инициализация…</span>
+    </div>
+
+    <div id="warehouse-info" class="management-dashboard__periods"></div>
+
+    <section class="management-dashboard__section">
+        <h2 class="management-dashboard__section-title">Участники</h2>
+        <p class="management-dashboard__section-hint">Всего · активные · отпавшие · завершили. Отвал = молчат ≥ 7 дней.</p>
+        <div id="kpi-grid" class="management-dashboard__kpi-grid"></div>
+    </section>
+
+    <section class="management-dashboard__section">
+        <h2 class="management-dashboard__section-title">Воронка успеха</h2>
+        <p class="management-dashboard__section-hint">Все участники: сколько дошли хотя бы до этапа (всего)</p>
+        <div class="management-dashboard__chart-wrap">
+            <canvas id="chart-active" height="120"></canvas>
+        </div>
+        <div id="table-active" class="management-dashboard__table-wrap"></div>
+    </section>
+
+    <section class="management-dashboard__section">
+        <h2 class="management-dashboard__section-title">Воронка отвалившихся</h2>
+        <p class="management-dashboard__section-hint">На каком этапе отвалились — узкие горлышки</p>
+        <div class="management-dashboard__chart-wrap">
+            <canvas id="chart-churned" height="120"></canvas>
+        </div>
+        <div id="table-churned" class="management-dashboard__table-wrap"></div>
+    </section>
+
+    <script src="./assets/bots.js"></script>
+</body>
+</html>

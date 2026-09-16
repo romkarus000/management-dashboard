@@ -14,8 +14,10 @@
 1. **`index.html`** — каталог дашбордов по отделам.
 2. **`management.html`** — блок «Управление»: owner / main / активности + drill.
 3. **`marketing.html`** — блок «CRM Маркетинг»: обзор / коммуникации / база / воронка / RFM (warehouse `crm.*`).
-4. **`sales.html`** — блок «Отдел продаж»: C2 / ср.чек / SLA / … (пока карточки-заглушки; данные из MCP).
-5. **`development.html`** — блок «Отдел разработки» (Asana flow metrics, warehouse `dev/*`).
+4. **`sales.html`** — блок «Отдел продаж»: C2 / ср.чек / SLA / … (warehouse `sales.kpis`).
+5. **`callcenter.html`** — блок «Колл-центр» (в группе Продажи): % квалификации / SLA / % дозвона (warehouse `cc.kpis`, см. `docs/cc-warehouse-contract.md`).
+6. **`development.html`** — блок «Отдел разработки» (Asana flow metrics, warehouse `dev/*`).
+7. **`bots.html`** — блок «Боты»: Помогатор / Достигатор СП / ВР (warehouse `bots/funnel`).
 
 ## Warehouse sync (v2)
 
@@ -33,9 +35,10 @@ node scripts/migrate-warehouse-v2.mjs
 # node scripts/migrate-warehouse-v2.mjs --delete-legacy
 ```
 
-Файлы: `main/profit/`, `owner/marketing/`, `activity/summary/`, `activity/drill/{type}/`, `crm/leading|base|rfm/`, `dev/*`.  
-Реестр: `warehouse/manifest.json`. Контракты: `docs/warehouse-v2-contract.md`, `docs/crm-warehouse-contract.md`, `docs/dev-flow-contract.md`.  
+Файлы: `main/profit/`, `owner/marketing/`, `activity/summary/`, `activity/drill/{type}/`, `crm/leading|base|rfm/`, `sales/kpis/`, `cc/kpis/`, `dev/*`, `bots/funnel/`. 
+Реестр: `warehouse/manifest.json`. Контракты: `docs/warehouse-v2-contract.md`, `docs/crm-warehouse-contract.md`, `docs/sales-warehouse-contract.md`, `docs/cc-warehouse-contract.md`, `docs/dev-flow-contract.md`, `docs/bots-warehouse-contract.md`. 
 CRM primary: n8n `[CRM] Leading Metrics Daily` → HTTP ingest → `warehouse/crm/` (каналы enKod/Salebot/BotHelp пока carry).
+Bots primary: n8n `[Bots] Funnel Metrics Daily` → HTTP ingest → `warehouse/bots/funnel/`.
 
 ## Как действуем
 

@@ -13,6 +13,8 @@ warehouse/activity/
 warehouse/dev/
 warehouse/crm/
 warehouse/sales/
+warehouse/cc/
+warehouse/bots/
 warehouse/latest.json
 
 # Кэш timestamps Asana stories для sync-dev-warehouse
