@@ -23,6 +23,23 @@ const MANIFEST_PATH = join(ROOT, 'warehouse', 'manifest.json');
 const ACADEMY_OP_DEPARTMENT_IDS = [5, 7, 9, 23, 25, 27];
 const ACADEMY_COMPANY_ID = 3;
 
+/** C2: служебные/тестовые направления вне знаменателя и числителя. */
+const C2_EXCLUDE_LINE_IDS = [33, 53, 65];
+/** C2: spam / тест-аккаунты (user_detail.email / phone). */
+const C2_EXCLUDE_EMAILS = [
+  'autotest-ui@loc.ru',
+  'test.mayya@yandex.ru',
+  'ploshadnova.v@mail.ru',
+  'test.ploshadnova.v@yandex.ru',
+];
+const C2_EXCLUDE_PHONES = ['79990000000'];
+
+const C2_SPAM_ARG = {
+  exclude_line_ids: C2_EXCLUDE_LINE_IDS,
+  exclude_emails: C2_EXCLUDE_EMAILS,
+  exclude_phones: C2_EXCLUDE_PHONES,
+};
+
 /**
  * Воронки funnel.version=v2 (по имени «V2»), без тестовой.
  * Discovery: mcp_funnel_list(search=v2, entity=order).
@@ -280,6 +297,7 @@ async function fetchCompanyMonth(mcp, companyId, ym, ndz = null) {
     dimension: 'month',
     offer_categories: [15, 19, 45],
     application_match: 'offer_or_ads',
+    ...C2_SPAM_ARG,
     ...companyArg,
   });
   // Пары (клиент × курс): Σ distinct_users по subline_id.
@@ -291,6 +309,7 @@ async function fetchCompanyMonth(mcp, companyId, ym, ndz = null) {
     dimension: 'subline_id',
     offer_categories: [15, 19, 45],
     application_match: 'offer_or_ads',
+    ...C2_SPAM_ARG,
     ...companyArg,
   });
   const pays = await mcp.call('mcp_segment_orders', {
@@ -302,6 +321,7 @@ async function fetchCompanyMonth(mcp, companyId, ym, ndz = null) {
     offer_categories: [17, 29],
     status_id: 20,
     paid_only: true,
+    ...C2_SPAM_ARG,
     ...companyArg,
   });
   const net = await mcp.call('mcp_segment_orders', {
@@ -310,6 +330,18 @@ async function fetchCompanyMonth(mcp, companyId, ym, ndz = null) {
     mode: 'summary',
     dimension: 'month',
     with_payment_net: true,
+    ...companyArg,
+  });
+  // Чистый итог только по заказам с позициями ДПО/Курс (cat 17/29) —
+  // числитель «Средний чек ДПО+Курс по категории»; те же spam/line, что у «Оплат».
+  const netDpo = await mcp.call('mcp_segment_orders', {
+    date_from: from,
+    date_to: toPaid,
+    mode: 'summary',
+    dimension: 'month',
+    with_payment_net: true,
+    offer_categories: [17, 29],
+    ...C2_SPAM_ARG,
     ...companyArg,
   });
   const qual = await mcp.call('mcp_sales_qual_leads_per_mop', {
@@ -328,6 +360,7 @@ async function fetchCompanyMonth(mcp, companyId, ym, ndz = null) {
   const ag = firstGroup(apps);
   const pg = firstGroup(pays);
   const ng = firstGroup(net);
+  const ndg = firstGroup(netDpo);
   const applications = ag ? Number(ag.orders_count) : 0;
   const applicationUsers = ag ? Number(ag.distinct_users) : 0;
   const applicationClientSublines = sumDistinctUsers(appsBySubline);
@@ -342,6 +375,12 @@ async function fetchCompanyMonth(mcp, companyId, ym, ndz = null) {
   const avgCheck = ng && ng.avg_payment_net != null ? Number(ng.avg_payment_net) : null;
   const paymentNetSum = ng && ng.payment_net_sum != null ? Number(ng.payment_net_sum) : null;
   const completedPaid = ng && ng.completed_paid_count != null ? Number(ng.completed_paid_count) : null;
+  const paymentNetDpo =
+    ndg && ndg.payment_net_sum != null ? Number(ndg.payment_net_sum) : null;
+  const avgCheckDpoCourse =
+    paymentNetSum != null && payments > 0 ? paymentNetSum / payments : null;
+  const avgCheckDpoCourseCat =
+    paymentNetDpo != null && payments > 0 ? paymentNetDpo / payments : null;
 
   return {
     company_id: companyId,
@@ -355,6 +394,9 @@ async function fetchCompanyMonth(mcp, companyId, ym, ndz = null) {
     payment_net_sum: paymentNetSum,
     completed_paid_count: completedPaid,
     avg_check: avgCheck,
+    payment_net_dpo_course: paymentNetDpo,
+    avg_check_dpo_course: avgCheckDpoCourse,
+    avg_check_dpo_course_cat: avgCheckDpoCourseCat,
     qualified_leads: Number(qual.qualified_leads ?? 0),
     mop_count: Number(qual.mop_count ?? 0),
     calendar_days: Number(qual.calendar_days ?? 0),
@@ -372,6 +414,14 @@ async function fetchCompanyMonth(mcp, companyId, ym, ndz = null) {
       sla.avg_minutes == null || !Number.isFinite(Number(sla.avg_minutes))
         ? null
         : Number(sla.avg_minutes),
+    sla_first_call_median_hours:
+      sla.median_hours == null || !Number.isFinite(Number(sla.median_hours))
+        ? null
+        : Number(sla.median_hours),
+    sla_first_call_median_minutes:
+      sla.median_minutes == null || !Number.isFinite(Number(sla.median_minutes))
+        ? null
+        : Number(sla.median_minutes),
     sla_orders_with_call: Number(sla.orders_with_sla ?? 0),
     // НДЗ пока без среза company_id (mcp_funnel_statistics не фильтрует по компании).
     ...(ndz || {
@@ -506,7 +556,7 @@ async function main() {
       process.stdout.write(`  ${ym} company=${cid}… `);
       byCompany[String(cid)] = await fetchCompanyMonth(mcp, cid, ym, ndz);
       console.log(
-        `c2=${byCompany[String(cid)].c2?.toFixed?.(4) ?? '—'} avg=${byCompany[String(cid)].avg_check ?? '—'} qual=${byCompany[String(cid)].qual_leads_mop_day ?? '—'} sla_h=${byCompany[String(cid)].sla_first_call_hours ?? '—'} ndz=${byCompany[String(cid)].ndz_share == null ? '—' : (byCompany[String(cid)].ndz_share * 100).toFixed(2) + '%'}`,
+        `c2=${byCompany[String(cid)].c2?.toFixed?.(4) ?? '—'} avg=${byCompany[String(cid)].avg_check ?? '—'} qual=${byCompany[String(cid)].qual_leads_mop_day ?? '—'} sla_h=${byCompany[String(cid)].sla_first_call_hours ?? '—'} sla_med=${byCompany[String(cid)].sla_first_call_median_hours ?? '—'} ndz=${byCompany[String(cid)].ndz_share == null ? '—' : (byCompany[String(cid)].ndz_share * 100).toFixed(2) + '%'}`,
       );
     }
     const meta = await writePeriod(ym, byCompany);

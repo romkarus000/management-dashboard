@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM Маркетинг — опережающие метрики</title>
+    <link rel="stylesheet" href="./assets/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body class="management-dashboard">
+    <header class="management-dashboard__header">
+        <p class="management-dashboard__breadcrumb">
+            <a href="./index.html" id="link-home">Дашборды</a>
+            <span aria-hidden="true"> / </span>
+            <span>CRM Маркетинг</span>
+        </p>
+        <h1 class="management-dashboard__title">CRM Маркетинг</h1>
+        <p class="management-dashboard__subtitle">Опережающие метрики: enKod · Salebot · BotHelp · EdproBiz</p>
+    </header>
+
+    <nav class="management-dashboard__tabs" role="tablist" aria-label="Вкладки CRM">
+        <button type="button" class="management-dashboard__tab is-active" data-tab="overview" role="tab" aria-selected="true">Обзор</button>
+        <button type="button" class="management-dashboard__tab" data-tab="leading" role="tab" aria-selected="false">Коммуникации</button>
+        <button type="button" class="management-dashboard__tab" data-tab="base" role="tab" aria-selected="false">База</button>
+        <button type="button" class="management-dashboard__tab" data-tab="funnel" role="tab" aria-selected="false">Воронка</button>
+        <button type="button" class="management-dashboard__tab" data-tab="rfm" role="tab" aria-selected="false">RFM</button>
+        <button type="button" class="management-dashboard__tab" data-tab="notes" role="tab" aria-selected="false">Оговорки</button>
+    </nav>
+
+    <section class="management-dashboard__filters">
+        <div class="management-dashboard__field management-dashboard__field--period">
+            <span class="management-dashboard__field-label">Период</span>
+            <div id="filter-period" class="management-dashboard__chips" role="group" aria-label="Период"></div>
+        </div>
+        <div class="management-dashboard__field management-dashboard__field--period">
+            <span class="management-dashboard__field-label">Направление</span>
+            <div id="filter-direction" class="management-dashboard__chips" role="group" aria-label="Направление"></div>
+        </div>
+        <div class="management-dashboard__field management-dashboard__field--period">
+            <span class="management-dashboard__field-label">Канал</span>
+            <div id="filter-channel" class="management-dashboard__chips" role="group" aria-label="Канал"></div>
+        </div>
+    </section>
+
+    <div class="management-dashboard__actions">
+        <button id="btn-reload" type="button" class="management-dashboard__btn management-dashboard__btn--secondary">Перечитать warehouse</button>
+        <span id="dashboard-status" class="management-dashboard__status">Инициализация…</span>
+    </div>
+
+    <div id="warehouse-info" class="management-dashboard__periods"></div>
+    <div id="period-range" class="management-dashboard__periods"></div>
+
+    <div id="panel-overview" class="management-dashboard__panel is-active" role="tabpanel"></div>
+    <div id="panel-leading" class="management-dashboard__panel" role="tabpanel" hidden></div>
+    <div id="panel-base" class="management-dashboard__panel" role="tabpanel" hidden></div>
+    <div id="panel-funnel" class="management-dashboard__panel" role="tabpanel" hidden></div>
+    <div id="panel-rfm" class="management-dashboard__panel" role="tabpanel" hidden></div>
+    <div id="panel-notes" class="management-dashboard__panel" role="tabpanel" hidden></div>
+
+    <script src="./assets/marketing.js"></script>
+</body>
+</html>

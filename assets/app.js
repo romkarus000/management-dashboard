@@ -7,6 +7,8 @@
     var API_BASE = window.MGMT_REPORT_API_BASE || '/api/v1/management-report';
     var WAREHOUSE_BASE = window.MGMT_WAREHOUSE_BASE || './warehouse';
     var TOKEN_STORAGE_KEY = 'mgmtReportApiToken';
+    /** Последняя вкладка + фильтры периода (URL и localStorage). */
+    var UI_STATE_STORAGE_KEY = 'mgmtDashboardUi';
 
     /** Warehouse v2: датасеты по папкам (docs/warehouse-v2-contract.md). */
     var DATASET_PATHS = {
@@ -39,16 +41,16 @@
         manual: { label: 'Ручная (всего)', hint: 'Нет заработанного способа', group: 'overview' },
         purchase: { label: 'Покупка 100+ баллов', hint: 'Только покупка 100+', group: 'earned' },
         registration: { label: '20+ в 1-ю линию', hint: '20+ регистраций 1 линии', group: 'earned' },
-        hybrid: { label: 'Гибрид', hint: 'Сумма баллов+рег ≥ 100', group: 'earned', rare: true },
+        hybrid: { label: 'Гибрид', hint: 'Сумма баллов+рег ≥ 100', group: 'earned' },
         adv: { label: 'Реклама в соцсетях', hint: '2+ verified интеграций', group: 'earned' },
         club: { label: 'Клуб', hint: 'Покупка клуба / WAH', group: 'earned' },
         partner_registration: { label: 'Регистрация в ПП (ЗС)', hint: 'Пак ЗС 8485', group: 'earned' },
         product_education: { label: 'Покупка / мероприятие', hint: 'Правило Партнер / мероприятие', group: 'earned' },
-        overlap: { label: 'Несколько способов', hint: 'Больше одного earned', group: 'earned', rare: true },
+        overlap: { label: 'Несколько способов', hint: 'Больше одного earned', group: 'earned' },
         manual_ambassador: { label: 'Амбассадоры Fitstars', hint: 'parent 4264877 / амбассадор*', group: 'manual' },
         manual_barter_influence: { label: 'Бартер Инфлюенс', hint: 'Группа 3823', group: 'manual' },
         manual_cross_marketing: { label: 'Кросс-маркетинг', hint: 'Группа 3829', group: 'manual' },
-        manual_barter_solo: { label: 'Бартер самостоятельный', hint: 'блогер*', group: 'manual' },
+        manual_barter_solo: { label: 'Бартер партнёрка', hint: 'блогер*', group: 'manual' },
         manual_coach: { label: 'Коучи / наставники', hint: 'коуч/наставник/куратор', group: 'manual' },
         manual_human: { label: 'Аккаунты компании', hint: 'Без других оснований', group: 'manual' }
     };
@@ -90,7 +92,6 @@
         payload: null,
         manifest: null,
         loading: false,
-        showRare: false,
         selectedYear: null,
         selectedMonth: null,
         activeTab: 'owner',
@@ -183,6 +184,141 @@
         return state.selectedYear + '-' + String(state.selectedMonth).padStart(2, '0');
     }
 
+    /**
+     * Текущее UI-состояние для URL / localStorage.
+     *
+     * @returns {{tab: string, year: number|null, month: number|null, compareMode: string, companyId: number, compareFrom: string, compareTo: string}}
+     */
+    function collectUiState() {
+        return {
+            tab: state.activeTab || 'owner',
+            year: state.selectedYear,
+            month: state.selectedMonth,
+            compareMode: el('filter-compare-mode').value || 'previous',
+            companyId: parseInt(el('filter-company').value, 10) || 0,
+            compareFrom: el('filter-compare-from').value || '',
+            compareTo: el('filter-compare-to').value || ''
+        };
+    }
+
+    /**
+     * Пишет вкладку и фильтры в localStorage и адресную строку (replaceState).
+     *
+     * @returns {void}
+     */
+    function persistUiState() {
+        var ui = collectUiState();
+        try {
+            localStorage.setItem(UI_STATE_STORAGE_KEY, JSON.stringify(ui));
+        } catch (error) {
+            // quota / private mode — URL всё равно обновим
+        }
+
+        var params = new URLSearchParams();
+        params.set('tab', ui.tab);
+        if (ui.year && ui.month) {
+            params.set('period', ui.year + '-' + String(ui.month).padStart(2, '0'));
+        }
+        params.set('periodType', 'month');
+        params.set('compareMode', ui.compareMode || 'previous');
+        params.set('companyId', String(ui.companyId || 0));
+        if (ui.compareMode === 'custom') {
+            if (ui.compareFrom) {
+                params.set('compareFrom', ui.compareFrom);
+            }
+            if (ui.compareTo) {
+                params.set('compareTo', ui.compareTo);
+            }
+        }
+
+        var qs = params.toString();
+        var next = window.location.pathname + (qs ? '?' + qs : '') + window.location.hash;
+        if (window.location.pathname + window.location.search + window.location.hash !== next) {
+            window.history.replaceState({}, '', next);
+        }
+    }
+
+    /**
+     * Читает вкладку/период: query URL важнее localStorage.
+     *
+     * @returns {{tab: string, year: number|null, month: number|null, compareMode: string, companyId: number, compareFrom: string, compareTo: string}}
+     */
+    function readPersistedUiState() {
+        var fromUrl = {};
+        var q = new URLSearchParams(window.location.search);
+        var tab = q.get('tab');
+        if (tab === 'owner' || tab === 'main' || tab === 'activity') {
+            fromUrl.tab = tab;
+        }
+        var period = q.get('period');
+        if (period && /^\d{4}-\d{2}$/.test(period)) {
+            var periodParts = period.split('-');
+            fromUrl.year = Number(periodParts[0]);
+            fromUrl.month = Number(periodParts[1]);
+        }
+        if (q.get('compareMode')) {
+            fromUrl.compareMode = q.get('compareMode');
+        }
+        if (q.get('companyId') !== null && q.get('companyId') !== '') {
+            fromUrl.companyId = parseInt(q.get('companyId'), 10) || 0;
+        }
+        if (q.get('compareFrom')) {
+            fromUrl.compareFrom = q.get('compareFrom');
+        }
+        if (q.get('compareTo')) {
+            fromUrl.compareTo = q.get('compareTo');
+        }
+
+        var fromStore = {};
+        try {
+            fromStore = JSON.parse(localStorage.getItem(UI_STATE_STORAGE_KEY) || '{}') || {};
+        } catch (error) {
+            fromStore = {};
+        }
+
+        var storeTab = fromStore.tab;
+        if (storeTab !== 'owner' && storeTab !== 'main' && storeTab !== 'activity') {
+            storeTab = null;
+        }
+
+        return {
+            tab: fromUrl.tab || storeTab || 'owner',
+            year: fromUrl.year || fromStore.year || null,
+            month: fromUrl.month || fromStore.month || null,
+            compareMode: fromUrl.compareMode || fromStore.compareMode || 'previous',
+            companyId: fromUrl.companyId !== undefined
+                ? fromUrl.companyId
+                : (fromStore.companyId !== undefined ? fromStore.companyId : 0),
+            compareFrom: fromUrl.compareFrom || fromStore.compareFrom || '',
+            compareTo: fromUrl.compareTo || fromStore.compareTo || ''
+        };
+    }
+
+    /**
+     * Применяет сохранённые фильтры к форме (без загрузки данных).
+     *
+     * @param {{compareMode?: string, companyId?: number, compareFrom?: string, compareTo?: string}} ui
+     * @returns {void}
+     */
+    function applyFilterFormState(ui) {
+        if (!ui) {
+            return;
+        }
+        if (ui.compareMode) {
+            el('filter-compare-mode').value = ui.compareMode;
+        }
+        if (ui.companyId !== undefined && el('filter-company').querySelector('option[value="' + ui.companyId + '"]')) {
+            el('filter-company').value = String(ui.companyId);
+        }
+        if (ui.compareFrom) {
+            el('filter-compare-from').value = ui.compareFrom;
+        }
+        if (ui.compareTo) {
+            el('filter-compare-to').value = ui.compareTo;
+        }
+        toggleCustomCompare();
+    }
+
     function createPeriodChip(label, active, onClick) {
         var button = document.createElement('button');
         button.type = 'button';
@@ -208,6 +344,7 @@
                 }
                 state.selectedYear = value;
                 renderPeriodButtons();
+                persistUiState();
                 loadSelectedPeriodPreferWarehouse();
             }.bind(null, year)));
         }
@@ -217,6 +354,7 @@
             monthWrap.appendChild(createPeriodChip(label, month === state.selectedMonth, function () {
                 state.selectedMonth = month;
                 renderPeriodButtons();
+                persistUiState();
                 loadSelectedPeriodPreferWarehouse();
             }));
         });
@@ -289,7 +427,7 @@
             panel.classList.toggle('is-active', on);
             panel.hidden = !on;
         });
-        el('toggle-rare-wrap').classList.toggle('management-dashboard__hidden', tabId !== 'activity');
+        persistUiState();
         if (state.payload) {
             renderDashboard(state.payload, state.source);
         } else if (tabId === 'main') {
@@ -317,11 +455,7 @@
     }
 
     function isVisibleMetric(key) {
-        var meta = ACTIVITY_METRICS[key];
-        if (!meta || !meta.rare) {
-            return true;
-        }
-        return state.showRare;
+        return !!ACTIVITY_METRICS[key];
     }
 
     function formatDelta(delta) {
@@ -957,12 +1091,19 @@
     }
 
     function buildDrillUrl(type) {
+        // Перед уходом на drill фиксируем вкладку/период — «назад» и повторный вход восстановят.
+        if (state.activeTab !== 'activity') {
+            state.activeTab = 'activity';
+        }
+        persistUiState();
         var filters = readFiltersFromForm();
         var params = new URLSearchParams();
         params.set('type', type);
         params.set('periodType', filters.periodType);
         params.set('period', filters.period);
         params.set('companyId', String(filters.companyId || 0));
+        params.set('compareMode', filters.compareMode || 'previous');
+        params.set('returnTab', 'activity');
         // token не в URL — drill читает из localStorage
         return 'drill.html?' + params.toString();
     }
@@ -1490,7 +1631,15 @@
     }
 
     function bindEvents() {
-        el('filter-compare-mode').addEventListener('change', toggleCustomCompare);
+        el('filter-compare-mode').addEventListener('change', function () {
+            toggleCustomCompare();
+            persistUiState();
+        });
+        el('filter-company').addEventListener('change', function () {
+            persistUiState();
+        });
+        el('filter-compare-from').addEventListener('change', persistUiState);
+        el('filter-compare-to').addEventListener('change', persistUiState);
         el('btn-refresh-live').addEventListener('click', refreshLive);
         el('btn-load-warehouse').addEventListener('click', function () {
             loadSelectedPeriodPreferWarehouse().catch(function () {
@@ -1502,12 +1651,6 @@
                 setStatus(error.message, true);
             });
         });
-        el('toggle-rare').addEventListener('change', function (event) {
-            state.showRare = !!event.target.checked;
-            if (state.payload) {
-                renderDashboard(state.payload, state.source);
-            }
-        });
         document.querySelectorAll('.management-dashboard__tab').forEach(function (btn) {
             btn.addEventListener('click', function () {
                 setActiveTab(btn.getAttribute('data-tab'));
@@ -1517,10 +1660,12 @@
 
     function init() {
         bindEvents();
-        toggleCustomCompare();
-        setActiveTab('owner');
         // Token только сохраняем — live API на старте не дергаем.
         getToken();
+
+        var preferred = readPersistedUiState();
+        setActiveTab(preferred.tab);
+        applyFilterFormState(preferred);
 
         setStatus('Читаем warehouse…');
 
@@ -1534,7 +1679,16 @@
                 });
             })
             .then(function () {
-                applyPeriodFromManifest();
+                // После fillCompanySelect — снова применить companyId из preferred.
+                applyFilterFormState(preferred);
+                if (preferred.year && preferred.month) {
+                    state.selectedYear = preferred.year;
+                    state.selectedMonth = preferred.month;
+                    renderPeriodButtons();
+                } else {
+                    applyPeriodFromManifest();
+                }
+                persistUiState();
                 return loadSelectedPeriodPreferWarehouse();
             })
             .catch(function () {

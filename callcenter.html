@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Отдел продаж</title>
+    <title>Колл-центр</title>
     <link rel="stylesheet" href="./assets/styles.css">
 </head>
 <body class="management-dashboard">
@@ -13,8 +13,8 @@
             <span aria-hidden="true"> / </span>
             <span>Продажи</span>
         </p>
-        <h1 class="management-dashboard__title">Отдел продаж</h1>
-        <p class="management-dashboard__subtitle">C2 · средний чек · реакция · нагрузка · экономика отдела</p>
+        <h1 class="management-dashboard__title">Колл-центр</h1>
+        <p class="management-dashboard__subtitle">% квалификации · SLA 1 звонка · % дозвона</p>
     </header>
 
     <section class="management-dashboard__filters">
@@ -44,21 +44,34 @@
     <section class="management-dashboard__section">
         <h2 class="management-dashboard__section-title">Ключевые метрики</h2>
         <p class="management-dashboard__section-hint">
-            C2 · ср.чек · квал.лиды · SLA — warehouse <code>sales.kpis</code>
-            (sync из MCP). Канон: <code>docs/sales-warehouse-contract.md</code>.
-            SLA: v2 + was_in_cc пусто · timeline · рабочие минуты · avg/median.
+            % квалификации — warehouse <code>cc.kpis</code>.
+            Канон: <code>docs/cc-warehouse-contract.md</code>.
+            Когорта: первое касание КЦ в месяце → квалифицированы в том же месяце.
         </p>
         <div id="kpi-grid" class="management-dashboard__kpi-grid"></div>
     </section>
 
     <section class="management-dashboard__section">
-        <h2 class="management-dashboard__section-title">Контроль C2</h2>
+        <h2 class="management-dashboard__section-title">Контроль % квалификации</h2>
         <p class="management-dashboard__section-hint">
-            C2 = оплаченные заказы (cat 17/29) ÷ уникальные заявки клиент×курс
-            (Σ distinct_users по subline). Без line 33/53 и spam-аккаунтов
-            (телефон 79990000000 / тестовые email). Рядом — старый C2 по уник. клиентам.
+            Знаменатель — лиды с <code>was_in_cc=Да</code> и датой
+            <code>cc_sla_first_touch_at</code> в месяце.
+            Числитель — из них с <code>qualified_cc=Да</code> и
+            <code>cc_qualification_date</code> в том же месяце.
         </p>
-        <ul id="c2-control-list" class="sales-c2-control"></ul>
+        <ul id="qual-control-list" class="sales-c2-control"></ul>
+    </section>
+
+    <section class="management-dashboard__section">
+        <h2 class="management-dashboard__section-title">Деталка SLA 1 звонка КЦ</h2>
+        <p class="management-dashboard__section-hint">
+            Первый исходящий звонок менеджера dept=47 после <code>order.created</code>
+            (на заказе / на пользователе / unbound).
+            Исключены заявки вне 09:00–20:00 и возвращённые из ОП
+            (<code>returned_from_op</code>). SQL-канон и построчный запрос —
+            в <code>docs/cc-warehouse-contract.md</code>.
+        </p>
+        <ul id="sla-control-list" class="sales-c2-control"></ul>
     </section>
 
     <section class="management-dashboard__section">
@@ -78,6 +91,6 @@
         </div>
     </section>
 
-    <script src="./assets/sales.js"></script>
+    <script src="./assets/callcenter.js"></script>
 </body>
 </html>

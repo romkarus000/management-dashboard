@@ -38,6 +38,7 @@ warehouse/
 | `owner.marketing` | `owner/marketing/YYYY-MM.json` | месяц | вкладка Owner |
 | `activity.summary` | `activity/summary/YYYY-MM.json` | месяц | вкладка Активности |
 | `activity.drill.{type}` | `activity/drill/{type}/YYYY-MM.json` | месяц × корзина | `drill.html` |
+| `dev.card` / `dev.series` / `dev.wip` / `dev.tasks_closed` | `dev/{…}/YYYY-MM-DD.json` | **день** | `development.html` — см. [`dev-flow-contract.md`](./dev-flow-contract.md) |
 
 `periods/YYYY-MM.json` (v1) — legacy, не писать в новых sync.
 

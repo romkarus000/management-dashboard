@@ -14,6 +14,19 @@
         'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'
     ];
 
+    /** Годы для наложения на drill-графиках. */
+    var CHART_YEAR_START = 2021;
+
+    /** Цвета линий по годам (старые → новые). */
+    var YEAR_COLORS = [
+        '#94a3b8', // 2021
+        '#64748b', // 2022
+        '#0ea5e9', // 2023
+        '#2563eb', // 2024
+        '#7c3aed', // 2025
+        '#059669'  // 2026+
+    ];
+
     var METRIC_LABELS = {
         total: 'Всего с активностью',
         manual: 'Ручная (всего)',
@@ -28,7 +41,7 @@
         manual_ambassador: 'Амбассадоры Fitstars',
         manual_barter_influence: 'Бартер Инфлюенс',
         manual_cross_marketing: 'Кросс-маркетинг',
-        manual_barter_solo: 'Бартер самостоятельный',
+        manual_barter_solo: 'Бартер партнёрка',
         manual_coach: 'Коучи / наставники',
         manual_human: 'Аккаунты компании'
     };
@@ -95,8 +108,32 @@
             type: q.get('type') || '',
             periodType: q.get('periodType') || 'month',
             period: q.get('period') || '',
-            companyId: q.get('companyId') || '0'
+            companyId: q.get('companyId') || '0',
+            compareMode: q.get('compareMode') || 'previous',
+            returnTab: q.get('returnTab') || 'activity'
         };
+    }
+
+    /**
+     * Ссылка «назад» в management с той же вкладкой и периодом.
+     *
+     * @param {{periodType?: string, period?: string, companyId?: string, compareMode?: string, returnTab?: string}} params
+     * @returns {string}
+     */
+    function buildBackUrl(params) {
+        var qs = new URLSearchParams();
+        var tab = params.returnTab || 'activity';
+        if (tab !== 'owner' && tab !== 'main' && tab !== 'activity') {
+            tab = 'activity';
+        }
+        qs.set('tab', tab);
+        if (params.period) {
+            qs.set('period', params.period);
+        }
+        qs.set('periodType', params.periodType || 'month');
+        qs.set('companyId', String(params.companyId || '0'));
+        qs.set('compareMode', params.compareMode || 'previous');
+        return './management.html?' + qs.toString();
     }
 
     /**
@@ -233,7 +270,7 @@
             ' · ' + params.periodType + ' ' + params.period;
 
         var back = el('back-link');
-        back.href = './management.html';
+        back.href = buildBackUrl(params);
     }
 
     /**
@@ -252,7 +289,8 @@
 
         el('source-info').textContent = sourceLabel || '';
 
-        if (meta.label) {
+        var type = payload.type || (currentParams && currentParams.type) || '';
+        if (meta.label && !METRIC_LABELS[type]) {
             el('drill-title').textContent = meta.label;
         }
     }
@@ -403,61 +441,119 @@
     }
 
     /**
-     * Годовая серия totals из warehouse (12 файлов).
+     * Список лет для overlay-графиков: с CHART_YEAR_START до текущего (или выбранного).
+     *
+     * @param {number} [selectedYear]
+     * @returns {number[]}
+     */
+    function listChartYears(selectedYear) {
+        var end = Math.max(
+            new Date().getFullYear(),
+            selectedYear || 0,
+            CHART_YEAR_START
+        );
+        var years = [];
+        for (var y = CHART_YEAR_START; y <= end; y += 1) {
+            years.push(y);
+        }
+        return years;
+    }
+
+    /**
+     * @param {number} year
+     * @param {number} selectedYear
+     * @returns {string}
+     */
+    function yearLineColor(year, selectedYear) {
+        var idx = Math.max(0, year - CHART_YEAR_START);
+        var color = YEAR_COLORS[Math.min(idx, YEAR_COLORS.length - 1)];
+        return color;
+    }
+
+    /**
+     * Загружает totals по месяцам для нескольких лет (overlay).
      *
      * @param {string} type
-     * @param {number} year
-     * @returns {Promise<{labels: string[], months: string[], rows: Array<Object|null>}>}
+     * @param {number[]} years
+     * @returns {Promise<{labels: string[], years: number[], byYear: Object.<number, Array<Object|null>>}>}
      */
-    function loadDrillYearSeries(type, year) {
+    function loadDrillMultiYearSeries(type, years) {
         var fetches = [];
-        var months = [];
-        for (var month = 1; month <= 12; month += 1) {
-            var ym = year + '-' + String(month).padStart(2, '0');
-            months.push(ym);
-            fetches.push(
-                fetchWarehouseMonth(type, ym).then(function (envelope) {
-                    if (!envelope || !envelope.data) {
-                        return null;
-                    }
-                    var data = ensureDrillKpi(envelope.data);
-                    return data.totals || null;
-                })
-            );
-        }
-        return Promise.all(fetches).then(function (rows) {
+        years.forEach(function (year) {
+            for (var month = 1; month <= 12; month += 1) {
+                var ym = year + '-' + String(month).padStart(2, '0');
+                fetches.push(
+                    fetchWarehouseMonth(type, ym).then(function (envelope) {
+                        if (!envelope || !envelope.data) {
+                            return null;
+                        }
+                        var data = ensureDrillKpi(envelope.data);
+                        return data.totals || null;
+                    })
+                );
+            }
+        });
+
+        return Promise.all(fetches).then(function (flat) {
+            var byYear = {};
+            years.forEach(function (year, yearIdx) {
+                byYear[year] = flat.slice(yearIdx * 12, yearIdx * 12 + 12);
+            });
             return {
                 labels: MONTH_LABELS.slice(),
-                months: months,
-                rows: rows
+                years: years,
+                byYear: byYear
             };
         });
     }
 
     /**
-     * @param {{labels: string[], rows: Array<Object|null>}} series
-     * @param {number} year
+     * Подмешивает totals выбранного месяца (live/текущий payload) в серию.
+     *
+     * @param {{byYear: Object.<number, Array<Object|null>>}} series
+     * @param {string} periodYm
+     * @param {Object|null} totals
      * @returns {void}
      */
-    function renderYearCharts(series, year) {
-        var hint = el('drill-charts-hint');
-        var filled = (series.rows || []).filter(Boolean).length;
-        if (hint) {
-            hint.textContent = 'Год ' + year +
-                ': месяцев с drill в warehouse — ' + filled + ' из 12.';
+    function mergeCurrentMonthIntoSeries(series, periodYm, totals) {
+        if (!series || !totals || !/^\d{4}-\d{2}$/.test(periodYm)) {
+            return;
         }
+        var year = Number(periodYm.slice(0, 4));
+        var monthIdx = Number(periodYm.slice(5, 7)) - 1;
+        if (!series.byYear[year] || monthIdx < 0 || monthIdx > 11) {
+            return;
+        }
+        series.byYear[year][monthIdx] = totals;
+    }
 
-        var reg = [];
-        var revenue = [];
-        (series.rows || []).forEach(function (row) {
-            if (!row) {
-                reg.push(null);
-                revenue.push(null);
-                return;
+    /**
+     * Overlay-графики: каждый год — линия, ось X — месяцы.
+     *
+     * @param {{labels: string[], years: number[], byYear: Object.<number, Array<Object|null>>}} series
+     * @param {number} selectedYear
+     * @returns {void}
+     */
+    function renderMultiYearCharts(series, selectedYear) {
+        var hint = el('drill-charts-hint');
+        var filledMonths = 0;
+        var yearsWithData = 0;
+        (series.years || []).forEach(function (year) {
+            var rows = series.byYear[year] || [];
+            var n = rows.filter(Boolean).length;
+            filledMonths += n;
+            if (n > 0) {
+                yearsWithData += 1;
             }
-            reg.push(row.reg_count != null ? Number(row.reg_count) : null);
-            revenue.push(row.revenue != null ? Number(row.revenue) : null);
         });
+        if (hint) {
+            hint.textContent =
+                'Наложение лет ' + (series.years[0] || '') + '–' +
+                (series.years[series.years.length - 1] || '') +
+                ': линий с данными — ' + yearsWithData +
+                ', точек — ' + filledMonths +
+                '. Выбранный год (' + selectedYear + ') выделен толще.';
+        }
 
         regChart = destroyChart(regChart);
         revenueChart = destroyChart(revenueChart);
@@ -468,49 +564,73 @@
             return;
         }
 
+        var regDatasets = [];
+        var revenueDatasets = [];
+
+        (series.years || []).forEach(function (year) {
+            var rows = series.byYear[year] || [];
+            var reg = [];
+            var revenue = [];
+            rows.forEach(function (row) {
+                if (!row) {
+                    reg.push(null);
+                    revenue.push(null);
+                    return;
+                }
+                reg.push(row.reg_count != null ? Number(row.reg_count) : null);
+                revenue.push(row.revenue != null ? Number(row.revenue) : null);
+            });
+
+            var isSelected = year === selectedYear;
+            var color = yearLineColor(year, selectedYear);
+            var common = {
+                label: String(year),
+                borderColor: color,
+                backgroundColor: 'transparent',
+                tension: 0.25,
+                spanGaps: false,
+                borderWidth: isSelected ? 3 : 1.5,
+                pointRadius: isSelected ? 3 : 2,
+                pointHoverRadius: 5,
+                order: isSelected ? 0 : 1
+            };
+            regDatasets.push(Object.assign({ data: reg }, common));
+            revenueDatasets.push(Object.assign({ data: revenue }, common));
+        });
+
+        var sharedOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
+            plugins: {
+                legend: { display: true, position: 'top' }
+            },
+            scales: {
+                y: { beginAtZero: true }
+            }
+        };
+
         regChart = new Chart(regCanvas, {
             type: 'line',
             data: {
                 labels: series.labels,
-                datasets: [{
-                    label: 'Регистрации 1 линии',
-                    data: reg,
-                    borderColor: '#2563eb',
-                    backgroundColor: 'rgba(37, 99, 235, 0.12)',
-                    tension: 0.25,
-                    spanGaps: false
-                }]
+                datasets: regDatasets
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: true }
-                },
-                scales: {
-                    y: { beginAtZero: true }
-                }
-            }
+            options: sharedOptions
         });
 
         revenueChart = new Chart(revCanvas, {
             type: 'line',
             data: {
                 labels: series.labels,
-                datasets: [{
-                    label: 'Выручка (чистый итог)',
-                    data: revenue,
-                    borderColor: '#059669',
-                    backgroundColor: 'rgba(5, 150, 105, 0.12)',
-                    tension: 0.25,
-                    spanGaps: false
-                }]
+                datasets: revenueDatasets
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
+            options: Object.assign({}, sharedOptions, {
                 plugins: {
-                    legend: { display: true },
+                    legend: { display: true, position: 'top' },
                     tooltip: {
                         callbacks: {
                             label: function (context) {
@@ -523,11 +643,28 @@
                             }
                         }
                     }
-                },
-                scales: {
-                    y: { beginAtZero: true }
                 }
+            })
+        });
+    }
+
+    /**
+     * Грузит и рисует multi-year overlay для корзины.
+     *
+     * @param {string} type
+     * @param {string} periodYm
+     * @returns {Promise<void>}
+     */
+    function loadAndRenderCharts(type, periodYm) {
+        var selectedYear = /^\d{4}-\d{2}$/.test(periodYm)
+            ? Number(periodYm.slice(0, 4))
+            : new Date().getFullYear();
+        var years = listChartYears(selectedYear);
+        return loadDrillMultiYearSeries(type, years).then(function (series) {
+            if (currentPayload && currentPayload.totals) {
+                mergeCurrentMonthIntoSeries(series, periodYm, currentPayload.totals);
             }
+            renderMultiYearCharts(series, selectedYear);
         });
     }
 
@@ -562,14 +699,7 @@
             var data = envelope.data;
             renderAll(data, 'Источник: warehouse · ' + (envelope.fetchedAt || params.period));
             setStatus('Готово (warehouse)');
-            var year = Number(params.period.slice(0, 4));
-            return loadDrillYearSeries(params.type, year).then(function (series) {
-                // Подмешиваем текущий месяц из уже загруженного payload
-                var monthIdx = Number(params.period.slice(5, 7)) - 1;
-                if (series.rows && currentPayload && currentPayload.totals) {
-                    series.rows[monthIdx] = currentPayload.totals;
-                }
-                renderYearCharts(series, year);
+            return loadAndRenderCharts(params.type, params.period).then(function () {
                 return true;
             });
         });
@@ -604,14 +734,7 @@
                 setStatus('Готово (API)');
 
                 if (params.periodType === 'month' && /^\d{4}-\d{2}$/.test(params.period)) {
-                    var year = Number(params.period.slice(0, 4));
-                    return loadDrillYearSeries(params.type, year).then(function (series) {
-                        var monthIdx = Number(params.period.slice(5, 7)) - 1;
-                        if (series.rows && currentPayload && currentPayload.totals) {
-                            series.rows[monthIdx] = currentPayload.totals;
-                        }
-                        renderYearCharts(series, year);
-                    });
+                    return loadAndRenderCharts(params.type, params.period);
                 }
             });
     }

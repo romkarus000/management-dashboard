@@ -228,6 +228,10 @@
     border-left: 4px solid #f97316;
 }
 
+.management-dashboard__kpi--overview:nth-child(4) {
+    border-left: 4px solid #0ea5e9;
+}
+
 .management-dashboard__kpi--earned {
     border-top: 3px solid #16a34a;
 }
@@ -362,6 +366,13 @@
     color: #5c6370;
 }
 
+.management-dashboard__bar {
+    height: 8px;
+    min-width: 2px;
+    border-radius: 4px;
+    background: #94a3b8;
+}
+
 .management-dashboard__btn:disabled {
     opacity: 0.55;
     cursor: not-allowed;
@@ -479,5 +490,122 @@ a.dashboard-home__card:hover {
 
 .dashboard-home__department--soon .dashboard-home__card-title {
     color: #5c6370;
+}
+
+/* Dev flow playbook */
+.dev-playbook {
+    margin: 0;
+    padding: 16px 16px 16px 36px;
+    background: #ffffff;
+    border: 1px solid #e3e8f0;
+    border-radius: 12px;
+}
+
+.dev-playbook li {
+    margin: 0 0 10px;
+    color: #1a1a2e;
+}
+
+.dev-playbook li:last-child {
+    margin-bottom: 0;
+}
+
+/* CRM marketing page extras */
+.crm-watch-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid #eef2f7;
+}
+
+.crm-watch-row:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+}
+
+.crm-watch-row:first-child {
+    padding-top: 0;
+}
+
+.crm-tone--danger { color: #b42318; }
+.crm-tone--warning { color: #b54708; }
+.crm-tone--success { color: #067647; }
+.crm-tone--neutral { color: #5c6370; }
+
+.crm-callout {
+    margin-bottom: 12px;
+    padding: 14px 16px;
+    background: #fff;
+    border: 1px solid #e3e8f0;
+    border-left: 4px solid #2563eb;
+    border-radius: 12px;
+    color: #5c6370;
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.crm-callout strong {
+    display: block;
+    margin-bottom: 4px;
+    color: #1a1a2e;
+}
+
+.crm-callout--warn {
+    border-left-color: #f97316;
+}
+
+/* Sales: контроль C2 */
+.sales-c2-control {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 8px;
+}
+
+.sales-c2-control__item {
+    display: grid;
+    grid-template-columns: minmax(160px, 1.4fr) minmax(72px, 0.6fr) minmax(72px, 0.6fr) minmax(140px, 1.4fr);
+    gap: 8px 12px;
+    align-items: baseline;
+    padding: 12px 14px;
+    background: #ffffff;
+    border: 1px solid #e3e8f0;
+    border-radius: 12px;
+    font-size: 13px;
+}
+
+.sales-c2-control__label {
+    color: #5c6370;
+}
+
+.sales-c2-control__value {
+    font-weight: 700;
+    font-size: 16px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.sales-c2-control__delta {
+    color: #8b93a1;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.sales-c2-control__extra {
+    color: #8b93a1;
+    font-size: 12px;
+}
+
+@media (max-width: 720px) {
+    .sales-c2-control__item {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .sales-c2-control__extra {
+        grid-column: 1 / -1;
+    }
 }
 

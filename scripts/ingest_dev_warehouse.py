@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
-"""HTTP ingest for warehouse JSON from n8n (dev.* + crm.* + sales.*).
+"""HTTP ingest for warehouse JSON from n8n (dev.* + crm.* + sales.* + bots.*).
 
 POST /ingest
   Authorization: Bearer <token>
   Body: {
     "asOf": "...",
-    "files": { "dev/...": {...}, "crm/...": {...}, "sales/...": {...} },
+    "files": { "dev/...": {...}, "crm/...": {...}, "sales/...": {...}, "bots/...": {...} },
     "manifestDevDatasets": { "dev.card": {...} },
-    "manifestCrmDatasets": { "crm.leading": {...} }
+    "manifestCrmDatasets": { "crm.leading": {...} },
+    "manifestBotsDatasets": { "bots.funnel": {...} }
   }
 
-Allowed paths: dev/**, crm/**, sales/**, manifest.json
+Allowed paths: dev/**, crm/**, sales/**, bots/**, manifest.json
 """
 from __future__ import annotations
 
@@ -26,7 +27,7 @@ TOKEN_PATH = Path(os.environ.get("MGMT_INGEST_TOKEN_FILE", "/etc/management-repo
 HOST = os.environ.get("MGMT_INGEST_HOST", "127.0.0.1")
 PORT = int(os.environ.get("MGMT_INGEST_PORT", "8791"))
 
-ALLOWED_PREFIXES = ("dev/", "crm/", "sales/")
+ALLOWED_PREFIXES = ("dev/", "crm/", "sales/", "bots/")
 
 
 def load_token() -> str:
@@ -120,6 +121,7 @@ class Handler(BaseHTTPRequestHandler):
         for key, prefix in (
             ("manifestDevDatasets", "dev."),
             ("manifestCrmDatasets", "crm."),
+            ("manifestBotsDatasets", "bots."),
             ("manifestDatasets", None),
         ):
             patch = payload.get(key)
@@ -144,7 +146,9 @@ class Handler(BaseHTTPRequestHandler):
                     if prefix is not None and not str(ds_id).startswith(prefix):
                         continue
                     if prefix is None and not (
-                        str(ds_id).startswith("dev.") or str(ds_id).startswith("crm.")
+                        str(ds_id).startswith("dev.")
+                        or str(ds_id).startswith("crm.")
+                        or str(ds_id).startswith("bots.")
                     ):
                         continue
                     prev = manifest["datasets"].get(ds_id) or {}

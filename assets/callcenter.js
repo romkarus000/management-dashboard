@@ -1,6 +1,6 @@
 /**
- * Отдел продаж: KPI из warehouse/sales/kpis/{YYYY-MM}.json
- * Канон: docs/sales-warehouse-contract.md + n8n-corp sales-c2-contract.md
+ * Колл-центр: KPI из warehouse/cc/kpis/{YYYY-MM}.json
+ * Канон: docs/cc-warehouse-contract.md
  */
 (function () {
     'use strict';
@@ -15,145 +15,53 @@
 
     var METRICS = [
         {
-            key: 'c2',
-            label: 'C2 в оплату',
-            hint: 'оплаты ÷ заявки (уник. продукт) · без line 33/53/65 · без spam',
+            key: 'qualification_rate',
+            label: '% квалификации',
+            hint: 'квал. в месяце ÷ первое касание КЦ в том же месяце',
             format: 'pct'
         },
         {
-            key: 'application_client_sublines',
-            label: 'Заявки (уникальный продукт)',
-            hint: 'пары клиент×курс · Σ distinct_users по subline · cat 15/19/45+ads',
-            format: 'num'
+            key: 'sla_first_call_avg_min',
+            label: 'SLA 1 звонка · среднее',
+            hint: 'исключены звонки в нерабочее время и возвращенные из ОП',
+            format: 'min'
         },
         {
-            key: 'application_users',
-            label: 'Заявки (уникальный клиент)',
-            hint: 'distinct user_id · created · cat 15/19/45+ads · −line 33/53 −spam',
-            format: 'num'
+            key: 'sla_first_call_median_min',
+            label: 'SLA 1 звонка · медиана',
+            hint: 'исключены звонки в нерабочее время и возвращенные из ОП',
+            format: 'min'
         },
         {
-            key: 'payments',
-            label: 'Оплаты',
-            hint: 'заказы · paid · cat 17/29 · status 20 · −line 33/53 −spam',
-            format: 'num'
-        },
-        {
-            key: 'payment_net_sum',
-            label: 'Чистый итог',
-            hint: 'сумма платежей · reports/main · −тег Тест · company remapping',
-            format: 'money'
-        },
-        {
-            key: 'avg_check',
-            label: 'Средний чек',
-            hint: 'чистый итог ÷ завершённые+оплаченные · reports/main',
-            format: 'money'
-        },
-        {
-            key: 'avg_check_dpo_course',
-            label: 'Средний чек ДПО+Курс',
-            hint: 'чистый итог (весь) ÷ оплаты (cat 17/29)',
-            format: 'money'
-        },
-        {
-            key: 'avg_check_dpo_course_cat',
-            label: 'Средний чек ДПО+Курс по категории',
-            hint: 'чистый итог заказов cat 17/29 ÷ оплаты',
-            format: 'money'
-        },
-        {
-            key: 'qual_leads_mop_day',
-            label: 'Квал. лидов на МОП / день',
-            hint: 'ср. (квал.лиды/МОП) по дням 1…N · N=сегодня в тек. месяце',
-            format: 'num'
-        },
-        {
-            key: 'sla_first_call',
-            label: 'SLA 1 звонка ОП · среднее',
-            hint: 'AVG рабочих мин · v2 + was_in_cc∅ · timeline · часы',
-            format: 'hours'
-        },
-        {
-            key: 'sla_first_call_median',
-            label: 'SLA 1 звонка ОП · медиана',
-            hint: 'MEDIAN рабочих мин · v2 + was_in_cc∅ · timeline · часы',
-            format: 'hours'
-        },
-        {
-            key: 'target_call_duration',
-            label: 'Длит. целевого звонка',
-            hint: 'скоро',
-            format: 'num'
-        },
-        {
-            key: 'target_tariff_share',
-            label: 'Доля целевых тарифов',
-            hint: 'в выручке МОПа · скоро',
+            key: 'dial_rate',
+            label: '% дозвона',
+            hint: 'скоро · этап «В работе КЦ»',
             format: 'pct'
-        },
-        {
-            key: 'lead_redistribution',
-            label: 'Перераспределение лидов',
-            hint: 'скоро',
-            format: 'pct'
-        },
-        {
-            key: 'ndz_share',
-            label: '% недозвона (НДЗ)',
-            hint: 'посл. 7 дней месяца · статус «не берет» + закрыто НДЗ/«Контакт не состоялся» ÷ V2 без «В работе КЦ»',
-            format: 'pct'
-        },
-        {
-            key: 'payroll',
-            label: 'ФОТ и подрядчики',
-            hint: 'скоро',
-            format: 'money'
-        },
-        {
-            key: 'service_costs',
-            label: 'Расходы на сервисы',
-            hint: 'скоро',
-            format: 'money'
-        },
-        {
-            key: 'dkr',
-            label: 'ДКР',
-            hint: 'скоро',
-            format: 'money'
-        },
-        {
-            key: 'headcount',
-            label: 'Людей',
-            hint: 'скоро',
-            format: 'num'
         }
     ];
 
     var VALUE_KEYS = [
-        'c2',
-        'c2_users',
-        'application_client_sublines',
-        'application_users',
-        'payment_users',
-        'applications',
-        'payments',
-        'payment_net_sum',
-        'completed_paid_count',
-        'avg_check',
-        'avg_check_dpo_course',
-        'payment_net_dpo_course',
-        'avg_check_dpo_course_cat',
-        'qual_leads_mop_day',
-        'sla_first_call',
-        'sla_first_call_median',
-        'ndz_share'
+        'qualification_rate',
+        'cc_touched',
+        'cc_qualified_same_month',
+        'sla_first_call_avg_min',
+        'sla_first_call_median_min',
+        'sla_orders_with_call',
+        'sla_p70_min',
+        'sla_p90_min',
+        'sla_within_5min',
+        'sla_within_15min',
+        'sla_within_1h',
+        'sla_src_order',
+        'sla_src_user',
+        'sla_src_unbound',
+        'dial_rate'
     ];
 
     var state = {
         year: 2026,
-        month: 8,
-        companyId: 3,
+        month: 9,
+        companyId: 0,
         companies: [{ id: 0, name: 'Все' }],
         availablePeriods: [],
         values: {},
@@ -201,8 +109,8 @@
         if (format === 'hours') {
             return (Math.round(n * 10) / 10).toLocaleString('ru-RU') + ' ч';
         }
-        if (format === 'money') {
-            return Math.round(n).toLocaleString('ru-RU') + ' ₽';
+        if (format === 'min') {
+            return (Math.round(n * 10) / 10).toLocaleString('ru-RU') + ' мин';
         }
         return Math.round(n).toLocaleString('ru-RU');
     }
@@ -217,6 +125,11 @@
             var dpp = (c - p) * 100;
             var sign = dpp > 0 ? '+' : '';
             return sign + (Math.round(dpp * 10) / 10).toLocaleString('ru-RU') + ' п.п.';
+        }
+        if (format === 'min' || format === 'hours') {
+            var d = c - p;
+            var s2 = d > 0 ? '+' : '';
+            return s2 + (Math.round(d * 10) / 10).toLocaleString('ru-RU') + (format === 'min' ? ' мин' : ' ч');
         }
         if (p === 0) return '—';
         var pct = (100 * (c - p)) / p;
@@ -246,7 +159,7 @@
             periodLabel() +
             ' · Компания: ' +
             companyLabel() +
-            ' · Данные: sales.kpis' +
+            ' · Данные: cc.kpis' +
             src;
     }
 
@@ -257,7 +170,7 @@
         METRICS.forEach(function (metric, idx) {
             var card = document.createElement('div');
             card.className = 'management-dashboard__kpi';
-            if (idx < 4) {
+            if (idx === 0) {
                 card.classList.add('management-dashboard__kpi--overview');
             }
 
@@ -271,47 +184,21 @@
 
             var hint = document.createElement('div');
             hint.className = 'management-dashboard__kpi-hint';
-            if (metric.key === 'application_client_sublines') {
+            if (metric.key === 'qualification_rate') {
                 hint.textContent =
-                    metric.hint +
-                    ' · заказов: ' +
-                    fmtValue(state.values.applications, 'num');
-            } else if (metric.key === 'application_users') {
-                hint.textContent =
-                    metric.hint +
-                    ' · заказов: ' +
-                    fmtValue(state.values.applications, 'num');
-            } else if (metric.key === 'payments') {
-                hint.textContent =
-                    metric.hint +
-                    ' · уник. клиентов: ' +
-                    fmtValue(state.values.payment_users, 'num');
-            } else if (metric.key === 'payment_net_sum') {
-                hint.textContent =
-                    metric.hint +
-                    ' · заказов (ср.чек): ' +
-                    fmtValue(state.values.completed_paid_count, 'num');
-            } else if (metric.key === 'avg_check_dpo_course') {
-                hint.textContent =
-                    fmtValue(state.values.payment_net_sum, 'money') +
+                    fmtValue(state.values.cc_qualified_same_month, 'num') +
                     ' ÷ ' +
-                    fmtValue(state.values.payments, 'num') +
+                    fmtValue(state.values.cc_touched, 'num') +
                     ' · ' +
                     metric.hint;
-            } else if (metric.key === 'avg_check_dpo_course_cat') {
+            } else if (
+                metric.key === 'sla_first_call_avg_min' ||
+                metric.key === 'sla_first_call_median_min'
+            ) {
                 hint.textContent =
-                    fmtValue(state.values.payment_net_dpo_course, 'money') +
-                    ' ÷ ' +
-                    fmtValue(state.values.payments, 'num') +
-                    ' · ' +
-                    metric.hint;
-            } else if (metric.key === 'c2') {
-                hint.textContent =
-                    fmtValue(state.values.payments, 'num') +
-                    ' ÷ ' +
-                    fmtValue(state.values.application_client_sublines, 'num') +
-                    ' · ' +
-                    metric.hint;
+                    metric.hint +
+                    ' · заказов со звонком: ' +
+                    fmtValue(state.values.sla_orders_with_call, 'num');
             } else {
                 hint.textContent = metric.hint;
             }
@@ -321,52 +208,37 @@
             card.appendChild(hint);
             grid.appendChild(card);
         });
-        renderC2Control();
+        renderQualControl();
+        renderSlaControl();
     }
 
-    function renderC2Control() {
-        var list = el('c2-control-list');
+    function renderQualControl() {
+        var list = el('qual-control-list');
         if (!list) return;
         var cur = state.values;
         var prev = state.previous;
         var rows = [
             {
-                label: 'Заявки (уникальный продукт)',
-                cur: cur.application_client_sublines,
-                prev: prev.application_client_sublines,
-                extra: 'заказов: ' + fmtValue(cur.applications, 'num')
+                label: 'Первое касание КЦ (знаменатель)',
+                cur: cur.cc_touched,
+                prev: prev.cc_touched,
+                extra: 'was_in_cc + cc_sla_first_touch_at в месяце'
             },
             {
-                label: 'Заявки (уникальный клиент)',
-                cur: cur.application_users,
-                prev: prev.application_users,
-                extra: 'заказов: ' + fmtValue(cur.applications, 'num')
+                label: 'Квалифицированы в том же месяце',
+                cur: cur.cc_qualified_same_month,
+                prev: prev.cc_qualified_same_month,
+                extra: 'из когорты · qualified_cc + cc_qualification_date'
             },
             {
-                label: 'Оплаты',
-                cur: cur.payments,
-                prev: prev.payments,
-                extra: 'уник. клиентов: ' + fmtValue(cur.payment_users, 'num')
-            },
-            {
-                label: 'C2 = оплаты ÷ уник. продукт',
-                cur: cur.c2,
-                prev: prev.c2,
+                label: '% квалификации',
+                cur: cur.qualification_rate,
+                prev: prev.qualification_rate,
                 format: 'pct',
                 extra:
-                    fmtValue(cur.payments, 'num') +
+                    fmtValue(cur.cc_qualified_same_month, 'num') +
                     ' / ' +
-                    fmtValue(cur.application_client_sublines, 'num')
-            },
-            {
-                label: 'C2 · уник. клиенты (сверка)',
-                cur: cur.c2_users,
-                prev: prev.c2_users,
-                format: 'pct',
-                extra:
-                    fmtValue(cur.payment_users, 'num') +
-                    ' / ' +
-                    fmtValue(cur.application_users, 'num')
+                    fmtValue(cur.cc_touched, 'num')
             }
         ];
         list.innerHTML = '';
@@ -383,6 +255,98 @@
                 '</span>' +
                 '<span class="sales-c2-control__delta">' +
                 fmtDelta(row.cur, row.prev, format) +
+                '</span>' +
+                '<span class="sales-c2-control__extra">' +
+                row.extra +
+                '</span>';
+            list.appendChild(li);
+        });
+    }
+
+    function renderSlaControl() {
+        var list = el('sla-control-list');
+        if (!list) return;
+        var cur = state.values;
+        var prev = state.previous;
+        var rows = [
+            {
+                label: 'Заказов со звонком КЦ',
+                cur: cur.sla_orders_with_call,
+                prev: prev.sla_orders_with_call,
+                extra: 'v2 · was_in_cc · без returned_from_op · 09:00–20:00'
+            },
+            {
+                label: 'Среднее',
+                cur: cur.sla_first_call_avg_min,
+                prev: prev.sla_first_call_avg_min,
+                format: 'min',
+                extra: 'минут до 1-го звонка dept=47'
+            },
+            {
+                label: 'Медиана (p50)',
+                cur: cur.sla_first_call_median_min,
+                prev: prev.sla_first_call_median_min,
+                format: 'min',
+                extra: 'p50'
+            },
+            {
+                label: 'p70',
+                cur: cur.sla_p70_min,
+                prev: prev.sla_p70_min,
+                format: 'min',
+                extra: 'деталка'
+            },
+            {
+                label: 'p90',
+                cur: cur.sla_p90_min,
+                prev: prev.sla_p90_min,
+                format: 'min',
+                extra: 'деталка'
+            },
+            {
+                label: '≤5 мин',
+                cur: cur.sla_within_5min,
+                prev: prev.sla_within_5min,
+                extra: 'деталка'
+            },
+            {
+                label: '≤15 мин',
+                cur: cur.sla_within_15min,
+                prev: prev.sla_within_15min,
+                extra: 'деталка'
+            },
+            {
+                label: '≤1 ч',
+                cur: cur.sla_within_1h,
+                prev: prev.sla_within_1h,
+                extra: 'деталка'
+            },
+            {
+                label: 'Источник: заказ / user / unbound',
+                cur: null,
+                prev: null,
+                extra:
+                    fmtValue(cur.sla_src_order, 'num') +
+                    ' / ' +
+                    fmtValue(cur.sla_src_user, 'num') +
+                    ' / ' +
+                    fmtValue(cur.sla_src_unbound, 'num')
+            }
+        ];
+        list.innerHTML = '';
+        rows.forEach(function (row) {
+            var li = document.createElement('li');
+            li.className = 'sales-c2-control__item';
+            var format = row.format || 'num';
+            li.innerHTML =
+                '<span class="sales-c2-control__label">' +
+                row.label +
+                '</span>' +
+                '<span class="sales-c2-control__value">' +
+                (row.cur == null && row.prev == null ? '—' : fmtValue(row.cur, format)) +
+                '</span>' +
+                '<span class="sales-c2-control__delta">' +
+                (row.cur == null ? '—' : fmtDelta(row.cur, row.prev, format)) +
                 '</span>' +
                 '<span class="sales-c2-control__extra">' +
                 row.extra +
@@ -482,30 +446,34 @@
     function rowToValues(row) {
         var out = emptyValues();
         if (!row) return out;
-        VALUE_KEYS.forEach(function (k) {
-            if (k === 'sla_first_call') {
-                out[k] = row.sla_first_call_hours == null ? null : Number(row.sla_first_call_hours);
-            } else if (k === 'sla_first_call_median') {
-                out[k] =
-                    row.sla_first_call_median_hours == null
-                        ? null
-                        : Number(row.sla_first_call_median_hours);
-            } else {
-                out[k] = row[k] == null ? null : Number(row[k]);
-            }
-        });
-        var pays = out.payments;
-        if (out.avg_check_dpo_course == null && out.payment_net_sum != null && pays != null && pays > 0) {
-            out.avg_check_dpo_course = out.payment_net_sum / pays;
-        }
+        out.cc_touched = row.cc_touched == null ? null : Number(row.cc_touched);
+        out.cc_qualified_same_month =
+            row.cc_qualified_same_month == null ? null : Number(row.cc_qualified_same_month);
+        out.qualification_rate =
+            row.qualification_rate == null ? null : Number(row.qualification_rate);
         if (
-            out.avg_check_dpo_course_cat == null &&
-            out.payment_net_dpo_course != null &&
-            pays != null &&
-            pays > 0
+            out.qualification_rate == null &&
+            out.cc_touched != null &&
+            out.cc_touched > 0 &&
+            out.cc_qualified_same_month != null
         ) {
-            out.avg_check_dpo_course_cat = out.payment_net_dpo_course / pays;
+            out.qualification_rate = out.cc_qualified_same_month / out.cc_touched;
         }
+        out.sla_first_call_avg_min =
+            row.sla_first_call_avg_min == null ? null : Number(row.sla_first_call_avg_min);
+        out.sla_first_call_median_min =
+            row.sla_first_call_median_min == null ? null : Number(row.sla_first_call_median_min);
+        out.sla_orders_with_call =
+            row.sla_orders_with_call == null ? null : Number(row.sla_orders_with_call);
+        out.sla_p70_min = row.sla_p70_min == null ? null : Number(row.sla_p70_min);
+        out.sla_p90_min = row.sla_p90_min == null ? null : Number(row.sla_p90_min);
+        out.sla_within_5min = row.sla_within_5min == null ? null : Number(row.sla_within_5min);
+        out.sla_within_15min = row.sla_within_15min == null ? null : Number(row.sla_within_15min);
+        out.sla_within_1h = row.sla_within_1h == null ? null : Number(row.sla_within_1h);
+        out.sla_src_order = row.sla_src_order == null ? null : Number(row.sla_src_order);
+        out.sla_src_user = row.sla_src_user == null ? null : Number(row.sla_src_user);
+        out.sla_src_unbound = row.sla_src_unbound == null ? null : Number(row.sla_src_unbound);
+        out.dial_rate = row.dial_rate == null ? null : Number(row.dial_rate);
         return out;
     }
 
@@ -516,7 +484,6 @@
             var ctype = (res.headers.get('content-type') || '').toLowerCase();
             return res.text().then(function (text) {
                 var trimmed = (text || '').trim();
-                // Нет файла: nginx/SPA отдаёт HTML 200 вместо 404.
                 if (!trimmed || trimmed.charAt(0) === '<') return null;
                 if (ctype && ctype.indexOf('json') === -1 && trimmed.charAt(0) !== '{' && trimmed.charAt(0) !== '[') {
                     return null;
@@ -531,7 +498,7 @@
     }
 
     function loadPeriodFile(ym) {
-        return fetchJson(WAREHOUSE_BASE + '/sales/kpis/' + ym + '.json');
+        return fetchJson(WAREHOUSE_BASE + '/cc/kpis/' + ym + '.json');
     }
 
     function loadMetrics() {
@@ -546,13 +513,12 @@
                 state.values = emptyValues();
                 state.previous = emptyValues();
                 state.meta = null;
-                throw new Error('Нет sales.kpis для ' + curYm + ' — запусти sync-sales-warehouse.mjs');
+                throw new Error('Нет cc.kpis для ' + curYm + ' — запусти sync-cc-warehouse.mjs');
             }
             var curRow = pickCompanyRow(curFile.data && curFile.data.byCompany, state.companyId);
             var prevRow = prevFile
                 ? pickCompanyRow(prevFile.data && prevFile.data.byCompany, state.companyId)
                 : null;
-            // Если выбранной компании нет в срезе — явно пусто, не подменяем «Все»
             if (
                 state.companyId !== 0 &&
                 curFile.data &&
@@ -582,7 +548,7 @@
                 renderKpis();
                 renderTable();
                 if (state.meta && state.meta.missingCompany) {
-                    setStatus('Для этой компании среза нет (есть 0/Академия) — пересинхронизируй', true);
+                    setStatus('Для этой компании среза нет', true);
                 } else {
                     setStatus('Готово · ' + periodLabel());
                 }
@@ -605,7 +571,7 @@
 
     function loadManifestPeriods() {
         return fetchJson(MANIFEST_URL).then(function (man) {
-            var ds = man && man.datasets && man.datasets['sales.kpis'];
+            var ds = man && man.datasets && man.datasets['cc.kpis'];
             if (ds && ds.periods) {
                 state.availablePeriods = Object.keys(ds.periods).sort();
                 if (state.availablePeriods.length) {
